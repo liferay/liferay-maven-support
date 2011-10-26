@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+
+<archetype-descriptor name="liferay-servicebuilder-archetype">
+	<fileSets>
+		<fileSet encoding="UTF-8" filtered="true">
+			<directory>__artifactId__-service</directory>
+		</fileSet>
+		<fileSet encoding="UTF-8" filtered="true">
+			<directory>__artifactId__-portlet</directory>
+		</fileSet>
+	</fileSets>
+</archetype-descriptor>

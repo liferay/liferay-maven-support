@@ -1,0 +1,121 @@
+<?xml version="1.0"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.liferay.maven</groupId>
+	<artifactId>maven-support</artifactId>
+	<packaging>pom</packaging>
+	<name>Liferay Maven 2 Support</name>
+	<version>6.1.0-SNAPSHOT</version>
+	<description>Parent project to support Maven 2 subprojects.</description>
+	<url>http://www.liferay.com</url>
+	<developers>
+		<developer>
+			<id>brian.chan</id>
+			<name>Brian Chan</name>
+		</developer>
+		<developer>
+			<id>mika.koivisto</id>
+			<name>Mika Koivisto</name>
+		</developer>
+		<developer>
+			<id>thiago.moreira</id>
+			<name>Thiago Moreira</name>
+		</developer>
+	</developers>
+	<licenses>
+		<license>
+			<name>GNU Lesser General Public License</name>
+			<url>http://www.gnu.org/licenses/lgpl-2.1.html</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<scm>
+		<connection>scm:svn:svn://svn.liferay.com/repos/public/portal/trunk/support-maven</connection>
+		<url>http://guest:guest@svn.liferay.com/repos/public/portal/trunk/support-maven</url>
+	</scm>
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.5</source>
+					<target>1.5</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>sign-artifacts</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-javadoc-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+	<modules>
+		<module>archetypes</module>
+		<module>plugins</module>
+	</modules>
+	<repositories>
+		<repository>
+			<id>jboss-release</id>
+			<name>JBoss Repository</name>
+			<url>http://repository.jboss.org/maven2</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>sonatype-release</id>
+			<name>Sonatype Repository</name>
+			<url>http://oss.sonatype.org/content/groups/public</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>sonatype-release</id>
+			<name>Sonatype Repository</name>
+			<url>http://oss.sonatype.org/content/groups/public</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
+	<distributionManagement>
+		<repository>
+			<id>sonatype-staging</id>
+			<name>Sonatype Staging Repository</name>
+			<url>http://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+		</repository>
+		<snapshotRepository>
+			<id>sonatype-snapshot</id>
+			<name>Sonatype Snapshot Repository</name>
+			<url>http://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
+	<properties>
+		<liferay.version>6.1.0-SNAPSHOT</liferay.version>
+		<maven.version>2.0.10</maven.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+</project>
