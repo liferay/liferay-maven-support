@@ -109,36 +109,38 @@ public class ExtBuilderMojo extends AbstractMojo {
 
 			Artifact artifact = resolveArtifact(dependency);
 
-			if (artifact.getArtifactId().endsWith("ext-impl")) {
+			String artifactId = artifact.getArtifactId();
+
+			if (artifactId.endsWith("ext-impl")) {
 				extImplFile = artifact.getFile();
 
 				copyJarAndClasses(artifact, implDir, "ext-impl.jar");
 			}
-			else if (artifact.getArtifactId().endsWith("ext-lib-global")) {
+			else if (artifactId.endsWith("ext-lib-global")) {
 				copyLibraryDependencies(globalLibDir, artifact);
 			}
-			else if (artifact.getArtifactId().endsWith("ext-lib-portal")) {
+			else if (artifactId.endsWith("ext-lib-portal")) {
 				copyLibraryDependencies(portalLibDir, artifact);
 			}
-			else if (artifact.getArtifactId().endsWith("ext-service")) {
+			else if (artifactId.endsWith("ext-service")) {
 				copyJarAndClasses(artifact, serviceDir, "ext-service.jar");
 			}
-			else if (artifact.getArtifactId().endsWith("ext-util-bridges")) {
+			else if (artifactId.endsWith("ext-util-bridges")) {
 				copyUtilLibrary(
 					artifact, utilBridgesDir, implClassesDir,
 					"util-bridges.jar");
 			}
-			else if (artifact.getArtifactId().endsWith("ext-util-java")) {
+			else if (artifactId.endsWith("ext-util-java")) {
 				copyUtilLibrary(
 					artifact, utilJavaDir, implClassesDir,
 					"util-java.jar");
 			}
-			else if (artifact.getArtifactId().endsWith("ext-util-taglib")) {
+			else if (artifactId.endsWith("ext-util-taglib")) {
 				copyUtilLibrary(
 					artifact, utilTaglibDir, implClassesDir,
 					"util-taglib.jar");
 			}
-			else if (artifact.getArtifactId().endsWith("ext-web")) {
+			else if (artifactId.endsWith("ext-web")) {
 				String[] excludes = new String[] {"META-INF/**"};
 
 				unpack(artifact.getFile(), webDir, excludes, null);
@@ -188,10 +190,17 @@ public class ExtBuilderMojo extends AbstractMojo {
 		List<Dependency> dependencies = libProject.getDependencies();
 
 		for (Dependency dependency : dependencies) {
-			if (dependency.getScope().equalsIgnoreCase("provided") ||
-				dependency.getScope().equalsIgnoreCase("test") ||
-				dependency.getType().equalsIgnoreCase("pom")) {
+			String scope = dependency.getScope();
 
+			if (scope.equalsIgnoreCase("provided") ||
+				scope.equalsIgnoreCase("test")) {
+
+				continue;
+			}
+
+			String type = dependency.getType();
+
+			if (type.equalsIgnoreCase("pom")) {
 				continue;
 			}
 
