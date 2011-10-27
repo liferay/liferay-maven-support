@@ -22,7 +22,7 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-plugin-plugin</artifactId>
-				<version>2.3</version>
+				<version>2.9</version>
 				<configuration>
 					<goalPrefix>liferay</goalPrefix>
 				</configuration>
@@ -210,6 +210,11 @@
 			<groupId>org.apache.tika</groupId>
 			<artifactId>tika-core</artifactId>
 			<version>0.8</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>tomcat-jdbc</artifactId>
+			<version>7.0.22</version>
 		</dependency>
 		<dependency>
 			<groupId>org.codehaus.plexus</groupId>

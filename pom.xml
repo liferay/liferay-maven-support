@@ -31,32 +31,29 @@
 		</license>
 	</licenses>
 	<scm>
-		<connection>scm:svn:svn://svn.liferay.com/repos/public/portal/trunk/support-maven</connection>
-		<url>http://guest:guest@svn.liferay.com/repos/public/portal/trunk/support-maven</url>
+		<connection>scm:git:git@github.com:liferay/liferay-maven-support.git</connection>
+		<url>https://github.com/liferay/liferay-maven-support</url>
 	</scm>
 	<build>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
 				<configuration>
 					<source>1.5</source>
 					<target>1.5</target>
 				</configuration>
 			</plugin>
 			<plugin>
-				<artifactId>maven-gpg-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>sign-artifacts</id>
-						<phase>verify</phase>
-						<goals>
-							<goal>sign</goal>
-						</goals>
-					</execution>
-				</executions>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.8</version>
 			</plugin>
 			<plugin>
-				<artifactId>maven-javadoc-plugin</artifactId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.5</version>
+				<configuration>
+					<encoding>UTF-8</encoding>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
@@ -68,7 +65,7 @@
 		<repository>
 			<id>jboss-release</id>
 			<name>JBoss Repository</name>
-			<url>http://repository.jboss.org/maven2</url>
+			<url>http://repository.jboss.org/nexus/content/groups/public</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
@@ -84,7 +81,7 @@
 				<enabled>true</enabled>
 			</releases>
 			<snapshots>
-				<enabled>true</enabled>
+				<enabled>false</enabled>
 			</snapshots>
 		</repository>
 	</repositories>
@@ -97,7 +94,7 @@
 				<enabled>true</enabled>
 			</releases>
 			<snapshots>
-				<enabled>true</enabled>
+				<enabled>false</enabled>
 			</snapshots>
 		</pluginRepository>
 	</pluginRepositories>
@@ -113,6 +110,28 @@
 			<url>http://oss.sonatype.org/content/repositories/snapshots</url>
 		</snapshotRepository>
 	</distributionManagement>
+	<profiles>
+		<profile>
+			<id>release</id>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>1.4</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 	<properties>
 		<liferay.version>6.1.0-SNAPSHOT</liferay.version>
 		<maven.version>2.0.10</maven.version>
