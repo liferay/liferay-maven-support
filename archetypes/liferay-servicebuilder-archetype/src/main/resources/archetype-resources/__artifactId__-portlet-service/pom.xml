@@ -9,9 +9,9 @@
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>${groupId}</groupId>
-	<artifactId>${artifactId}-service</artifactId>
+	<artifactId>${artifactId}-portlet-service</artifactId>
 	<packaging>jar</packaging>
-	<name>${artifactId} Service</name>
+	<name>${artifactId} Portlet Service</name>
 	<version>1.0-SNAPSHOT</version>
 	<dependencies>
 		<dependency>

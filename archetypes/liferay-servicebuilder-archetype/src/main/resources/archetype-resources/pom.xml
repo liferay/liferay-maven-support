@@ -40,6 +40,6 @@
 	</properties>
 	<modules>
 		<module>${artifactId}-portlet</module>
-		<module>${artifactId}-service</module>
+		<module>${artifactId}-portlet-service</module>
 	</modules>
 </project>
