@@ -16,6 +16,8 @@
 				<configuration>
 					<autoDeployDir>${liferay.auto.deploy.dir}</autoDeployDir>
 					<liferayVersion>${liferay.version}</liferayVersion>
+					<pluginName>${artifactId}-portlet</pluginName>
+					<pluginType>portlet</pluginType>
 				</configuration>
 			</plugin>
 			<plugin>

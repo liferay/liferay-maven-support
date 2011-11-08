@@ -20,8 +20,7 @@
 				<artifactId>liferay-maven-plugin</artifactId>
 				<version>${liferay.version}</version>
 				<configuration>
-					<apiDir>${basedir}/../${artifactId}-portlet-service/src/main/java</apiDir>
-					<pluginType>portlet</pluginType>
+					<apiBaseDir>${basedir}/../${artifactId}-portlet-service</apiBaseDir>
 				</configuration>
 			</plugin>
 		</plugins>

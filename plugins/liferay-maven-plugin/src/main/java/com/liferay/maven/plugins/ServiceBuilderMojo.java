@@ -17,6 +17,7 @@ package com.liferay.maven.plugins;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.tools.servicebuilder.ServiceBuilder;
 import com.liferay.portal.util.InitUtil;
 import com.liferay.portal.util.PropsUtil;
@@ -48,7 +49,6 @@ import org.apache.maven.shared.invoker.MavenCommandLineBuilder;
  * @author Mika Koivisto
  * @author Thiago Moreira
  * @goal   build-service
- * @phase  generate-sources
  */
 public class ServiceBuilderMojo extends AbstractMojo {
 
@@ -59,13 +59,19 @@ public class ServiceBuilderMojo extends AbstractMojo {
 			doExecute();
 		}
 		catch (Exception e) {
-			throw new MojoExecutionException(e.getMessage(), e);
+			if (e instanceof MojoExecutionException) {
+				throw (MojoExecutionException)e;
+			}
+			else {
+				throw new MojoExecutionException(
+					"Unable to execute Service Builder: " + e.getMessage(), e);
+			}
 		}
 	}
 
 	protected void copyServicePropertiesFile() throws Exception {
 		File servicePropertiesFile = new File(
-			resourcesDir, "service.properties");
+			implResourcesDir, "service.properties");
 
 		if (servicePropertiesFile.exists()) {
 			FileUtil.copyFile(
@@ -74,12 +80,14 @@ public class ServiceBuilderMojo extends AbstractMojo {
 	}
 
 	protected void doExecute() throws Exception {
+		initProperties();
+
 		File inputFile = new File(serviceFileName);
 
 		if (!inputFile.exists()) {
-			getLog().warn(inputFile.getAbsolutePath() + " does not exist");
-
-			return;
+			throw new MojoExecutionException(
+				"Unable to find service.xml with path: " +
+				inputFile.getAbsolutePath());
 		}
 
 		getLog().info("Building from " + serviceFileName);
@@ -97,13 +105,6 @@ public class ServiceBuilderMojo extends AbstractMojo {
 		File tempServiceFile = null;
 
 		if (pluginType.equals("ext")) {
-			pluginName = null;
-			springBaseFileName = null;
-			springDynamicDataSourceFileName = null;
-			springHibernateFileName = null;
-			springInfrastructureFileName = null;
-			springShardDataSourceFileName = null;
-
 			if (serviceFileName.contains("/main/resources/")) {
 				File serviceFile = new File(serviceFileName);
 
@@ -117,7 +118,7 @@ public class ServiceBuilderMojo extends AbstractMojo {
 
 		new ServiceBuilder(
 			serviceFileName, hbmFileName, ormFileName, modelHintsFileName,
-			springFileName, springBaseFileName, null,
+			springFileName, springBaseFileName, springClusterFileName,
 			springDynamicDataSourceFileName, springHibernateFileName,
 			springInfrastructureFileName, springShardDataSourceFileName,
 			apiDir, implDir, jsonFileName, remotingFileName, sqlDir,
@@ -157,10 +158,217 @@ public class ServiceBuilderMojo extends AbstractMojo {
 		}
 	}
 
+	protected void initProperties() {
+		if (Validator.isNotNull(apiBaseDir) ||
+			Validator.isNotNull(implBaseDir) ||
+			Validator.isNotNull(webappBaseDir)) {
+
+			if (Validator.isNull(apiBaseDir)) {
+				apiBaseDir = baseDir;
+			}
+
+			if (Validator.isNull(implBaseDir) &&
+				Validator.isNotNull(webappBaseDir)) {
+
+				implBaseDir = webappBaseDir;
+			}
+			else if (Validator.isNull(implBaseDir) &&
+					Validator.isNotNull(apiBaseDir)) {
+
+				implBaseDir = baseDir;
+			}
+
+			if (Validator.isNull(webappBaseDir) &&
+				Validator.isNotNull(implBaseDir)) {
+
+				webappBaseDir = implBaseDir;
+			}
+			else if (Validator.isNull(webappBaseDir) &&
+					Validator.isNotNull(apiBaseDir)) {
+
+				webappBaseDir = baseDir;
+			}
+		}
+
+		if (Validator.isNotNull(apiBaseDir)) {
+			apiDir = apiBaseDir.concat("/src/main/java");
+		}
+
+		if (Validator.isNotNull(implBaseDir)) {
+			implDir = implBaseDir.concat("/src/main/java");
+			implResourcesDir = implBaseDir.concat("/src/main/resources");
+
+			if (pluginType.equals("ext")) {
+				hbmFileName = implResourcesDir.concat("/META-INF/ext-hbm.xml");
+				ormFileName = implResourcesDir.concat("/META-INF/ext-orm.xml");
+				modelHintsFileName = implResourcesDir.concat(
+					"/META-INF/ext-model-hints.xml");
+				springFileName = implResourcesDir.concat(
+					"/META-INF/ext-spring.xml");
+			}
+		}
+
+		if (Validator.isNotNull(webappBaseDir)) {
+			String webappDir = webappBaseDir.concat("/src/main/webapp");
+			String webappResourcesDir = webappBaseDir.concat(
+				"/src/main/resources");
+
+			if (pluginType.equals("ext")) {
+				jsonFileName = webappDir.concat("/html/js/liferay/service.js");
+				remotingFileName = webappDir.concat(
+					"/WEB-INF/remoting-servlet-ext.xml");
+			}
+			else {
+				hbmFileName = webappResourcesDir.concat(
+					"/META-INF/portlet-hbm.xml");
+				jsonFileName = webappDir.concat("/js/service.js");
+				ormFileName = webappResourcesDir.concat(
+					"/META-INF/portlet-orm.xml");
+				modelHintsFileName = webappResourcesDir.concat(
+					"/META-INF/portlet-model-hints.xml");
+				serviceFileName = webappDir.concat("/WEB-INF/service.xml");
+				springBaseFileName = webappResourcesDir.concat(
+					"/META-INF/base-spring.xml");
+				springClusterFileName = webappResourcesDir.concat(
+					"/META-INF/cluster-spring.xml");
+				springDynamicDataSourceFileName = webappResourcesDir.concat(
+					"/META-INF/dynamic-data-source-spring.xml");
+				springFileName = webappResourcesDir.concat(
+					"/META-INF/portlet-spring.xml");
+				springHibernateFileName = webappResourcesDir.concat(
+					"/META-INF/hibernate-spring.xml");
+				springInfrastructureFileName = webappResourcesDir.concat(
+					"/META-INF/infrastructure-spring.xml");
+				springShardDataSourceFileName = webappResourcesDir.concat(
+					"/META-INF/shard-data-source-spring.xml");
+				sqlDir = webappDir.concat("/WEB-INF/sql");
+
+				if (Validator.isNull(serviceFileName)) {
+					serviceFileName = webappDir.concat("/WEB-INF/service.xml");
+				}
+			}
+		}
+
+		if (Validator.isNull(sqlDir)) {
+			sqlDir = baseDir.concat("/src/main/webapp/WEB-INF/sql");
+		}
+
+		if (pluginType.equals("ext")) {
+			if (Validator.isNull(beanLocatorUtil)) {
+				beanLocatorUtil =
+					"com.liferay.portal.kernel.bean.PortalBeanLocatorUtil";
+			}
+
+			if (Validator.isNull(propsUtil)) {
+				propsUtil = "com.liferay.portal.util.PropsUtil";
+			}
+
+			if (Validator.isNull(sqlFileName)) {
+				sqlFileName = "portal-tables.sql";
+			}
+
+			pluginName = null;
+			springBaseFileName = null;
+			springClusterFileName = null;
+			springDynamicDataSourceFileName = null;
+			springHibernateFileName = null;
+			springInfrastructureFileName = null;
+			springShardDataSourceFileName = null;
+		}
+		else {
+			String webappDir = baseDir.concat("/src/main/webapp");
+			String webappResourcesDir = baseDir.concat("/src/main/resources");
+
+			if (Validator.isNull(beanLocatorUtil)) {
+				beanLocatorUtil =
+					"com.liferay.util.bean.PortletBeanLocatorUtil";
+			}
+
+			if (Validator.isNull(hbmFileName)) {
+				hbmFileName = webappResourcesDir.concat(
+					"/META-INF/portlet-hbm.xml");
+			}
+
+			if (Validator.isNull(implDir)) {
+				implDir = baseDir.concat("/src/main/java");
+				implResourcesDir = baseDir.concat("/src/main/resources");
+			}
+
+			if (Validator.isNull(jsonFileName)) {
+				jsonFileName = webappDir.concat("/js/service.js");
+			}
+
+			if (Validator.isNull(modelHintsFileName)) {
+				modelHintsFileName = webappResourcesDir.concat(
+					"/META-INF/portlet-model-hints.xml");
+			}
+
+			if (Validator.isNull(ormFileName)) {
+				ormFileName = webappResourcesDir.concat(
+					"/META-INF/portlet-orm.xml");
+			}
+
+			if (Validator.isNull(propsUtil)) {
+				propsUtil = "com.liferay.util.service.ServiceProps";
+			}
+
+			if (Validator.isNull(serviceFileName)) {
+				serviceFileName = webappDir.concat("/WEB-INF/service.xml");
+			}
+
+			if (Validator.isNull(springBaseFileName)) {
+				springBaseFileName = webappResourcesDir.concat(
+					"/META-INF/base-spring.xml");
+			}
+
+			if (Validator.isNull(springClusterFileName)) {
+				springClusterFileName = webappResourcesDir.concat(
+					"/META-INF/cluster-spring.xml");
+			}
+
+			if (Validator.isNull(springDynamicDataSourceFileName)) {
+				springDynamicDataSourceFileName = webappResourcesDir.concat(
+					"/META-INF/dynamic-data-source-spring.xml");
+			}
+
+			if (Validator.isNull(springFileName)) {
+				springFileName = webappResourcesDir.concat(
+					"/META-INF/portlet-spring.xml");
+			}
+
+			if (Validator.isNull(springHibernateFileName)) {
+				springHibernateFileName = webappResourcesDir.concat(
+					"/META-INF/hibernate-spring.xml");
+			}
+
+			if (Validator.isNull(springInfrastructureFileName)) {
+				springInfrastructureFileName = webappResourcesDir.concat(
+					"/META-INF/infrastructure-spring.xml");
+			}
+
+			if (Validator.isNull(springShardDataSourceFileName)) {
+				springShardDataSourceFileName = webappResourcesDir.concat(
+					"/META-INF/shard-data-source-spring.xml");
+			}
+
+			if (Validator.isNull(sqlFileName)) {
+				sqlFileName = "tables.sql";
+			}
+		}
+	}
+
+	/**
+	 * @deprecated 
+	 * @since 6.1.0
+	 */
 	protected void invokeDependencyBuild() throws Exception {
 		if (!postBuildDependencyModules) {
 			return;
 		}
+
+		getLog().warn(
+			"Invoker is no longer supported by Maven 3 and this will be " +
+			"removed in future builds.");
 
 		List<Dependency> dependencies = new ArrayList<Dependency>();
 
@@ -229,13 +437,17 @@ public class ServiceBuilderMojo extends AbstractMojo {
 		if (servicePropertiesFile.exists()) {
 			FileUtil.move(
 				servicePropertiesFile,
-				new File(resourcesDir, "service.properties"));
+				new File(implResourcesDir, "service.properties"));
 		}
 	}
 
 	/**
-	 * @parameter default-value="${basedir}/src/main/java"
-	 * @required
+	 * @parameter
+	 */
+	private String apiBaseDir;
+
+	/**
+	 * @parameter
 	 */
 	private String apiDir;
 
@@ -246,22 +458,35 @@ public class ServiceBuilderMojo extends AbstractMojo {
 	private boolean autoNamespaceTables;
 
 	/**
-	 * @parameter default-value="com.liferay.util.bean.PortletBeanLocatorUtil"
+	 * @parameter default-value="${basedir}"
 	 * @required
+	 */
+	private String baseDir;
+
+	/**
+	 * @parameter
 	 */
 	private String beanLocatorUtil;
 
 	/**
-	 * @parameter default-value="${basedir}/src/main/resources/META-INF/portlet-hbm.xml"
-	 * @required
+	 * @parameter
 	 */
 	private String hbmFileName;
 
 	/**
-	 * @parameter default-value="${basedir}/src/main/java"
-	 * @required
+	 * @parameter
+	 */
+	private String implBaseDir;
+
+	/**
+	 * @parameter
 	 */
 	private String implDir;
+
+	/**
+	 * @parameter
+	 */
+	private String implResourcesDir;
 
 	/**
 	 * @component
@@ -269,25 +494,22 @@ public class ServiceBuilderMojo extends AbstractMojo {
 	private Invoker invoker;
 
 	/**
-	 * @parameter default-value="${basedir}/src/main/webapp/html/js/liferay/service.js"
-	 * @required
+	 * @parameter
 	 */
 	private String jsonFileName;
 
 	/**
-	 * @parameter default-value="${basedir}/src/main/resources/META-INF/portlet-model-hints.xml"
-	 * @required
+	 * @parameter
 	 */
 	private String modelHintsFileName;
 
 	/**
-	 * @parameter default-value="${basedir}/src/main/resources/META-INF/portlet-orm.xml"
-	 * @required
+	 * @parameter
 	 */
 	private String ormFileName;
 
 	/**
-	 * @parameter expression="${project.artifactId}"
+	 * @parameter default-value="${project.artifactId}" expression="${pluginName}"
 	 * @required
 	 */
 	private String pluginName;
@@ -299,13 +521,16 @@ public class ServiceBuilderMojo extends AbstractMojo {
 	private String pluginType;
 
 	/**
-	 * @parameter default-value="true" expression="${postBuildDependencyModules}"
-	 * @required
+	 * @deprecated
+	 * @parameter default-value="false" expression="${postBuildDependencyModules}"
+	 * @since 6.1.0
 	 */
 	private boolean postBuildDependencyModules;
 
 	/**
+	 * @deprecated
 	 * @parameter
+	 * @since 6.1.0
 	 */
 	private List<String> postBuildGoals;
 
@@ -317,73 +542,62 @@ public class ServiceBuilderMojo extends AbstractMojo {
 	private MavenProject project;
 
 	/**
-	 * @parameter default-value="com.liferay.util.service.ServiceProps"
-	 * @required
+	 * @parameter
 	 */
 	private String propsUtil;
 
 	/**
-	 * @parameter default-value=""
+	 * @parameter
 	 */
 	private String remotingFileName;
 
 	/**
-	 * @parameter default-value="${basedir}/src/main/resources"
-	 * @required
-	 */
-	private String resourcesDir;
-
-	/**
-	 * @parameter default-value="${basedir}/src/main/webapp/WEB-INF/service.xml" expression="${serviceFileName}"
-	 * @required
+	 * @parameter default-value="" expression="${serviceFileName}"
 	 */
 	private String serviceFileName;
 
 	/**
-	 * @parameter default-value="${basedir}/src/main/resources/META-INF/base-spring.xml"
-	 * @required
+	 * @parameter
 	 */
 	private String springBaseFileName;
 
 	/**
-	 * @parameter default-value="${basedir}/src/main/resources/META-INF/dynamic-data-source-spring.xml"
-	 * @required
+	 * @parameter
+	 */
+	private String springClusterFileName;
+
+	/**
+	 * @parameter
 	 */
 	private String springDynamicDataSourceFileName;
 
 	/**
-	 * @parameter default-value="${basedir}/src/main/resources/META-INF/portlet-spring.xml"
-	 * @required
+	 * @parameter
 	 */
 	private String springFileName;
 
 	/**
-	 * @parameter default-value="${basedir}/src/main/resources/META-INF/hibernate-spring.xml"
-	 * @required
+	 * @parameter
 	 */
 	private String springHibernateFileName;
 
 	/**
-	 * @parameter default-value="${basedir}/src/main/resources/META-INF/infrastructure-spring.xml"
-	 * @required
+	 * @parameter
 	 */
 	private String springInfrastructureFileName;
 
 	/**
-	 * @parameter default-value="${basedir}/src/main/resources/META-INF/shard-data-source-spring.xml"
-	 * @required
+	 * @parameter
 	 */
 	private String springShardDataSourceFileName;
 
 	/**
-	 * @parameter default-value="${basedir}/src/main/webapp/WEB-INF/sql"
-	 * @required
+	 * @parameter
 	 */
 	private String sqlDir;
 
 	/**
-	 * @parameter default-value="tables.sql"
-	 * @required
+	 * @parameter
 	 */
 	private String sqlFileName;
 
@@ -404,5 +618,10 @@ public class ServiceBuilderMojo extends AbstractMojo {
 	 * @required
 	 */
 	private String sqlSequencesFileName;
+
+	/**
+	 * @parameter
+	 */
+	private String webappBaseDir;
 
 }

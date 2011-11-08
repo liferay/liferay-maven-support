@@ -13,6 +13,19 @@
 	<packaging>war</packaging>
 	<name>${artifactId} Ext Web</name>
 	<version>${version}</version>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>com.liferay.maven.plugins</groupId>
+				<artifactId>liferay-maven-plugin</artifactId>
+				<version>${liferay.version}</version>
+				<configuration>
+					<apiBaseDir>${basedir}/../${artifactId}-ext-service</apiBaseDir>
+					<implBaseDir>${basedir}/../${artifactId}-ext-impl</implBaseDir>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>

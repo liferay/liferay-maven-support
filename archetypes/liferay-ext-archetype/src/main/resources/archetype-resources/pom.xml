@@ -16,6 +16,8 @@
 				<configuration>
 					<autoDeployDir>${liferay.auto.deploy.dir}</autoDeployDir>
 					<liferayVersion>${liferay.version}</liferayVersion>
+					<pluginName>${artifactId}-ext</pluginName>
+					<pluginType>ext</pluginType>
 				</configuration>
 			</plugin>
 			<plugin>

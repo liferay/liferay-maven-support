@@ -28,18 +28,9 @@
 					</execution>
 				</executions>
 				<configuration>
-					<apiDir>../${artifactId}-ext-service/src/main/java</apiDir>
-					<beanLocatorUtil>com.liferay.portal.kernel.bean.PortalBeanLocatorUtil</beanLocatorUtil>
-					<hbmFileName>../${artifactId}-ext-impl/src/main/resources/META-INF/ext-hbm.xml</hbmFileName>
-					<implDir>../${artifactId}-ext-impl/src/main/java</implDir>
-					<jsonFileName>../${artifactId}-ext-web/src/main/webapp/html/js/liferay/service.js</jsonFileName>
-					<modelHintsFileName>../${artifactId}-ext-impl/src/main/resources/META-INF/ext-model-hints.xml</modelHintsFileName>
-					<ormFileName>../${artifactId}-ext-impl/src/main/resources/META-INF/ext-orm.xml</ormFileName>
-					<pluginType>ext</pluginType>
-					<propsUtil>com.liferay.portal.util.PropsUtil</propsUtil>
-					<remotingFileName>../${artifactId}-ext-web/src/main/webapp/WEB-INF/remoting-servlet-ext.xml</remotingFileName>
-					<springFileName>../${artifactId}-ext-impl/src/main/resources/META-INF/ext-spring.xml</springFileName>
-					<sqlFileName>portal-tables.sql</sqlFileName>
+					<apiBaseDir>${basedir}/../${artifactId}-ext-service</apiBaseDir>
+					<implBaseDir>${basedir}/../${artifactId}-ext-impl</implBaseDir>
+					<webappBaseDir>${basedir}/../${artifactId}-ext-web</webappBaseDir>
 				</configuration>
 			</plugin>
 		</plugins>
