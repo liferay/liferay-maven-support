@@ -87,7 +87,7 @@ public class ServiceBuilderMojo extends AbstractMojo {
 		if (!inputFile.exists()) {
 			throw new MojoExecutionException(
 				"Unable to find service.xml with path: " +
-				inputFile.getAbsolutePath());
+					inputFile.getAbsolutePath());
 		}
 
 		getLog().info("Building from " + serviceFileName);
@@ -173,7 +173,7 @@ public class ServiceBuilderMojo extends AbstractMojo {
 				implBaseDir = webappBaseDir;
 			}
 			else if (Validator.isNull(implBaseDir) &&
-					Validator.isNotNull(apiBaseDir)) {
+					 Validator.isNotNull(apiBaseDir)) {
 
 				implBaseDir = baseDir;
 			}
@@ -184,7 +184,7 @@ public class ServiceBuilderMojo extends AbstractMojo {
 				webappBaseDir = implBaseDir;
 			}
 			else if (Validator.isNull(webappBaseDir) &&
-					Validator.isNotNull(apiBaseDir)) {
+					 Validator.isNotNull(apiBaseDir)) {
 
 				webappBaseDir = baseDir;
 			}
@@ -200,9 +200,9 @@ public class ServiceBuilderMojo extends AbstractMojo {
 
 			if (pluginType.equals("ext")) {
 				hbmFileName = implResourcesDir.concat("/META-INF/ext-hbm.xml");
-				ormFileName = implResourcesDir.concat("/META-INF/ext-orm.xml");
 				modelHintsFileName = implResourcesDir.concat(
 					"/META-INF/ext-model-hints.xml");
+				ormFileName = implResourcesDir.concat("/META-INF/ext-orm.xml");
 				springFileName = implResourcesDir.concat(
 					"/META-INF/ext-spring.xml");
 			}
@@ -222,10 +222,10 @@ public class ServiceBuilderMojo extends AbstractMojo {
 				hbmFileName = webappResourcesDir.concat(
 					"/META-INF/portlet-hbm.xml");
 				jsonFileName = webappDir.concat("/js/service.js");
-				ormFileName = webappResourcesDir.concat(
-					"/META-INF/portlet-orm.xml");
 				modelHintsFileName = webappResourcesDir.concat(
 					"/META-INF/portlet-model-hints.xml");
+				ormFileName = webappResourcesDir.concat(
+					"/META-INF/portlet-orm.xml");
 				serviceFileName = webappDir.concat("/WEB-INF/service.xml");
 				springBaseFileName = webappResourcesDir.concat(
 					"/META-INF/base-spring.xml");
@@ -367,8 +367,8 @@ public class ServiceBuilderMojo extends AbstractMojo {
 		}
 
 		getLog().warn(
-			"Invoker is no longer supported by Maven 3 and this will be " +
-			"removed in future builds.");
+			"Invoker is no longer supported by Maven 3 and will be removed " +
+				"in future builds.");
 
 		List<Dependency> dependencies = new ArrayList<Dependency>();
 
