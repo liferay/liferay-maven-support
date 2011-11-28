@@ -150,8 +150,7 @@ public class PluginDirectDeployerMojo extends AbstractMojo {
 	protected void deployPortlet() throws Exception {
 		String tldPath = workDir.getAbsolutePath() + "/WEB-INF/tld";
 
-		System.setProperty(
-			"deployer.aui.taglib.dtd", tldPath + "/liferay-aui.tld");
+		System.setProperty("deployer.aui.taglib.dtd", tldPath + "/aui.tld");
 		System.setProperty(
 			"deployer.custom.portlet.xml", String.valueOf(customPortletXml));
 		System.setProperty(
