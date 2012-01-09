@@ -14,10 +14,6 @@
 	<name>Liferay Maven 2 Layout Template Archetype</name>
 	<version>6.1.0-SNAPSHOT</version>
 	<description>Provides an archetype to create Liferay layout templates.</description>
-	<scm>
-		<connection>scm:svn:svn://svn.liferay.com/repos/public/portal/trunk/support-maven/archetypes/liferay-layouttpl-archetype</connection>
-		<url>http://guest:guest@svn.liferay.com/repos/public/portal/trunk/support-maven/archetypes/liferay-layouttpl-archetype</url>
-	</scm>
 	<build>
 		<extensions>
 			<extension>

@@ -14,10 +14,6 @@
 	<name>Liferay Maven 2 ServiceBuilder Archetype</name>
 	<version>6.1.0-SNAPSHOT</version>
 	<description>Provides an archetype to create Liferay Service Builder portlets.</description>
-	<scm>
-		<connection>scm:svn:svn://svn.liferay.com/repos/public/portal/trunk/support-maven/archetypes/liferay-servicebuilder-archetype</connection>
-		<url>http://guest:guest@svn.liferay.com/repos/public/portal/trunk/support-maven/archetypes/liferay-servicebuilder-archetype</url>
-	</scm>
 	<build>
 		<extensions>
 			<extension>

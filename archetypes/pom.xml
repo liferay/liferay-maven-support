@@ -14,10 +14,6 @@
 	<name>Liferay Maven 2 Archetypes</name>
 	<version>6.1.0-SNAPSHOT</version>
 	<description>Parent project to support Liferay archetypes.</description>
-	<scm>
-		<connection>scm:svn:svn://svn.liferay.com/repos/public/portal/trunk/support-maven/archetypes</connection>
-		<url>http://guest:guest@svn.liferay.com/repos/public/portal/trunk/support-maven/archetypes</url>
-	</scm>
 	<modules>
 		<module>liferay-ext-archetype</module>
 		<module>liferay-hook-archetype</module>

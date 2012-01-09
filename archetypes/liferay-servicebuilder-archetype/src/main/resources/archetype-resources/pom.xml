@@ -36,10 +36,6 @@
 			</plugin>
 		</plugins>
 	</build>
-	<properties>
-		<liferay.auto.deploy.dir>../bundles/deploy</liferay.auto.deploy.dir>
-		<liferay.version>6.1.0-SNAPSHOT</liferay.version>
-	</properties>
 	<modules>
 		<module>${artifactId}-portlet</module>
 		<module>${artifactId}-portlet-service</module>

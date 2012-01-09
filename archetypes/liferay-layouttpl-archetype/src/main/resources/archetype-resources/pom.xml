@@ -71,8 +71,4 @@
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
-	<properties>
-		<liferay.auto.deploy.dir>../bundles/deploy</liferay.auto.deploy.dir>
-		<liferay.version>6.1.0-SNAPSHOT</liferay.version>
-	</properties>
 </project>
