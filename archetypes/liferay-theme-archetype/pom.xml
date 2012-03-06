@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.liferay.maven</groupId>
 		<artifactId>liferay-archetypes</artifactId>
-		<version>6.1.10</version>
+		<version>6.2.0-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
@@ -12,7 +12,7 @@
 	<artifactId>liferay-theme-archetype</artifactId>
 	<packaging>maven-archetype</packaging>
 	<name>Liferay Maven 2 Theme Archetype</name>
-	<version>6.1.10</version>
+	<version>6.2.0-SNAPSHOT</version>
 	<description>Provides an archetype to create Liferay themes.</description>
 	<build>
 		<extensions>
