@@ -137,7 +137,7 @@
 		</profile>
 	</profiles>
 	<properties>
-		<liferay.version>6.1.0</liferay.version>
+		<liferay.version>6.1.10</liferay.version>
 		<maven.version>2.0.10</maven.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
