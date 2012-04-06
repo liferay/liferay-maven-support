@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,25 +14,18 @@
 
 package com.liferay.maven.plugins;
 
-import com.liferay.portal.bean.BeanLocatorImpl;
-import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
-import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.kernel.util.HtmlUtil;
-import com.liferay.portal.kernel.xml.SAXReaderUtil;
+import com.liferay.portal.cache.MultiVMPoolImpl;
+import com.liferay.portal.cache.memory.MemoryPortalCacheManager;
+import com.liferay.portal.kernel.cache.MultiVMPoolUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.tools.deploy.ExtDeployer;
 import com.liferay.portal.tools.deploy.HookDeployer;
 import com.liferay.portal.tools.deploy.LayoutTemplateDeployer;
 import com.liferay.portal.tools.deploy.PortletDeployer;
 import com.liferay.portal.tools.deploy.ThemeDeployer;
 import com.liferay.portal.tools.deploy.WebDeployer;
-import com.liferay.portal.util.FastDateFormatFactoryImpl;
-import com.liferay.portal.util.FileImpl;
-import com.liferay.portal.util.HtmlImpl;
 import com.liferay.portal.util.InitUtil;
-import com.liferay.portal.util.PortalImpl;
-import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.xml.SAXReaderImpl;
+import com.liferay.portal.util.PropsUtil;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -213,31 +206,24 @@ public class PluginDirectDeployerMojo extends AbstractMojo {
 	}
 
 	protected void initPortal() {
-		InitUtil.init();
+		PropsUtil.set("spring.configs", "META-INF/service-builder-spring.xml");
+		PropsUtil.set(
+			PropsKeys.RESOURCE_ACTIONS_READ_PORTLET_RESOURCES, "false");
 
-		PortalBeanLocatorUtil.setBeanLocator(new BeanLocatorImpl(null, null));
+		InitUtil.initWithSpring();
 
-		FastDateFormatFactoryUtil fastDateFormatFactoryUtil =
-			new FastDateFormatFactoryUtil();
+		MemoryPortalCacheManager memoryPortalCacheManager =
+			new MemoryPortalCacheManager();
 
-		fastDateFormatFactoryUtil.setFastDateFormatFactory(
-			new FastDateFormatFactoryImpl());
+		memoryPortalCacheManager.afterPropertiesSet();
 
-		FileUtil fileUtil = new FileUtil();
+		MultiVMPoolImpl multiVMPoolImpl = new MultiVMPoolImpl();
 
-		fileUtil.setFile(new FileImpl());
+		multiVMPoolImpl.setPortalCacheManager(memoryPortalCacheManager);
 
-		HtmlUtil htmlUtil = new HtmlUtil();
+		MultiVMPoolUtil multiVMPoolUtil = new MultiVMPoolUtil();
 
-		htmlUtil.setHtml(new HtmlImpl());
-
-		PortalUtil portalUtil = new PortalUtil();
-
-		portalUtil.setPortal(new PortalImpl());
-
-		SAXReaderUtil saxReaderUtil = new SAXReaderUtil();
-
-		saxReaderUtil.setSAXReader(new SAXReaderImpl());
+		multiVMPoolUtil.setMultiVMPool(multiVMPoolImpl);
 	}
 
 	protected void preparePortalDependencies() throws Exception {
@@ -311,7 +297,6 @@ public class PluginDirectDeployerMojo extends AbstractMojo {
 
 	/**
 	 * @parameter default-value="" expression="${jbossPrefix}"
-	 * @required
 	 */
 	private String jbossPrefix;
 
