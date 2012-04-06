@@ -11,5 +11,13 @@
 		<resource>src/main/webapp/WEB-INF/portlet.xml</resource>
 		<resource>src/main/webapp/icon.png</resource>
 		<resource>src/main/webapp/view.jsp</resource>
+		<!-- Fix: MAVEN-6 -->
+		<resource>src/main/webapp/WEB-INF/web.xml</resource>
+		<resource>src/main/webapp/WEB-INF/tld/aui.tld</resource>
+		<resource>src/main/webapp/WEB-INF/tld/liferay-portlet-ext.tld</resource>
+		<resource>src/main/webapp/WEB-INF/tld/liferay-portlet.tld</resource>
+		<resource>src/main/webapp/WEB-INF/tld/liferay-ui.tld</resource>
+		<resource>src/main/webapp/WEB-INF/tld/liferay-util.tld</resource>
+		<resource>src/main/webapp/init.jsp</resource>
 	</resources>
 </archetype>
