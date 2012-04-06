@@ -206,9 +206,11 @@ public class PluginDirectDeployerMojo extends AbstractMojo {
 	}
 
 	protected void initPortal() {
-		PropsUtil.set("spring.configs", "META-INF/service-builder-spring.xml");
 		PropsUtil.set(
-			PropsKeys.RESOURCE_ACTIONS_READ_PORTLET_RESOURCES, "false");
+			PropsKeys.RESOURCE_ACTIONS_READ_PORTLET_RESOURCES,
+			Boolean.FALSE.toString());
+
+		PropsUtil.set("spring.configs", "META-INF/service-builder-spring.xml");
 
 		InitUtil.initWithSpring();
 
