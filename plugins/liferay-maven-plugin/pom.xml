@@ -14,6 +14,36 @@
 	<name>Liferay Maven 2 Plugin</name>
 	<version>6.2.0-SNAPSHOT</version>
 	<description>Contains goals to manage Liferay plugins.</description>
+	
+	
+	<!-- 
+	   Added for Fix - MAVEN-14
+	   Generate the Plugin documentation : 
+	   TODO update CSS to map Liferay	branding
+     -->
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-plugin-plugin</artifactId>
+				<version>2.5.1</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.4</version>
+				<configuration>
+					<minmemory>256m</minmemory>
+					<maxmemory>512m</maxmemory>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jxr-plugin</artifactId>
+				<version>2.1</version>
+			</plugin>
+		</plugins>
+	</reporting>
 	<build>
 		<plugins>
 			<plugin>
@@ -49,6 +79,14 @@
 			<artifactId>util-java</artifactId>
 			<version>${liferay.version}</version>
 		</dependency>
+		<!-- Added for Fix - MAVEN-14 -->
+		<dependency>
+			<groupId>com.liferay.maven.plugins</groupId>
+			<artifactId>liferay-maven-plugin-components</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+
+
 
 		<!-- Maven -->
 
@@ -75,6 +113,12 @@
 		<dependency>
 			<groupId>org.apache.maven.shared</groupId>
 			<artifactId>maven-invoker</artifactId>
+			<version>${maven.version}</version>
+		</dependency>
+		<!-- Added for Fix - MAVEN-14, for plugin automation tests -->
+		<dependency>
+			<groupId>org.apache.maven</groupId>
+			<artifactId>maven-settings</artifactId>
 			<version>${maven.version}</version>
 		</dependency>
 
@@ -252,6 +296,14 @@
 			<groupId>wsdl4j</groupId>
 			<artifactId>wsdl4j</artifactId>
 			<version>1.6.2</version>
+		</dependency>
+
+		<!-- Added for Fix - MAVEN-14, Unit and Integration Tests -->
+		<dependency>
+			<groupId>org.apache.maven.plugin-testing</groupId>
+			<artifactId>maven-plugin-testing-harness</artifactId>
+			<version>1.2</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 </project>

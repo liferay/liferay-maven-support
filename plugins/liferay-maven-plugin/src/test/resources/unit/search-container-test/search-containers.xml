@@ -1,0 +1,36 @@
+<searchContainers>
+	<searchContainer>
+		<name>customer</name>
+		<delta>10</delta>
+		<packageDirectory>com.lifery.demo</packageDirectory>
+		<additionalImports />
+		<searchFields>
+			<searchField>
+				<columnHeader>customer-id</columnHeader>
+				<fieldName>customerId</fieldName>
+				<fieldType>int</fieldType>
+				<showable>true</showable>
+			</searchField>
+			<searchField>
+				<columnHeader>customer-first-name</columnHeader>
+				<fieldName>firstName</fieldName>
+				<showable>true</showable>
+			</searchField>
+			<searchField>
+				<columnHeader>customer-last-name</columnHeader>
+				<fieldName>lastName</fieldName>
+				<showable>true</showable>
+			</searchField>
+			<searchField>
+				<columnHeader>date-of-birth</columnHeader>
+				<fieldName>dateOfBirth</fieldName>
+				<fieldType>date</fieldType>
+				<showable>true</showable>
+			</searchField>
+		</searchFields>
+		<modelClass>com.test.model.Customer</modelClass>
+		<modelPK>customerId</modelPK>
+		<emptyResultsMessage>there-are-no-records</emptyResultsMessage>
+	</searchContainer>
+</searchContainers>   
+   

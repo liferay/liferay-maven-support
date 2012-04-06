@@ -1,0 +1,62 @@
+/**
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ */
+
+
+  package com.liferay.demo;
+
+	import java.util.*;
+	import javax.portlet.PortletRequest;
+	import javax.portlet.PortletURL;	
+	import com.liferay.portal.kernel.util.ParamUtil;
+	import com.liferay.portal.kernel.dao.search.SearchContainer;
+  		import com.test.model.Customer;
+  		import java.util.Date;
+  		import java.util.Locale;
+  		import java.util.TimeZone;
+  		import java.text.Format;
+  		import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
+
+
+/**
+ *
+ * @author kamesh
+ *
+ * @generated
+ */
+public class TributeToGodSearch extends SearchContainer<Customer> {
+	
+	private static String EMPTY_RESULTS_MESSAGE = "there-are-no-records";
+	
+    /**
+     * @param portletRequest
+     * @generated
+     */
+    public TributeToGodSearch(PortletRequest portletRequest,
+	    PortletURL iteratorURL,List<String> columnNames) {
+	    super(portletRequest, new TributeToGodDisplayTerms(portletRequest),
+		new TributeToGodSearchTerms(portletRequest), DEFAULT_CUR_PARAM,
+		10, iteratorURL, columnNames, EMPTY_RESULTS_MESSAGE);
+		
+		TributeToGodDisplayTerms displayTerms = (TributeToGodDisplayTerms) getDisplayTerms();
+		
+			iteratorURL.setParameter(TributeToGodDisplayTerms.CUSTOMERID,
+				String.valueOf(displayTerms.getCustomerId()));
+			iteratorURL.setParameter(TributeToGodDisplayTerms.FIRSTNAME,
+				String.valueOf(displayTerms.getFirstName()));
+			iteratorURL.setParameter(TributeToGodDisplayTerms.LASTNAME,
+				String.valueOf(displayTerms.getLastName()));
+			iteratorURL.setParameter(TributeToGodDisplayTerms.DATEOFBIRTH,
+				String.valueOf(displayTerms.getDateOfBirth()));
+    }	
+}
