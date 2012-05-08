@@ -40,7 +40,7 @@ public class ThumbnailBuilderMojo extends AbstractMojo {
 	private int height;
 
 	/**
-	 * @parameter expression="${basedir}/src/main/webapp/images/screenshot.png"
+	 * @parameter default-value="${basedir}/src/main/webapp/images/screenshot.png"
 	 * @required
 	 */
 	private File originalFile;
@@ -52,7 +52,7 @@ public class ThumbnailBuilderMojo extends AbstractMojo {
 	private boolean overwrite;
 
 	/**
-	 * @parameter expression="${basedir}/src/main/webapp/images/thumbnail.png"
+	 * @parameter default-value="${basedir}/src/main/webapp/images/thumbnail.png"
 	 * @required
 	 */
 	private File thumbnailFile;
