@@ -211,8 +211,7 @@ public class ThemeMergeMojo extends AbstractMojo {
 	private String themeType;
 
 	/**
-	 * @parameter default-value=
-	 *			  "${project.build.directory}/${project.build.finalName}"
+	 * @parameter default-value="${project.build.directory}/${project.build.finalName}"
 	 * @required
 	 */
 	private File webappDir;
