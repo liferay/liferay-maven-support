@@ -50,19 +50,19 @@ public class PluginDeployerMojo extends AbstractMojo {
 	}
 
 	/**
-	 * @parameter
+	 * @parameter expression="${autoDeployDir}"
 	 * @required
 	 */
 	private File autoDeployDir;
 
 	/**
-	 * @parameter expression="${project.build.directory}/${project.build.finalName}.war"
+	 * @parameter default-value="${project.build.directory}/${project.build.finalName}.war" expression="${warFile}"
 	 * @required
 	 */
 	private File warFile;
 
 	/**
-	 * @parameter expression="${project.build.finalName}.war"
+	 * @parameter default-value="${project.build.finalName}.war" expression="${warFileName}"
 	 * @required
 	 */
 	private String warFileName;

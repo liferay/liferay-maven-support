@@ -211,14 +211,14 @@ public class ThemeMergeMojo extends AbstractMojo {
 	private String themeType;
 
 	/**
-	 * @parameter expression=
+	 * @parameter default-value=
 	 *			  "${project.build.directory}/${project.build.finalName}"
 	 * @required
 	 */
 	private File webappDir;
 
 	/**
-	 * @parameter expression="${project.build.directory}/liferay-theme/work"
+	 * @parameter default-value="${project.build.directory}/liferay-theme/work"
 	 * @required
 	 */
 	private File workDir;

@@ -117,7 +117,7 @@ public class WSDDBuilderMojo extends AbstractMojo {
 	private MavenProject project;
 
 	/**
-	 * @parameter expression="${basedir}/src/main/resources"
+	 * @parameter default-value="${basedir}/src/main/resources"
 	 * @required
 	 */
 	private String resourcesDir;
