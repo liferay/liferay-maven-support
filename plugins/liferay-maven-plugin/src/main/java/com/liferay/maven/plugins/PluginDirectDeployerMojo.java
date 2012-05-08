@@ -66,7 +66,7 @@ public class PluginDirectDeployerMojo extends AbstractMojo {
 		if (!warFile.exists()) {
 			getLog().error(warFileName + " does not exist");
 
-			throw new FileNotFoundException(warFileName + " does not exist!");
+			throw new FileNotFoundException(warFileName + " does not exist");
 		}
 
 		getLog().info("Directly deploying " + warFileName);
@@ -163,13 +163,14 @@ public class PluginDirectDeployerMojo extends AbstractMojo {
 			workDir, "WEB-INF/ext-web/docroot/WEB-INF/web.xml");
 
 		if (webXml.exists()) {
-			String originalWebXml = new File(
-				appServerPortalDir, "WEB-INF/web.xml").getAbsolutePath();
-			String customWebXml = webXml.getAbsolutePath();
-			String mergedWebXml = new File(
-				appServerPortalDir, "WEB-INF/web.xml.merged").getAbsolutePath();
+			File originalWebXml = new File(
+				appServerPortalDir, "WEB-INF/web.xml");
+			File mergedWebXml = new File(
+				appServerPortalDir, "WEB-INF/web.xml.merged");
 
-			new WebXMLBuilder(originalWebXml, customWebXml, mergedWebXml);
+			new WebXMLBuilder(
+				originalWebXml.getAbsolutePath(), webXml.getAbsolutePath(),
+				mergedWebXml.getAbsolutePath());
 
 			FileUtil.move(mergedWebXml, originalWebXml);
 		}
