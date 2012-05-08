@@ -18,7 +18,8 @@ import com.liferay.portal.cache.MultiVMPoolImpl;
 import com.liferay.portal.cache.memory.MemoryPortalCacheManager;
 import com.liferay.portal.kernel.cache.MultiVMPoolUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
-import com.liferay.portal.tools.deploy.ExtDeployer;
+import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.tools.WebXMLBuilder;
 import com.liferay.portal.tools.deploy.HookDeployer;
 import com.liferay.portal.tools.deploy.LayoutTemplateDeployer;
 import com.liferay.portal.tools.deploy.PortletDeployer;
@@ -26,6 +27,7 @@ import com.liferay.portal.tools.deploy.ThemeDeployer;
 import com.liferay.portal.tools.deploy.WebDeployer;
 import com.liferay.portal.util.InitUtil;
 import com.liferay.portal.util.PropsUtil;
+import com.liferay.util.ant.CopyTask;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -71,7 +73,7 @@ public class PluginDirectDeployerMojo extends AbstractMojo {
 
 		getLog().debug("appServerType: " + appServerType);
 		getLog().debug("baseDir: " + baseDir);
-		getLog().debug("deployDir: " + deployDir.getAbsolutePath());
+		getLog().debug("deployDir: " + appServerDeployDir.getAbsolutePath());
 		getLog().debug("jbossPrefix: " + jbossPrefix);
 		getLog().debug("pluginType: " + pluginType);
 		getLog().debug("unpackWar: " + unpackWar);
@@ -80,7 +82,8 @@ public class PluginDirectDeployerMojo extends AbstractMojo {
 
 		System.setProperty("deployer.app.server.type", appServerType);
 		System.setProperty("deployer.base.dir", baseDir);
-		System.setProperty("deployer.dest.dir", deployDir.getAbsolutePath());
+		System.setProperty(
+			"deployer.dest.dir", appServerDeployDir.getAbsolutePath());
 		System.setProperty("deployer.file.pattern", warFileName);
 		System.setProperty("deployer.unpack.war", String.valueOf(unpackWar));
 		System.setProperty(
@@ -110,15 +113,75 @@ public class PluginDirectDeployerMojo extends AbstractMojo {
 	}
 
 	protected void deployExt() throws Exception {
-		List<String> wars = new ArrayList<String>();
+		workDir.mkdirs();
 
-		List<String> jars = new ArrayList<String>();
+		UnArchiver unArchiver = archiverManager.getUnArchiver(warFile);
 
-		String libPath = workDir.getAbsolutePath() + "/WEB-INF/lib";
+		unArchiver.setDestDirectory(workDir);
+		unArchiver.setSourceFile(warFile);
 
-		jars.add(libPath + "/util-java.jar");
+		unArchiver.extract();
 
-		new ExtDeployer(wars, jars);
+		CopyTask.copyDirectory(
+			new File(workDir, "WEB-INF/ext-lib/global"), appServerLibGlobalDir,
+			"*.jar", null, true, true);
+
+		CopyTask.copyFile(
+			new File(workDir, "WEB-INF/ext-service/ext-service.jar"),
+			appServerLibGlobalDir, "ext-" + pluginName + "-service.jar", null,
+			true, true);
+
+		CopyTask.copyDirectory(
+			new File(workDir, "WEB-INF/ext-lib/portal"), appServerLibPortalDir,
+			"*.jar", null, true, true);
+
+		CopyTask.copyFile(
+			new File(workDir, "WEB-INF/ext-impl/ext-impl.jar"),
+			appServerLibGlobalDir, "ext-" + pluginName + "-impl.jar", null, true,
+			true);
+
+		CopyTask.copyFile(
+			new File(workDir, "WEB-INF/ext-util-bridges/ext-util-bridges.jar"),
+			appServerLibGlobalDir, "ext-" + pluginName + "-util-bridges.jar",
+			null, true, true);
+
+		CopyTask.copyFile(
+			new File(workDir, "WEB-INF/ext-util-java/ext-util-java.jar"),
+			appServerLibGlobalDir, "ext-" + pluginName + "-util-java.jar", null,
+			true, true);
+
+		CopyTask.copyFile(
+			new File(workDir, "WEB-INF/ext-util-taglib/ext-util-taglib.jar"),
+			appServerLibGlobalDir, "ext-" + pluginName + "-util-taglib.jar",
+			null, true, true);
+
+		CopyTask.copyDirectory(
+			new File(workDir, "WEB-INF/ext-web/docroot"), appServerPortalDir,
+			null, "WEB-INF/web.xml", true, true);
+
+		File webXml = new File(
+			workDir, "WEB-INF/ext-web/docroot/WEB-INF/web.xml");
+
+		if (webXml.exists()) {
+			String originalWebXml = new File(
+				appServerPortalDir, "WEB-INF/web.xml").getAbsolutePath();
+			String customWebXml = webXml.getAbsolutePath();
+			String mergedWebXml = new File(
+				appServerPortalDir, "WEB-INF/web.xml.merged").getAbsolutePath();
+
+			new WebXMLBuilder(originalWebXml, customWebXml, mergedWebXml);
+
+			FileUtil.move(mergedWebXml, originalWebXml);
+		}
+
+		CopyTask.copyFile(
+			new File(workDir, "WEB-INF/ext-" + pluginName + ".xml"),
+			appServerPortalDir, null, true, true);
+
+		CopyTask.copyDirectory(
+			new File(workDir, "WEB-INF/ext-web/docroot/WEB-INF/classes"),
+			appServerClassesPortalDir,
+			"portal-*.properties,system-*.properties", null, true, true);
 	}
 
 	protected void deployHook() throws Exception {
@@ -259,6 +322,35 @@ public class PluginDirectDeployerMojo extends AbstractMojo {
 	}
 
 	/**
+	 * @parameter default-value="${appServerPortalDir}/WEB-INF/classes" expression="${appServerClassesPortalDir}"
+	 * @required
+	 */
+	private File appServerClassesPortalDir;
+
+	/**
+	 * @parameter default-value="${deployDir}" expression="${appServerDeployDir}"
+	 * @required
+	 */
+	private File appServerDeployDir;
+
+	/**
+	 * @parameter expression="${appServerLibGlobalDir}"
+	 * @required
+	 */
+	private File appServerLibGlobalDir;
+
+	/**
+	 * @parameter expression="${appServerPortalDir}"
+	 * @required
+	 */
+	private File appServerPortalDir;
+
+	/**
+	 * @parameter default-value="${appServerPortalDir}/WEB-INF/lib" expression="${appServerLibPortalDir}"
+	 */
+	private File appServerLibPortalDir;
+
+	/**
 	 * @parameter default-value="tomcat" expression="${appServerType}"
 	 * @required
 	 */
@@ -292,13 +384,14 @@ public class PluginDirectDeployerMojo extends AbstractMojo {
 	private boolean customPortletXml;
 
 	/**
+	 * @deprecated
 	 * @parameter expression="${deployDir}"
-	 * @required
+	 * @since 6.1.1
 	 */
 	private File deployDir;
 
 	/**
-	 * @parameter default-value="" expression="${jbossPrefix}"
+	 * @parameter expression="${jbossPrefix}"
 	 */
 	private String jbossPrefix;
 
@@ -316,6 +409,12 @@ public class PluginDirectDeployerMojo extends AbstractMojo {
 	private ArtifactRepository localArtifactRepository;
 
 	/**
+	 * @parameter default-value="${project.artifactId}" expression="${pluginName}"
+	 * @required
+	 */
+	private String pluginName;
+
+	/**
 	 * @parameter default-value="portlet" expression="${pluginType}"
 	 * @required
 	 */
@@ -329,25 +428,25 @@ public class PluginDirectDeployerMojo extends AbstractMojo {
 	private List remoteArtifactRepositories;
 
 	/**
-	 * @parameter expression="${unpackWar}" default-value="true"
+	 * @parameter default-value="true" expression="${unpackWar}"
 	 * @required
 	 */
 	private boolean unpackWar;
 
 	/**
-	 * @parameter expression="${project.build.directory}/${project.build.finalName}.war"
+	 * @parameter default-value="${project.build.directory}/${project.build.finalName}.war" expression="${warFile}"
 	 * @required
 	 */
 	private File warFile;
 
 	/**
-	 * @parameter expression="${project.build.finalName}.war"
+	 * @parameter default-value="${project.build.finalName}.war" expression="${warFileName}
 	 * @required
 	 */
 	private String warFileName;
 
 	/**
-	 * @parameter expression="${project.build.directory}/liferay-work"
+	 * @parameter default-value="${project.build.directory}/liferay-work"
 	 * @required
 	 */
 	private File workDir;
