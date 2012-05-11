@@ -109,9 +109,9 @@
 			<url>http://oss.sonatype.org/service/local/staging/deploy/maven2</url>
 		</repository>
 		<snapshotRepository>
-			<id>sonatype-snapshot</id>
-			<name>Sonatype Snapshot Repository</name>
-			<url>http://oss.sonatype.org/content/repositories/snapshots</url>
+			<id>${distMgmtSnasphotsId}</id>
+			<name>${distMgmtSnasphotsName}</name>
+			<url>${distMgmtSnasphotsUrl}</url>
 		</snapshotRepository>
 	</distributionManagement>
 	<profiles>
@@ -140,5 +140,8 @@
 		<liferay.version>6.1.10</liferay.version>
 		<maven.version>2.0.10</maven.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<distMgmtSnasphotsId>sonatype-snapshot</distMgmtSnasphotsId>
+		<distMgmtSnasphotsName>Sonatype Snapshot Repository</distMgmtSnasphotsName>
+		<distMgmtSnasphotsUrl>http://oss.sonatype.org/content/repositories/snapshots</distMgmtSnasphotsUrl>
 	</properties>
 </project>
