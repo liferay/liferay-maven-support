@@ -40,6 +40,7 @@ import org.codehaus.plexus.components.io.fileselectors.IncludeExcludeFileSelecto
 
 /**
  * @author Mika Koivisto
+ * @author Barrie Selack
  * @goal   build-ext
  */
 public class ExtBuilderMojo extends AbstractMojo {
