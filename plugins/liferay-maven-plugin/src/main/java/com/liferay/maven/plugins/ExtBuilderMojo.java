@@ -14,7 +14,6 @@
 
 package com.liferay.maven.plugins;
 
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.tools.ExtInfoBuilder;
 import com.liferay.portal.util.FileImpl;
 import com.liferay.util.ant.CopyTask;
@@ -193,8 +192,8 @@ public class ExtBuilderMojo extends AbstractMojo {
 		for (Dependency dependency : dependencies) {
 			String scope = dependency.getScope();
 
-			if (scope != null && (scope.equalsIgnoreCase("provided") ||
-				scope.equalsIgnoreCase("test"))) {
+			if (scope.equalsIgnoreCase("provided") ||
+				scope.equalsIgnoreCase("test")) {
 
 				continue;
 			}
@@ -207,20 +206,8 @@ public class ExtBuilderMojo extends AbstractMojo {
 
 			Artifact libArtifact = resolveArtifact(dependency);
 
-			File libJarFile = null;
-			
-			if (addVersionAndClassifier) {
-				libJarFile = new File(
-						libDir, libArtifact.getArtifactId() + 
-						(libArtifact.getVersion() == null ? "" : 
-							StringPool.DASH + libArtifact.getVersion()) + 
-							(libArtifact.getClassifier() == null ? "" : 
-								StringPool.DASH + libArtifact.getClassifier()) + 
-						".jar");
-			} else {
-				libJarFile = new File(
-						libDir, libArtifact.getArtifactId() + ".jar");
-			}
+			File libJarFile = new File(
+				libDir, libArtifact.getArtifactId() + ".jar");
 
 			_fileUtil.copyFile(libArtifact.getFile(), libJarFile);
 		}
@@ -255,10 +242,10 @@ public class ExtBuilderMojo extends AbstractMojo {
 	}
 
 	protected Artifact resolveArtifact(Dependency dependency) throws Exception {
-		Artifact artifact = artifactFactory.createArtifactWithClassifier(
+		Artifact artifact = artifactFactory.createArtifact(
 			dependency.getGroupId(), dependency.getArtifactId(),
-			dependency.getVersion(), dependency.getType(), dependency.getClassifier());
-		artifact.setScope(dependency.getScope());
+			dependency.getVersion(), dependency.getClassifier(),
+			dependency.getType());
 
 		artifactResolver.resolve(
 			artifact, remoteArtifactRepositories, localArtifactRepository);
@@ -360,16 +347,7 @@ public class ExtBuilderMojo extends AbstractMojo {
 	private File sqlSourceDir;
 
 	/**
-<<<<<<< Updated upstream
 	 * @parameter default-value="${project.build.directory}/${project.build.finalName}"
-=======
-	 * @parameter default-value="false"
-	 */
-	private boolean addVersionAndClassifier;
-
-	/**
-	 * @parameter expression="${project.build.directory}/${project.build.finalName}"
->>>>>>> Stashed changes
 	 * @required
 	 */
 	private File webappDir;
