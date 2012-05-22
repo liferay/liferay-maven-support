@@ -327,7 +327,7 @@ public class ExtBuilderMojo extends AbstractMojo {
 	private ArtifactRepository localArtifactRepository;
 
 	/**
-	 * @parameter default-value="${project.artifactId}" expression="${pluginName}"
+	 * @parameter expression="${project.artifactId}"
 	 * @required
 	 */
 	private String pluginName;
@@ -354,28 +354,24 @@ public class ExtBuilderMojo extends AbstractMojo {
 	private List remoteArtifactRepositories;
 
 	/**
-	 * @parameter default-value="${basedir}/src/main/webapp/WEB-INF/sql"
+	 * @parameter expression="${basedir}/src/main/webapp/WEB-INF/sql"
 	 * @required
 	 */
 	private File sqlSourceDir;
 
 	/**
-<<<<<<< Updated upstream
-	 * @parameter default-value="${project.build.directory}/${project.build.finalName}"
-=======
 	 * @parameter default-value="false"
 	 */
 	private boolean addVersionAndClassifier;
 
 	/**
 	 * @parameter expression="${project.build.directory}/${project.build.finalName}"
->>>>>>> Stashed changes
 	 * @required
 	 */
 	private File webappDir;
 
 	/**
-	 * @parameter default-value="${project.build.directory}/liferay-work"
+	 * @parameter expression="${project.build.directory}/liferay-work"
 	 * @required
 	 */
 	private File workDir;
