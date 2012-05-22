@@ -56,7 +56,6 @@ import org.codehaus.plexus.components.io.fileselectors.IncludeExcludeFileSelecto
 
 /**
  * @author Mika Koivisto
- * @author Barrie Selack
  * @goal   direct-deploy
  */
 public class PluginDirectDeployerMojo extends AbstractMojo {
