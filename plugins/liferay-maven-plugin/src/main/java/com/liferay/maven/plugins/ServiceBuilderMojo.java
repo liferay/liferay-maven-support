@@ -55,17 +55,17 @@ public class ServiceBuilderMojo extends AbstractMojo {
 	public void execute() throws MojoExecutionException {
 		try {
 			if (pluginType.equals("ext")) {
-				getLog().warn("");
-				getLog().warn("WARNING: Support for ServiceBuilder in EXT "+
-					"plugins will be deprecated in future");
-				getLog().warn("versions. EXT plugins are designed to override "+
-					"the portal's core code that");
-				getLog().warn("cannot be done with hooks, layout templates, "+
-					"portlets, or themes. EXT plugins");
-				getLog().warn("are not meant to contain new custom services. "+
-					"Please migrate your service.xml to");
-				getLog().warn("a portlet plugin.");
-				getLog().warn("");
+				StringBuilder sb = new StringBuilder();
+
+				sb.append("WARNING: Support for ServiceBuilder in EXT ");
+				sb.append("plugins will be deprecated in future versions. ");
+				sb.append("EXT plugins are designed to override the portal's ");
+				sb.append("core code that cannot be done with hooks, layout ");
+				sb.append("templates, portlets, or themes. EXT plugins are ");
+				sb.append("not meant to contain new custom services. Please ");
+				sb.append("migrate your service.xml to a portlet plugin.");
+
+				getLog().warn(sb.toString());
 			}
 
 			initClassLoader();
