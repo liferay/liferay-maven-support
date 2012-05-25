@@ -195,7 +195,7 @@ public class ExtBuilderMojo extends AbstractMojo {
 
 			if (Validator.isNotNull(scope) &&
 				(scope.equalsIgnoreCase("provided") ||
-				scope.equalsIgnoreCase("test"))) {
+				 scope.equalsIgnoreCase("test"))) {
 
 				continue;
 			}
@@ -224,8 +224,8 @@ public class ExtBuilderMojo extends AbstractMojo {
 
 			File libArtifactFile = libArtifact.getFile();
 
-			libJarFileName += "." + _fileUtil.getExtension(
-				libArtifactFile.getName());
+			libJarFileName +=
+				"." + _fileUtil.getExtension(libArtifactFile.getName());
 
 			File libJarFile = new File(libDir, libJarFileName);
 
