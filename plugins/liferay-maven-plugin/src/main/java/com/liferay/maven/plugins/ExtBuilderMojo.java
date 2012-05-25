@@ -14,6 +14,7 @@
 
 package com.liferay.maven.plugins;
 
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.tools.ExtInfoBuilder;
 import com.liferay.portal.util.FileImpl;
 import com.liferay.util.ant.CopyTask;
@@ -192,8 +193,9 @@ public class ExtBuilderMojo extends AbstractMojo {
 		for (Dependency dependency : dependencies) {
 			String scope = dependency.getScope();
 
-			if (scope.equalsIgnoreCase("provided") ||
-				scope.equalsIgnoreCase("test")) {
+			if (Validator.isNotNull(scope) &&
+				(scope.equalsIgnoreCase("provided") ||
+				scope.equalsIgnoreCase("test"))) {
 
 				continue;
 			}
@@ -206,8 +208,26 @@ public class ExtBuilderMojo extends AbstractMojo {
 
 			Artifact libArtifact = resolveArtifact(dependency);
 
-			File libJarFile = new File(
-				libDir, libArtifact.getArtifactId() + ".jar");
+			String libJarFileName = libArtifact.getArtifactId();
+
+			if (dependencyAddVersion || dependencyAddVersionAndClassifier) {
+				if (Validator.isNotNull(libArtifact.getVersion())) {
+					libJarFileName += "-" + libArtifact.getVersion();
+				}
+			}
+
+			if (dependencyAddClassifier || dependencyAddVersionAndClassifier) {
+				if (Validator.isNotNull(libArtifact.getClassifier())) {
+					libJarFileName += "-" + libArtifact.getClassifier();
+				}
+			}
+
+			File libArtifactFile = libArtifact.getFile();
+
+			libJarFileName += "." + _fileUtil.getExtension(
+				libArtifactFile.getName());
+
+			File libJarFile = new File(libDir, libJarFileName);
 
 			_fileUtil.copyFile(libArtifact.getFile(), libJarFile);
 		}
@@ -305,6 +325,21 @@ public class ExtBuilderMojo extends AbstractMojo {
 	 * @component
 	 */
 	private ArtifactResolver artifactResolver;
+
+	/**
+	 * @parameter default-value="false"
+	 */
+	private boolean dependencyAddClassifier;
+
+	/**
+	 * @parameter default-value="false"
+	 */
+	private boolean dependencyAddVersion;
+
+	/**
+	 * @parameter default-value="false"
+	 */
+	private boolean dependencyAddVersionAndClassifier;
 
 	/**
 	 * @parameter expression="${localRepository}"
