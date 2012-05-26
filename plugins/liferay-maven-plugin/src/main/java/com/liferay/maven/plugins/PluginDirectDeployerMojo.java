@@ -14,10 +14,6 @@
 
 package com.liferay.maven.plugins;
 
-import com.liferay.portal.cache.MultiVMPoolImpl;
-import com.liferay.portal.cache.memory.MemoryPortalCacheManager;
-import com.liferay.portal.kernel.cache.MultiVMPoolUtil;
-import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.tools.WebXMLBuilder;
 import com.liferay.portal.tools.deploy.HookDeployer;
@@ -25,8 +21,6 @@ import com.liferay.portal.tools.deploy.LayoutTemplateDeployer;
 import com.liferay.portal.tools.deploy.PortletDeployer;
 import com.liferay.portal.tools.deploy.ThemeDeployer;
 import com.liferay.portal.tools.deploy.WebDeployer;
-import com.liferay.portal.util.InitUtil;
-import com.liferay.portal.util.PropsUtil;
 import com.liferay.util.ant.CopyTask;
 
 import java.io.File;
@@ -36,14 +30,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
 
 import org.codehaus.plexus.archiver.UnArchiver;
-import org.codehaus.plexus.archiver.manager.ArchiverManager;
 import org.codehaus.plexus.components.io.fileselectors.FileSelector;
 import org.codehaus.plexus.components.io.fileselectors.IncludeExcludeFileSelector;
 
@@ -51,16 +39,7 @@ import org.codehaus.plexus.components.io.fileselectors.IncludeExcludeFileSelecto
  * @author Mika Koivisto
  * @goal   direct-deploy
  */
-public class PluginDirectDeployerMojo extends AbstractMojo {
-
-	public void execute() throws MojoExecutionException {
-		try {
-			doExecute();
-		}
-		catch (Exception e) {
-			throw new MojoExecutionException(e.getMessage(), e);
-		}
-	}
+public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 
 	protected void doExecute() throws Exception {
 		if (!warFile.exists()) {
@@ -89,8 +68,6 @@ public class PluginDirectDeployerMojo extends AbstractMojo {
 		System.setProperty(
 			"liferay.lib.portal.dir",
 			workDir.getAbsolutePath() + "/WEB-INF/lib");
-
-		initPortal();
 
 		if (pluginType.equals("ext")) {
 			deployExt();
@@ -269,29 +246,6 @@ public class PluginDirectDeployerMojo extends AbstractMojo {
 		new WebDeployer(wars, jars);
 	}
 
-	protected void initPortal() {
-		PropsUtil.set(
-			PropsKeys.RESOURCE_ACTIONS_READ_PORTLET_RESOURCES,
-			Boolean.FALSE.toString());
-
-		PropsUtil.set("spring.configs", "META-INF/service-builder-spring.xml");
-
-		InitUtil.initWithSpring();
-
-		MemoryPortalCacheManager memoryPortalCacheManager =
-			new MemoryPortalCacheManager();
-
-		memoryPortalCacheManager.afterPropertiesSet();
-
-		MultiVMPoolImpl multiVMPoolImpl = new MultiVMPoolImpl();
-
-		multiVMPoolImpl.setPortalCacheManager(memoryPortalCacheManager);
-
-		MultiVMPoolUtil multiVMPoolUtil = new MultiVMPoolUtil();
-
-		multiVMPoolUtil.setMultiVMPool(multiVMPoolImpl);
-	}
-
 	protected void preparePortalDependencies() throws Exception {
 		Artifact artifact = artifactFactory.createArtifact(
 			"com.liferay.portal", "portal-web", liferayVersion, "", "war");
@@ -358,21 +312,6 @@ public class PluginDirectDeployerMojo extends AbstractMojo {
 	private String appServerType;
 
 	/**
-	 * @component
-	 */
-	private ArchiverManager archiverManager;
-
-	/**
-	 * @component
-	 */
-	private ArtifactFactory artifactFactory;
-
-	/**
-	 * @component
-	 */
-	private ArtifactResolver artifactResolver;
-
-	/**
 	 * @parameter expression="${project.build.directory}"
 	 * @required
 	 */
@@ -403,30 +342,10 @@ public class PluginDirectDeployerMojo extends AbstractMojo {
 	private String liferayVersion;
 
 	/**
-	 * @parameter expression="${localRepository}"
-	 * @readonly
-	 * @required
-	 */
-	private ArtifactRepository localArtifactRepository;
-
-	/**
 	 * @parameter default-value="${project.artifactId}" expression="${pluginName}"
 	 * @required
 	 */
 	private String pluginName;
-
-	/**
-	 * @parameter default-value="portlet" expression="${pluginType}"
-	 * @required
-	 */
-	private String pluginType;
-
-	/**
-	 * @parameter expression="${project.remoteArtifactRepositories}"
-	 * @readonly
-	 * @required
-	 */
-	private List remoteArtifactRepositories;
 
 	/**
 	 * @parameter default-value="true" expression="${unpackWar}"
