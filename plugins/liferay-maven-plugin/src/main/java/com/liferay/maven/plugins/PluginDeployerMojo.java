@@ -14,27 +14,16 @@
 
 package com.liferay.maven.plugins;
 
-import java.io.File;
+import com.liferay.portal.kernel.util.FileUtil;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
+import java.io.File;
 
 /**
  * @author Mika Koivisto
  * @author Thiago Moreira
  * @goal   deploy
  */
-public class PluginDeployerMojo extends AbstractMojo {
-
-	public void execute() throws MojoExecutionException {
-		try {
-			doExecute();
-		}
-		catch (Exception e) {
-			throw new MojoExecutionException(e.getMessage(), e);
-		}
-	}
+public class PluginDeployerMojo extends AbstractLiferayMojo {
 
 	protected void doExecute() throws Exception {
 		if (warFile.exists()) {
@@ -42,7 +31,7 @@ public class PluginDeployerMojo extends AbstractMojo {
 				"Deploying " + warFileName + " to " +
 					autoDeployDir.getAbsolutePath());
 
-			FileUtils.copyFile(warFile, new File(autoDeployDir, warFileName));
+			FileUtil.copyFile(warFile, new File(autoDeployDir, warFileName));
 		}
 		else {
 			getLog().warn(warFileName + " does not exist");

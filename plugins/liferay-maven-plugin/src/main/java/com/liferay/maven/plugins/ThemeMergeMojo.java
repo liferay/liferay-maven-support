@@ -24,8 +24,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.model.Dependency;
 
 import org.codehaus.plexus.archiver.UnArchiver;
 import org.codehaus.plexus.archiver.manager.ArchiverManager;
@@ -37,16 +36,7 @@ import org.codehaus.plexus.components.io.fileselectors.IncludeExcludeFileSelecto
  * @goal   theme-merge
  * @phase  process-sources
  */
-public class ThemeMergeMojo extends AbstractMojo {
-
-	public void execute() throws MojoExecutionException {
-		try {
-			doExecute();
-		}
-		catch (Exception e) {
-			throw new MojoExecutionException(e.getMessage(), e);
-		}
-	}
+public class ThemeMergeMojo extends AbstractLiferayMojo {
 
 	protected void doExecute() throws Exception {
 		if (!workDir.exists()) {
@@ -83,12 +73,11 @@ public class ThemeMergeMojo extends AbstractMojo {
 			includes = null;
 		}
 
-		Artifact artifact = artifactFactory.createArtifact(
-			parentThemeGroupId, parentThemeArtifactId, parentThemeVersion, "",
-			"war");
+		Dependency dependency = createDependency(
+			parentThemeGroupId, parentThemeArtifactId, parentThemeVersion,
+			"", "war");
 
-		artifactResolver.resolve(
-			artifact, remoteArtifactRepositories, localArtifactRepository);
+		Artifact artifact = resolveArtifact(dependency);
 
 		UnArchiver unArchiver = archiverManager.getUnArchiver(
 			artifact.getFile());
@@ -161,20 +150,6 @@ public class ThemeMergeMojo extends AbstractMojo {
 		}
 	}
 
-	/**
-	 * @component
-	 */
-	private ArchiverManager archiverManager;
-
-	/**
-	 * @component
-	 */
-	private ArtifactFactory artifactFactory;
-
-	/**
-	 * @component
-	 */
-	private ArtifactResolver artifactResolver;
 
 	/**
 	 * @parameter
@@ -183,26 +158,12 @@ public class ThemeMergeMojo extends AbstractMojo {
 	private String liferayVersion;
 
 	/**
-	 * @parameter expression="${localRepository}"
-	 * @readonly
-	 * @required
-	 */
-	private ArtifactRepository localArtifactRepository;
-
-	/**
 	 * Parent theme. Can be _styled | _unstyled | classic | control_panel |
 	 * artifactGroupId:artifactId:artifactVersion
 	 *
 	 * @parameter default-value="_styled"
 	 */
 	private String parentTheme;
-
-	/**
-	 * @parameter expression="${project.remoteArtifactRepositories}"
-	 * @readonly
-	 * @required
-	 */
-	private List remoteArtifactRepositories;
 
 	/**
 	 * @parameter default-value="vm"
