@@ -34,7 +34,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.model.Dependency;
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.invoker.DefaultInvocationRequest;
@@ -50,38 +49,7 @@ import org.apache.maven.shared.invoker.MavenCommandLineBuilder;
  * @author Thiago Moreira
  * @goal   build-service
  */
-public class ServiceBuilderMojo extends AbstractMojo {
-
-	public void execute() throws MojoExecutionException {
-		try {
-			if (pluginType.equals("ext")) {
-				StringBuilder sb = new StringBuilder();
-
-				sb.append("WARNING: Support for ServiceBuilder in EXT ");
-				sb.append("plugins will be deprecated in future versions. ");
-				sb.append("EXT plugins are designed to override the portal's ");
-				sb.append("core code that cannot be done with hooks, layout ");
-				sb.append("templates, portlets, or themes. EXT plugins are ");
-				sb.append("not meant to contain new custom services. Please ");
-				sb.append("migrate your service.xml to a portlet plugin.");
-
-				getLog().warn(sb.toString());
-			}
-
-			initClassLoader();
-
-			doExecute();
-		}
-		catch (Exception e) {
-			if (e instanceof MojoExecutionException) {
-				throw (MojoExecutionException)e;
-			}
-			else {
-				throw new MojoExecutionException(
-					"Unable to execute Service Builder: " + e.getMessage(), e);
-			}
-		}
-	}
+public class ServiceBuilderMojo extends AbstractLiferayMojo {
 
 	protected void copyServicePropertiesFile() throws Exception {
 		File servicePropertiesFile = new File(
@@ -94,7 +62,26 @@ public class ServiceBuilderMojo extends AbstractMojo {
 	}
 
 	protected void doExecute() throws Exception {
+		if (pluginType.equals("ext")) {
+			StringBuilder sb = new StringBuilder();
+
+			sb.append("WARNING: Support for ServiceBuilder in EXT ");
+			sb.append("plugins will be deprecated in future versions. ");
+			sb.append("EXT plugins are designed to override the portal's ");
+			sb.append("core code that cannot be done with hooks, layout ");
+			sb.append("templates, portlets, or themes. EXT plugins are ");
+			sb.append("not meant to contain new custom services. Please ");
+			sb.append("migrate your service.xml to a portlet plugin.");
+
+			getLog().warn(sb.toString());
+		}
+
 		initProperties();
+
+		if (Validator.isNull(serviceFileName)) {
+			throw new MojoExecutionException(
+				"Unable to find service.xml with path: " + serviceFileName);
+		}
 
 		File inputFile = new File(serviceFileName);
 
@@ -105,12 +92,6 @@ public class ServiceBuilderMojo extends AbstractMojo {
 		}
 
 		getLog().info("Building from " + serviceFileName);
-
-		PropsUtil.set("spring.configs", "META-INF/service-builder-spring.xml");
-		PropsUtil.set(
-			PropsKeys.RESOURCE_ACTIONS_READ_PORTLET_RESOURCES, "false");
-
-		InitUtil.initWithSpring();
 
 		copyServicePropertiesFile();
 
@@ -149,29 +130,6 @@ public class ServiceBuilderMojo extends AbstractMojo {
 		invokeDependencyBuild();
 	}
 
-	protected void initClassLoader() throws Exception {
-		synchronized (ServiceBuilderMojo.class) {
-			Class<?> clazz = getClass();
-
-			URLClassLoader classLoader = (URLClassLoader)clazz.getClassLoader();
-
-			Method method = URLClassLoader.class.getDeclaredMethod(
-				"addURL", URL.class);
-
-			method.setAccessible(true);
-
-			for (Object object : project.getCompileClasspathElements()) {
-				String path = (String)object;
-
-				File file = new File(path);
-
-				URI uri = file.toURI();
-
-				method.invoke(classLoader, uri.toURL());
-			}
-		}
-	}
-
 	protected void initProperties() {
 		if (Validator.isNotNull(apiBaseDir) ||
 			Validator.isNotNull(implBaseDir) ||
@@ -192,13 +150,7 @@ public class ServiceBuilderMojo extends AbstractMojo {
 				implBaseDir = baseDir;
 			}
 
-			if (Validator.isNull(webappBaseDir) &&
-				Validator.isNotNull(implBaseDir)) {
-
-				webappBaseDir = implBaseDir;
-			}
-			else if (Validator.isNull(webappBaseDir) &&
-					 Validator.isNotNull(apiBaseDir)) {
+			if (Validator.isNull(webappBaseDir)) {
 
 				webappBaseDir = baseDir;
 			}
@@ -547,13 +499,6 @@ public class ServiceBuilderMojo extends AbstractMojo {
 	 * @since 6.1.0
 	 */
 	private List<String> postBuildGoals;
-
-	/**
-	 * @parameter expression="${project}"
-	 * @required
-	 * @readonly
-	 */
-	private MavenProject project;
 
 	/**
 	 * @parameter

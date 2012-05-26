@@ -27,31 +27,12 @@ import org.apache.maven.plugin.MojoExecutionException;
  * @author Mika Koivisto
  * @goal   build-lang
  */
-public class LangBuilderMojo extends AbstractMojo {
-
-	public void execute() throws MojoExecutionException {
-		try {
-			initPortal();
-
-			doExecute();
-		}
-		catch (Exception e) {
-			throw new MojoExecutionException(e.getMessage(), e);
-		}
-	}
+public class LangBuilderMojo extends AbstractLiferayMojo {
 
 	protected void doExecute() throws Exception {
+		initPortal();
+
 		new LangBuilder(langDir, langFile, langPlugin, langTranslate);
-	}
-
-	protected void initPortal() {
-		FileUtil fileUtil = new FileUtil();
-
-		fileUtil.setFile(new FileImpl());
-
-		HttpUtil httpUtil = new HttpUtil();
-
-		httpUtil.setHttp(new HttpImpl());
 	}
 
 	/**

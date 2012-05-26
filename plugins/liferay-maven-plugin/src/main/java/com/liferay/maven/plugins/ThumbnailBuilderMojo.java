@@ -18,17 +18,14 @@ import com.liferay.portal.tools.ThumbnailBuilder;
 
 import java.io.File;
 
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-
 /**
  * @author Mika Koivisto
  * @goal   build-thumbnail
  * @phase  process-sources
  */
-public class ThumbnailBuilderMojo extends AbstractMojo {
+public class ThumbnailBuilderMojo extends AbstractLiferayMojo {
 
-	public void execute() throws MojoExecutionException {
+	protected void doExecute() throws Exception {
 		new ThumbnailBuilder(
 			originalFile, thumbnailFile, height, width, overwrite);
 	}

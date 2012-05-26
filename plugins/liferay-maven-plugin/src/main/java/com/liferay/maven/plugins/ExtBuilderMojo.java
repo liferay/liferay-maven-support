@@ -14,9 +14,9 @@
 
 package com.liferay.maven.plugins;
 
+import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.tools.ExtInfoBuilder;
-import com.liferay.portal.util.FileImpl;
 import com.liferay.util.ant.CopyTask;
 
 import java.io.File;
@@ -24,17 +24,10 @@ import java.io.File;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.model.Dependency;
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.MavenProjectBuilder;
 
 import org.codehaus.plexus.archiver.UnArchiver;
-import org.codehaus.plexus.archiver.manager.ArchiverManager;
 import org.codehaus.plexus.components.io.fileselectors.FileSelector;
 import org.codehaus.plexus.components.io.fileselectors.IncludeExcludeFileSelector;
 
@@ -42,16 +35,7 @@ import org.codehaus.plexus.components.io.fileselectors.IncludeExcludeFileSelecto
  * @author Mika Koivisto
  * @goal   build-ext
  */
-public class ExtBuilderMojo extends AbstractMojo {
-
-	public void execute() throws MojoExecutionException {
-		try {
-			doExecute();
-		}
-		catch (Exception e) {
-			throw new MojoExecutionException(e.getMessage(), e);
-		}
-	}
+public class ExtBuilderMojo extends AbstractLiferayMojo {
 
 	protected void doExecute() throws Exception {
 		File implDir = new File(webappDir, "WEB-INF/ext-impl");
@@ -156,7 +140,7 @@ public class ExtBuilderMojo extends AbstractMojo {
 			workDir, new File(webDir, "WEB-INF/classes"),
 			"portal-*.properties,system-*.properties", null);
 
-		_fileUtil.copyDirectory(sqlSourceDir, sqlDir);
+		FileUtil.copyDirectory(sqlSourceDir, sqlDir);
 
 		String dirName = webappDir.getAbsolutePath() + "/WEB-INF";
 
@@ -170,7 +154,7 @@ public class ExtBuilderMojo extends AbstractMojo {
 
 		File serviceJarFile = new File(jarDir, jarName);
 
-		_fileUtil.copyFile(artifact.getFile(), serviceJarFile);
+		FileUtil.copyFile(artifact.getFile(), serviceJarFile);
 
 		File classesDir = new File(jarDir, "classes");
 
@@ -225,11 +209,11 @@ public class ExtBuilderMojo extends AbstractMojo {
 			File libArtifactFile = libArtifact.getFile();
 
 			libJarFileName +=
-				"." + _fileUtil.getExtension(libArtifactFile.getName());
+				"." + FileUtil.getExtension(libArtifactFile.getName());
 
 			File libJarFile = new File(libDir, libJarFileName);
 
-			_fileUtil.copyFile(libArtifact.getFile(), libJarFile);
+			FileUtil.copyFile(libArtifact.getFile(), libJarFile);
 		}
 	}
 
@@ -240,52 +224,12 @@ public class ExtBuilderMojo extends AbstractMojo {
 
 		File utilJarFile = new File(utilDir, "ext-" + utilJarName);
 
-		_fileUtil.copyFile(artifact.getFile(), utilJarFile);
+		FileUtil.copyFile(artifact.getFile(), utilJarFile);
 
 		File dependencyUtilJarFile = new File(
 			implClassesDir, "ext-" + pluginName + "-" + utilJarName);
 
-		_fileUtil.copyFile(artifact.getFile(), dependencyUtilJarFile);
-	}
-
-	protected Dependency createDependency(
-		String groupId, String artifactId, String version, String type) {
-
-		Dependency dependency = new Dependency();
-
-		dependency.setArtifactId(artifactId);
-		dependency.setGroupId(groupId);
-		dependency.setType(type);
-		dependency.setVersion(version);
-
-		return dependency;
-	}
-
-	protected Artifact resolveArtifact(Dependency dependency) throws Exception {
-		Artifact artifact = artifactFactory.createArtifact(
-			dependency.getGroupId(), dependency.getArtifactId(),
-			dependency.getVersion(), dependency.getClassifier(),
-			dependency.getType());
-
-		artifactResolver.resolve(
-			artifact, remoteArtifactRepositories, localArtifactRepository);
-
-		return artifact;
-	}
-
-	protected MavenProject resolveProject(Artifact artifact) throws Exception {
-		Artifact pomArtifact = artifact;
-
-		String type = artifact.getType();
-
-		if (!type.equals("pom")) {
-			pomArtifact = artifactFactory.createArtifact(
-				artifact.getGroupId(), artifact.getArtifactId(),
-				artifact.getVersion(), "", "pom");
-		}
-
-		return projectBuilder.buildFromRepository(
-			pomArtifact, remoteArtifactRepositories, localArtifactRepository);
+		FileUtil.copyFile(artifact.getFile(), dependencyUtilJarFile);
 	}
 
 	protected void unpack(
@@ -309,23 +253,6 @@ public class ExtBuilderMojo extends AbstractMojo {
 		unArchiver.extract();
 	}
 
-	private static FileImpl _fileUtil = new FileImpl();
-
-	/**
-	 * @component
-	 */
-	private ArchiverManager archiverManager;
-
-	/**
-	 * @component
-	 */
-	private ArtifactFactory artifactFactory;
-
-	/**
-	 * @component
-	 */
-	private ArtifactResolver artifactResolver;
-
 	/**
 	 * @parameter default-value="false"
 	 */
@@ -342,38 +269,10 @@ public class ExtBuilderMojo extends AbstractMojo {
 	private boolean dependencyAddVersionAndClassifier;
 
 	/**
-	 * @parameter expression="${localRepository}"
-	 * @readonly
-	 * @required
-	 */
-	private ArtifactRepository localArtifactRepository;
-
-	/**
 	 * @parameter default-value="${project.artifactId}" expression="${pluginName}"
 	 * @required
 	 */
 	private String pluginName;
-
-	/**
-	 * @parameter expression="${project}"
-	 * @required
-	 * @readonly
-	 */
-	private MavenProject project;
-
-	/**
-	 * @component role="org.apache.maven.project.MavenProjectBuilder"
-	 * @required
-	 * @readonly
-	 */
-	protected MavenProjectBuilder projectBuilder;
-
-	/**
-	 * @parameter expression="${project.remoteArtifactRepositories}"
-	 * @readonly
-	 * @required
-	 */
-	private List remoteArtifactRepositories;
 
 	/**
 	 * @parameter default-value="${basedir}/src/main/webapp/WEB-INF/sql"
