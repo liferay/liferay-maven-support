@@ -15,11 +15,20 @@
 package com.liferay.maven.plugins;
 
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.tools.servicebuilder.ServiceBuilder;
+import com.liferay.portal.util.InitUtil;
+import com.liferay.portal.util.PropsUtil;
 
 import java.io.File;
+
+import java.lang.reflect.Method;
+
+import java.net.URI;
+import java.net.URL;
+import java.net.URLClassLoader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,36 +62,16 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 	}
 
 	protected void doExecute() throws Exception {
-		String packaging = project.getPackaging();
-
-		if (packaging.equals("pom")) {
-			getLog().info("Skipping " + project.getArtifactId());
-
-			return;
-		}
-
-		String artifactId = project.getArtifactId();
-
-		if (pluginType.equals("ext") &&
-			(artifactId.endsWith("ext-util-bridges") ||
-			 artifactId.endsWith("ext-util-java") ||
-			 artifactId.endsWith("ext-util-taglib"))) {
-
-			getLog().info("Skipping " + artifactId);
-
-			return;
-		}
-
 		if (pluginType.equals("ext")) {
 			StringBuilder sb = new StringBuilder();
 
-			sb.append("WARNING: Support for ServiceBuilder in EXT plugins ");
-			sb.append("will be deprecated in future versions. EXT plugins ");
-			sb.append("are designed to override the portal's core code that ");
-			sb.append("cannot be done with hooks, layout templates, ");
-			sb.append("portlets, or themes. EXT plugins are not meant to ");
-			sb.append("contain new custom services. Please migrate your ");
-			sb.append("service.xml to a portlet plugin.");
+			sb.append("WARNING: Support for ServiceBuilder in EXT ");
+			sb.append("plugins will be deprecated in future versions. ");
+			sb.append("EXT plugins are designed to override the portal's ");
+			sb.append("core code that cannot be done with hooks, layout ");
+			sb.append("templates, portlets, or themes. EXT plugins are ");
+			sb.append("not meant to contain new custom services. Please ");
+			sb.append("migrate your service.xml to a portlet plugin.");
 
 			getLog().warn(sb.toString());
 		}
@@ -91,14 +80,14 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 
 		if (Validator.isNull(serviceFileName)) {
 			throw new MojoExecutionException(
-				"Unable to find service.xml with path " + serviceFileName);
+				"Unable to find service.xml with path: " + serviceFileName);
 		}
 
 		File inputFile = new File(serviceFileName);
 
 		if (!inputFile.exists()) {
 			throw new MojoExecutionException(
-				"Unable to find service.xml with path " +
+				"Unable to find service.xml with path: " +
 					inputFile.getAbsolutePath());
 		}
 
@@ -126,12 +115,11 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 			serviceFileName, hbmFileName, ormFileName, modelHintsFileName,
 			springFileName, springBaseFileName, springClusterFileName,
 			springDynamicDataSourceFileName, springHibernateFileName,
-			springInfrastructureFileName, springShardDataSourceFileName, apiDir,
-			implDir, jsonFileName, remotingFileName, sqlDir, sqlFileName,
-			sqlIndexesFileName, sqlIndexesPropertiesFileName,
+			springInfrastructureFileName, springShardDataSourceFileName,
+			apiDir, implDir, jsonFileName, remotingFileName, sqlDir,
+			sqlFileName, sqlIndexesFileName, sqlIndexesPropertiesFileName,
 			sqlSequencesFileName, autoNamespaceTables, beanLocatorUtil,
-			propsUtil, pluginName, targetEntityName, null, true,
-			serviceBuildNumber, serviceBuildNumberIncrement);
+			propsUtil, pluginName, null);
 
 		if (tempServiceFile != null) {
 			FileUtil.delete(tempServiceFile);
@@ -336,7 +324,7 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 	}
 
 	/**
-	 * @deprecated
+	 * @deprecated 
 	 * @since 6.1.0
 	 */
 	protected void invokeDependencyBuild() throws Exception {
@@ -523,16 +511,6 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 	private String remotingFileName;
 
 	/**
-	 * @parameter default-value="1" expression="${serviceBuildNumber}"
-	 */
-	private long serviceBuildNumber;
-
-	/**
-	 * @parameter default-value="true" expression="${serviceBuildNumberIncrement}"
-	 */
-	private boolean serviceBuildNumberIncrement;
-
-	/**
 	 * @parameter default-value="" expression="${serviceFileName}"
 	 */
 	private String serviceFileName;
@@ -599,11 +577,6 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 	 * @required
 	 */
 	private String sqlSequencesFileName;
-
-	/**
-	 * @parameter
-	 */
-	private String targetEntityName;
 
 	/**
 	 * @parameter
