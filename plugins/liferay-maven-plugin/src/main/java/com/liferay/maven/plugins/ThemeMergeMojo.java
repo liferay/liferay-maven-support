@@ -74,8 +74,8 @@ public class ThemeMergeMojo extends AbstractLiferayMojo {
 		}
 
 		Dependency dependency = createDependency(
-			parentThemeGroupId, parentThemeArtifactId, parentThemeVersion,
-			"", "war");
+			parentThemeGroupId, parentThemeArtifactId, parentThemeVersion, "",
+			"war");
 
 		Artifact artifact = resolveArtifact(dependency);
 
