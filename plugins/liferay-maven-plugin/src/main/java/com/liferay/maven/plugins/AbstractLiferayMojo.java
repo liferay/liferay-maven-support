@@ -48,9 +48,9 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 
 	public void execute() throws MojoExecutionException {
 		try {
-			initClassLoader();
-
 			initPortal();
+
+			initClassLoader();
 
 			doExecute();
 		}
@@ -87,7 +87,15 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 		}
 	}
 
-	protected void initPortal() {
+	protected void initPortal() throws Exception {
+		if (appServerLibPortalDir != null) {
+			System.setProperty(
+				"liferay.lib.portal.dir",
+				appServerLibPortalDir.getAbsolutePath());
+		}
+
+		PropsUtil.reload();
+
 		PropsUtil.set(
 			PropsKeys.RESOURCE_ACTIONS_READ_PORTLET_RESOURCES,
 			Boolean.FALSE.toString());
@@ -162,6 +170,16 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 		return projectBuilder.buildFromRepository(
 			pomArtifact, remoteArtifactRepositories, localArtifactRepository);
 	}
+
+	/**
+	 * @parameter expression="${appServerPortalDir}"
+	 */
+	protected File appServerPortalDir;
+
+	/**
+	 * @parameter default-value="${appServerPortalDir}/WEB-INF/lib" expression="${appServerLibPortalDir}"
+	 */
+	protected File appServerLibPortalDir;
 
 	/**
 	 * @component
