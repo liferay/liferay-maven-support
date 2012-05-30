@@ -65,13 +65,13 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 		if (pluginType.equals("ext")) {
 			StringBuilder sb = new StringBuilder();
 
-			sb.append("WARNING: Support for ServiceBuilder in EXT ");
-			sb.append("plugins will be deprecated in future versions. ");
-			sb.append("EXT plugins are designed to override the portal's ");
-			sb.append("core code that cannot be done with hooks, layout ");
-			sb.append("templates, portlets, or themes. EXT plugins are ");
-			sb.append("not meant to contain new custom services. Please ");
-			sb.append("migrate your service.xml to a portlet plugin.");
+			sb.append("WARNING: Support for ServiceBuilder in EXT plugins ");
+			sb.append("will be deprecated in future versions. EXT plugins ");
+			sb.append("are designed to override the portal's core code that ");
+			sb.append("cannot be done with hooks, layout templates, ");
+			sb.append("portlets, or themes. EXT plugins are not meant to ");
+			sb.append("contain new custom services. Please migrate your ");
+			sb.append("service.xml to a portlet plugin.");
 
 			getLog().warn(sb.toString());
 		}
@@ -80,14 +80,14 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 
 		if (Validator.isNull(serviceFileName)) {
 			throw new MojoExecutionException(
-				"Unable to find service.xml with path: " + serviceFileName);
+				"Unable to find service.xml with path " + serviceFileName);
 		}
 
 		File inputFile = new File(serviceFileName);
 
 		if (!inputFile.exists()) {
 			throw new MojoExecutionException(
-				"Unable to find service.xml with path: " +
+				"Unable to find service.xml with path " +
 					inputFile.getAbsolutePath());
 		}
 
