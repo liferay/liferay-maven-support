@@ -36,7 +36,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 
 /**
  * @author Mika Koivisto
- * @goal build-css
+ * @goal   build-css
  * @phase  process-sources
  */
 public class SassToCssBuilderMojo extends AbstractLiferayMojo {
@@ -62,21 +62,22 @@ public class SassToCssBuilderMojo extends AbstractLiferayMojo {
 		synchronized (SassToCssBuilderMojo.class) {
 			Class<?> clazz = getClass();
 
-			URLClassLoader classLoader = (URLClassLoader)clazz.getClassLoader();
+			URLClassLoader urlClassLoader =
+				(URLClassLoader)clazz.getClassLoader();
 
 			Method method = URLClassLoader.class.getDeclaredMethod(
 				"addURL", URL.class);
 
 			method.setAccessible(true);
 
-			String[] portalLibs = FileUtil.listFiles(appServerLibPortalDir);
+			String[] fileNames = FileUtil.listFiles(appServerLibPortalDir);
 
-			for (String path : portalLibs) {
-				File file = new File(appServerLibPortalDir, path);
+			for (String fileName : fileNames) {
+				File file = new File(appServerLibPortalDir, fileName);
 
 				URI uri = file.toURI();
 
-				method.invoke(classLoader, uri.toURL());
+				method.invoke(urlClassLoader, uri.toURL());
 			}
 		}
 	}

@@ -68,7 +68,8 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 		synchronized (AbstractLiferayMojo.class) {
 			Class<?> clazz = getClass();
 
-			URLClassLoader classLoader = (URLClassLoader)clazz.getClassLoader();
+			URLClassLoader urlClassLoader =
+				(URLClassLoader)clazz.getClassLoader();
 
 			Method method = URLClassLoader.class.getDeclaredMethod(
 				"addURL", URL.class);
@@ -82,7 +83,7 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 
 				URI uri = file.toURI();
 
-				method.invoke(classLoader, uri.toURL());
+				method.invoke(urlClassLoader, uri.toURL());
 			}
 		}
 	}
