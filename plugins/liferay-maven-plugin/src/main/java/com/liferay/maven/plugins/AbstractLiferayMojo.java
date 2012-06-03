@@ -17,23 +17,18 @@ package com.liferay.maven.plugins;
 import com.liferay.portal.cache.MultiVMPoolImpl;
 import com.liferay.portal.cache.memory.MemoryPortalCacheManager;
 import com.liferay.portal.kernel.cache.MultiVMPoolUtil;
-import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.util.HtmlImpl;
 import com.liferay.portal.util.InitUtil;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.util.ant.CopyTask;
 
 import java.io.File;
-
 import java.lang.reflect.Method;
-
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
-
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
@@ -45,11 +40,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
-
-import org.codehaus.plexus.archiver.UnArchiver;
 import org.codehaus.plexus.archiver.manager.ArchiverManager;
-import org.codehaus.plexus.components.io.fileselectors.FileSelector;
-import org.codehaus.plexus.components.io.fileselectors.IncludeExcludeFileSelector;
 
 /**
  * @author Mika Koivisto
@@ -74,86 +65,6 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 		}
 	}
 
-	protected void copyLibraryDependencies(File libDir, Artifact artifact)
-		throws Exception {
-
-		copyLibraryDependencies(libDir, artifact, false, false, false);
-	}
-
-	protected void copyLibraryDependencies(
-			File libDir, Artifact artifact, boolean dependencyAddVersion,
-			boolean dependencyAddClassifier, boolean copyTransitive)
-		throws Exception {
-
-		MavenProject mavenProject = resolveProject(artifact);
-
-		List<Dependency> dependencies = mavenProject.getDependencies();
-
-		for (Dependency dependency : dependencies) {
-			String scope = dependency.getScope();
-
-			if (Validator.isNotNull(scope) &&
-				(scope.equalsIgnoreCase("provided") ||
-				 scope.equalsIgnoreCase("test"))) {
-
-				continue;
-			}
-
-			String type = dependency.getType();
-
-			if (type.equalsIgnoreCase("pom")) {
-				continue;
-			}
-
-			Artifact libArtifact = resolveArtifact(dependency);
-
-			String libJarFileName = libArtifact.getArtifactId();
-
-			if (dependencyAddVersion) {
-				if (Validator.isNotNull(libArtifact.getVersion())) {
-					libJarFileName += "-" + libArtifact.getVersion();
-				}
-			}
-
-			if (dependencyAddClassifier) {
-				if (Validator.isNotNull(libArtifact.getClassifier())) {
-					libJarFileName += "-" + libArtifact.getClassifier();
-				}
-			}
-
-			File libArtifactFile = libArtifact.getFile();
-
-			libJarFileName +=
-				"." + FileUtil.getExtension(libArtifactFile.getName());
-
-			CopyTask.copyFile(
-				libArtifactFile, libDir, libJarFileName, null, true, true);
-
-			if (copyTransitive) {
-				copyLibraryDependencies(
-					libDir, libArtifact, dependencyAddVersion,
-					dependencyAddClassifier, copyTransitive);
-			}
-		}
-	}
-
-	protected Dependency createDependency(
-		String groupId, String artifactId, String version, String classifier,
-		String type) {
-
-		Dependency dependency = new Dependency();
-
-		dependency.setArtifactId(artifactId);
-		dependency.setClassifier(classifier);
-		dependency.setGroupId(groupId);
-		dependency.setType(type);
-		dependency.setVersion(version);
-
-		return dependency;
-	}
-
-	protected abstract void doExecute() throws Exception;
-
 	protected void initClassLoader() throws Exception {
 		synchronized (AbstractLiferayMojo.class) {
 			Class<?> clazz = getClass();
@@ -175,81 +86,10 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 
 				method.invoke(urlClassLoader, uri.toURL());
 			}
-
-			if ((appServerLibPortalDir != null) &&
-				appServerLibPortalDir.exists()) {
-
-				String[] fileNames = FileUtil.listFiles(appServerLibPortalDir);
-
-				for (String fileName : fileNames) {
-					File file = new File(appServerLibPortalDir, fileName);
-
-					URI uri = file.toURI();
-
-					method.invoke(urlClassLoader, uri.toURL());
-				}
-			}
 		}
 	}
 
 	protected void initPortal() throws Exception {
-		if ((appServerPortalDir != null) && appServerPortalDir.exists()) {
-			if (Validator.isNull(appServerClassesPortalDir)) {
-				appServerClassesPortalDir = new File(
-					appServerPortalDir, "WEB-INF/classes");
-			}
-
-			if (Validator.isNull(appServerLibPortalDir)) {
-				appServerLibPortalDir = new File(
-					appServerPortalDir, "WEB-INF/lib");
-			}
-
-			if (Validator.isNull(appServerTldPortalDir)) {
-				appServerTldPortalDir = new File(
-					appServerPortalDir, "WEB-INF/tld");
-			}
-		}
-
-		if (((appServerPortalDir == null) || !appServerPortalDir.exists()) &&
-			 Validator.isNotNull(liferayVersion)) {
-
-			appServerPortalDir = new File(workDir, "appServerPortalDir");
-
-			if (!appServerPortalDir.exists()) {
-				appServerPortalDir.mkdirs();
-			}
-
-			Dependency dependency = createDependency(
-				"com.liferay.portal", "portal-web", liferayVersion, "", "war");
-
-			Artifact artifact = resolveArtifact(dependency);
-
-			UnArchiver unArchiver = archiverManager.getUnArchiver(
-				artifact.getFile());
-
-			unArchiver.setDestDirectory(appServerPortalDir);
-
-			IncludeExcludeFileSelector includeExcludeFileSelector =
-				new IncludeExcludeFileSelector();
-
-			includeExcludeFileSelector.setExcludes(null);
-			includeExcludeFileSelector.setIncludes(
-				new String[] {"WEB-INF/lib/*.jar"});
-
-			unArchiver.setFileSelectors(
-				new FileSelector[] {includeExcludeFileSelector});
-
-			unArchiver.setOverwrite(false);
-			unArchiver.setSourceFile(artifact.getFile());
-
-			unArchiver.extract();
-
-			if (Validator.isNull(appServerLibPortalDir)) {
-				appServerLibPortalDir = new File(
-					appServerPortalDir, "WEB-INF/lib");
-			}
-		}
-
 		if (appServerLibPortalDir != null) {
 			System.setProperty(
 				"liferay.lib.portal.dir",
@@ -289,6 +129,54 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 		multiVMPoolUtil.setMultiVMPool(multiVMPoolImpl);
 	}
 
+	protected void copyLibraryDependencies(File libDir, Artifact artifact)
+			throws Exception {
+
+		MavenProject libProject = resolveProject(artifact);
+
+		List<Dependency> dependencies = libProject.getDependencies();
+
+		for (Dependency dependency : dependencies) {
+			String scope = dependency.getScope();
+
+			if (scope.equalsIgnoreCase("provided")
+				|| scope.equalsIgnoreCase("test")) {
+
+				continue;
+			}
+
+			String type = dependency.getType();
+
+			if (type.equalsIgnoreCase("pom")) {
+				continue;
+			}
+
+			Artifact libArtifact = resolveArtifact(dependency);
+
+			File libJarFile = new File(libDir, libArtifact.getArtifactId()
+				+ ".jar");
+
+			CopyTask.copyFile(libArtifact.getFile(), libJarFile, true, true);
+		}
+	}
+
+	protected Dependency createDependency(
+		String groupId, String artifactId, String version, String classifier,
+		String type) {
+
+		Dependency dependency = new Dependency();
+
+		dependency.setArtifactId(artifactId);
+		dependency.setClassifier(classifier);
+		dependency.setGroupId(groupId);
+		dependency.setType(type);
+		dependency.setVersion(version);
+
+		return dependency;
+	}
+
+	protected abstract void doExecute() throws Exception;
+
 	protected Artifact resolveArtifact(Dependency dependency) throws Exception {
 		Artifact artifact = artifactFactory.createArtifact(
 			dependency.getGroupId(), dependency.getArtifactId(),
@@ -317,29 +205,14 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 	}
 
 	/**
-	 * @parameter expression="${appServerClassesPortalDir}"
-	 */
-	protected File appServerClassesPortalDir;
-
-	/**
-	 * @parameter expression="${appServerLibGlobalDir}"
-	 */
-	protected File appServerLibGlobalDir;
-
-	/**
-	 * @parameter expression="${appServerLibPortalDir}"
-	 */
-	protected File appServerLibPortalDir;
-
-	/**
 	 * @parameter expression="${appServerPortalDir}"
 	 */
 	protected File appServerPortalDir;
 
 	/**
-	 * @parameter expression="${appServerTldPortalDir}"
+	 * @parameter default-value="${appServerPortalDir}/WEB-INF/lib" expression="${appServerLibPortalDir}"
 	 */
-	protected File appServerTldPortalDir;
+	protected File appServerLibPortalDir;
 
 	/**
 	 * @component
@@ -355,11 +228,6 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 	 * @component
 	 */
 	protected ArtifactResolver artifactResolver;
-
-	/**
-	 * @parameter expression="${liferayVersion}"
-	 */
-	protected String liferayVersion;
 
 	/**
 	 * @parameter expression="${localRepository}"
@@ -394,11 +262,5 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 	 * @required
 	 */
 	protected List remoteArtifactRepositories;
-
-	/**
-	 * @parameter default-value="${project.build.directory}/liferay-work"
-	 * @required
-	 */
-	protected File workDir;
 
 }
