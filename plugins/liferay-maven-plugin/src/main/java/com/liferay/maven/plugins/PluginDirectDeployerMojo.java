@@ -15,6 +15,8 @@
 package com.liferay.maven.plugins;
 
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.tools.WebXMLBuilder;
 import com.liferay.portal.tools.deploy.HookDeployer;
 import com.liferay.portal.tools.deploy.LayoutTemplateDeployer;
@@ -24,12 +26,12 @@ import com.liferay.portal.tools.deploy.WebDeployer;
 import com.liferay.util.ant.CopyTask;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.model.Build;
 
 import org.codehaus.plexus.archiver.UnArchiver;
 import org.codehaus.plexus.components.io.fileselectors.FileSelector;
@@ -37,17 +39,12 @@ import org.codehaus.plexus.components.io.fileselectors.IncludeExcludeFileSelecto
 
 /**
  * @author Mika Koivisto
+ * @author Thiago Moreira
  * @goal   direct-deploy
  */
 public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 
 	protected void doExecute() throws Exception {
-		if (!warFile.exists()) {
-			getLog().error(warFileName + " does not exist");
-
-			throw new FileNotFoundException(warFileName + " does not exist");
-		}
-
 		getLog().info("Directly deploying " + warFileName);
 
 		getLog().debug("appServerType: " + appServerType);
@@ -90,76 +87,81 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 	}
 
 	protected void deployExt() throws Exception {
-		workDir.mkdirs();
 
-		UnArchiver unArchiver = archiverManager.getUnArchiver(warFile);
+		String artifactId = project.getArtifactId();
+		Build build = project.getBuild();
 
-		unArchiver.setDestDirectory(workDir);
-		unArchiver.setSourceFile(warFile);
+		if (artifactId.endsWith("ext-service")) {
+			File sourceFile = new File(
+				build.getDirectory(), build.getFinalName()
+				+ StringPool.PERIOD + project.getPackaging());
 
-		unArchiver.extract();
+			CopyTask.copyFile(sourceFile, appServerLibGlobalDir, true, true);
 
-		CopyTask.copyDirectory(
-			new File(workDir, "WEB-INF/ext-lib/global"), appServerLibGlobalDir,
-			"*.jar", null, true, true);
+			copyLibraryDependencies(
+				appServerLibGlobalDir, project.getArtifact());
+		}
 
-		CopyTask.copyFile(
-			new File(workDir, "WEB-INF/ext-service/ext-service.jar"),
-			appServerLibGlobalDir, "ext-" + pluginName + "-service.jar", null,
-			true, true);
+		if (artifactId.endsWith("ext-impl")) {
+			File sourceFile = new File(
+				build.getDirectory(), build.getFinalName()
+				+ StringPool.PERIOD +  project.getPackaging());
+			File sourceDir = new File(build.getOutputDirectory());
 
-		CopyTask.copyDirectory(
-			new File(workDir, "WEB-INF/ext-lib/portal"), appServerLibPortalDir,
-			"*.jar", null, true, true);
+			CopyTask.copyFile(sourceFile, appServerLibPortalDir, true, true);
+			CopyTask.copyDirectory(
+				sourceDir, appServerClassesPortalDir,
+				"portal-*.properties,system-*.properties", null);
 
-		CopyTask.copyFile(
-			new File(workDir, "WEB-INF/ext-impl/ext-impl.jar"),
-			appServerLibGlobalDir, "ext-" + pluginName + "-impl.jar", null, true,
-			true);
+			copyLibraryDependencies(
+				appServerLibPortalDir, project.getArtifact());
+		}
 
-		CopyTask.copyFile(
-			new File(workDir, "WEB-INF/ext-util-bridges/ext-util-bridges.jar"),
-			appServerLibGlobalDir, "ext-" + pluginName + "-util-bridges.jar",
-			null, true, true);
+		if (artifactId.endsWith("ext-util-bridges")
+			|| artifactId.endsWith("ext-util-java")
+			|| artifactId.endsWith("ext-util-taglib")) {
 
-		CopyTask.copyFile(
-			new File(workDir, "WEB-INF/ext-util-java/ext-util-java.jar"),
-			appServerLibGlobalDir, "ext-" + pluginName + "-util-java.jar", null,
-			true, true);
+			File sourceFile = new File(
+				build.getDirectory(), build.getFinalName()
+				+ StringPool.PERIOD +  project.getPackaging());
 
-		CopyTask.copyFile(
-			new File(workDir, "WEB-INF/ext-util-taglib/ext-util-taglib.jar"),
-			appServerLibGlobalDir, "ext-" + pluginName + "-util-taglib.jar",
-			null, true, true);
+			CopyTask.copyFile(sourceFile, appServerLibPortalDir, true, true);
 
-		CopyTask.copyDirectory(
-			new File(workDir, "WEB-INF/ext-web/docroot"), appServerPortalDir,
-			null, "WEB-INF/web.xml", true, true);
+			copyLibraryDependencies(
+				appServerLibPortalDir, project.getArtifact());
+		}
 
-		File webXml = new File(
-			workDir, "WEB-INF/ext-web/docroot/WEB-INF/web.xml");
-
-		if (webXml.exists()) {
+		if (artifactId.endsWith("ext-web")) {
 			File originalWebXml = new File(
 				appServerPortalDir, "WEB-INF/web.xml");
 			File mergedWebXml = new File(
 				appServerPortalDir, "WEB-INF/web.xml.merged");
 
+			File sourceDir =
+				new File(build.getDirectory(), build.getFinalName());
+			String customWebXml = sourceDir + "/WEB-INF/web.xml";
+
+			CopyTask.copyDirectory(
+				sourceDir, appServerDeployDir, null, "WEB-INF/web.xml", true,
+				true);
+
 			new WebXMLBuilder(
-				originalWebXml.getAbsolutePath(), webXml.getAbsolutePath(),
+				originalWebXml.getAbsolutePath(), customWebXml,
 				mergedWebXml.getAbsolutePath());
 
 			FileUtil.move(mergedWebXml, originalWebXml);
 		}
 
-		CopyTask.copyFile(
-			new File(workDir, "WEB-INF/ext-" + pluginName + ".xml"),
-			appServerPortalDir, null, true, true);
+		if (artifactId.endsWith("-ext")
+			&& project.getPackaging().equals("war")) {
 
-		CopyTask.copyDirectory(
-			new File(workDir, "WEB-INF/ext-web/docroot/WEB-INF/classes"),
-			appServerClassesPortalDir,
-			"portal-*.properties,system-*.properties", null, true, true);
+			File sourceFile =
+				new File(
+					build.getDirectory() + File.separator + build.getFinalName(),
+					"WEB-INF/ext-" + pluginName + ".xml");
+
+			CopyTask.copyFile(sourceFile, appServerPortalDir, true, true);
+		}
 	}
 
 	protected void deployHook() throws Exception {

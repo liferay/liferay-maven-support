@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.util.HtmlImpl;
 import com.liferay.portal.util.InitUtil;
 import com.liferay.portal.util.PropsUtil;
+import com.liferay.util.ant.CopyTask;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -126,6 +127,37 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 		MultiVMPoolUtil multiVMPoolUtil = new MultiVMPoolUtil();
 
 		multiVMPoolUtil.setMultiVMPool(multiVMPoolImpl);
+	}
+
+	protected void copyLibraryDependencies(File libDir, Artifact artifact)
+			throws Exception {
+
+		MavenProject libProject = resolveProject(artifact);
+
+		List<Dependency> dependencies = libProject.getDependencies();
+
+		for (Dependency dependency : dependencies) {
+			String scope = dependency.getScope();
+
+			if (scope.equalsIgnoreCase("provided")
+				|| scope.equalsIgnoreCase("test")) {
+
+				continue;
+			}
+
+			String type = dependency.getType();
+
+			if (type.equalsIgnoreCase("pom")) {
+				continue;
+			}
+
+			Artifact libArtifact = resolveArtifact(dependency);
+
+			File libJarFile = new File(libDir, libArtifact.getArtifactId()
+				+ ".jar");
+
+			CopyTask.copyFile(libArtifact.getFile(), libJarFile, true, true);
+		}
 	}
 
 	protected Dependency createDependency(
