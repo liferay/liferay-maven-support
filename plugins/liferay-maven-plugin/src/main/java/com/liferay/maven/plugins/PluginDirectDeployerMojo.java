@@ -87,6 +87,14 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 	}
 
 	protected void deployExt() throws Exception {
+		if (Validator.isNull(appServerClassesPortalDir)) {
+			appServerClassesPortalDir =
+				new File(appServerPortalDir, "WEB-INF/classes");
+		}
+		if (Validator.isNull(appServerLibPortalDir)) {
+			appServerLibPortalDir =
+				new File(appServerPortalDir, "WEB-INF/lib");
+		}
 
 		String artifactId = project.getArtifactId();
 		Build build = project.getBuild();
@@ -279,8 +287,7 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 	}
 
 	/**
-	 * @parameter default-value="${appServerPortalDir}/WEB-INF/classes" expression="${appServerClassesPortalDir}"
-	 * @required
+	 * @parameter expression="${appServerClassesPortalDir}"
 	 */
 	private File appServerClassesPortalDir;
 
@@ -303,7 +310,7 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 	private File appServerPortalDir;
 
 	/**
-	 * @parameter default-value="${appServerPortalDir}/WEB-INF/lib" expression="${appServerLibPortalDir}"
+	 * @parameter expression="${appServerLibPortalDir}"
 	 */
 	private File appServerLibPortalDir;
 
