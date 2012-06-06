@@ -16,7 +16,6 @@ package com.liferay.maven.plugins;
 
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.tools.WebXMLBuilder;
 import com.liferay.portal.tools.deploy.HookDeployer;
 import com.liferay.portal.tools.deploy.LayoutTemplateDeployer;
@@ -30,12 +29,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Build;
-
-import org.codehaus.plexus.archiver.UnArchiver;
-import org.codehaus.plexus.components.io.fileselectors.FileSelector;
-import org.codehaus.plexus.components.io.fileselectors.IncludeExcludeFileSelector;
+import org.apache.maven.plugin.MojoExecutionException;
 
 /**
  * @author Mika Koivisto
@@ -45,6 +40,15 @@ import org.codehaus.plexus.components.io.fileselectors.IncludeExcludeFileSelecto
 public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 
 	protected void doExecute() throws Exception {
+		if (appServerLibGlobalDir == null) {
+			throw new MojoExecutionException(
+				"The parameter appServerLibGlobalDir is required");
+		}
+		if (appServerLibPortalDir == null) {
+			throw new MojoExecutionException(
+				"The parameter appServerLibPortalDir is required");
+		}
+
 		getLog().info("Directly deploying " + project.getArtifactId());
 
 		getLog().debug("appServerType: " + appServerType);
@@ -53,18 +57,6 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 		getLog().debug("jbossPrefix: " + jbossPrefix);
 		getLog().debug("pluginType: " + pluginType);
 		getLog().debug("unpackWar: " + unpackWar);
-
-		if (Validator.isNull(appServerClassesPortalDir)) {
-			appServerClassesPortalDir =
-				new File(appServerPortalDir, "WEB-INF/classes");
-		}
-		if (Validator.isNull(appServerLibPortalDir)) {
-			appServerLibPortalDir =
-				new File(appServerPortalDir, "WEB-INF/lib");
-		}
-		if (Validator.isNull(appServerTldPortalDir)) {
-			appServerTldPortalDir = new File(appServerPortalDir, "WEB-INF/tld");
-		}
 
 		if (dependencyAddVersionAndClassifier) {
 			dependencyAddVersion = true;
@@ -281,37 +273,10 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 	}
 
 	/**
-	 * @parameter expression="${appServerClassesPortalDir}"
-	 */
-	private File appServerClassesPortalDir;
-
-	/**
 	 * @parameter default-value="${deployDir}" expression="${appServerDeployDir}"
 	 * @required
 	 */
 	private File appServerDeployDir;
-
-	/**
-	 * @parameter expression="${appServerLibGlobalDir}"
-	 * @required
-	 */
-	private File appServerLibGlobalDir;
-
-	/**
-	 * @parameter expression="${appServerPortalDir}"
-	 * @required
-	 */
-	private File appServerPortalDir;
-
-	/**
-	 * @parameter expression="${appServerLibPortalDir}"
-	 */
-	private File appServerLibPortalDir;
-
-	/**
-	 * @parameter expression="${appServerTldPortalDir}"
-	 */
-	private File appServerTldPortalDir;
 
 	/**
 	 * @parameter default-value="tomcat" expression="${appServerType}"
