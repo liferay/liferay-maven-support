@@ -17,8 +17,10 @@ package com.liferay.maven.plugins;
 import com.liferay.portal.cache.MultiVMPoolImpl;
 import com.liferay.portal.cache.memory.MemoryPortalCacheManager;
 import com.liferay.portal.kernel.cache.MultiVMPoolUtil;
+import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.util.HtmlImpl;
 import com.liferay.portal.util.InitUtil;
 import com.liferay.portal.util.PropsUtil;
@@ -130,7 +132,15 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 	}
 
 	protected void copyLibraryDependencies(File libDir, Artifact artifact)
-			throws Exception {
+		throws Exception {
+
+		copyLibraryDependencies(libDir, artifact, false, false, false);
+	}
+
+	protected void copyLibraryDependencies(
+			File libDir, Artifact artifact, boolean dependencyAddVersion,
+			boolean dependencyAddClassifier, boolean copyTransitive)
+		throws Exception {
 
 		MavenProject libProject = resolveProject(artifact);
 
@@ -139,8 +149,9 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 		for (Dependency dependency : dependencies) {
 			String scope = dependency.getScope();
 
-			if (scope.equalsIgnoreCase("provided")
-				|| scope.equalsIgnoreCase("test")) {
+			if (Validator.isNotNull(scope) && 
+				(scope.equalsIgnoreCase("provided") ||
+				 scope.equalsIgnoreCase("test"))) {
 
 				continue;
 			}
@@ -153,10 +164,33 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 
 			Artifact libArtifact = resolveArtifact(dependency);
 
-			File libJarFile = new File(libDir, libArtifact.getArtifactId()
-				+ ".jar");
+			String libJarFileName = libArtifact.getArtifactId();
 
-			CopyTask.copyFile(libArtifact.getFile(), libJarFile, true, true);
+			if (dependencyAddVersion) {
+				if (Validator.isNotNull(libArtifact.getVersion())) {
+					libJarFileName += "-" + libArtifact.getVersion();
+				}
+			}
+
+			if (dependencyAddClassifier) {
+				if (Validator.isNotNull(libArtifact.getClassifier())) {
+					libJarFileName += "-" + libArtifact.getClassifier();
+				}
+			}
+
+			File libArtifactFile = libArtifact.getFile();
+
+			libJarFileName +=
+				"." + FileUtil.getExtension(libArtifactFile.getName());
+
+			CopyTask.copyFile(
+				libArtifactFile, libDir, libJarFileName, null, true, true);
+
+			if (copyTransitive) {
+				copyLibraryDependencies(
+					libDir, libArtifact, dependencyAddVersion,
+					dependencyAddClassifier, copyTransitive);
+			}
 		}
 	}
 
