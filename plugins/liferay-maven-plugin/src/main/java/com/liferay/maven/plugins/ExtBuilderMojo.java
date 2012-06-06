@@ -15,17 +15,13 @@
 package com.liferay.maven.plugins;
 
 import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.tools.ExtInfoBuilder;
 import com.liferay.util.ant.CopyTask;
 
 import java.io.File;
 
-import java.util.List;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Dependency;
-import org.apache.maven.project.MavenProject;
 
 import org.codehaus.plexus.archiver.UnArchiver;
 import org.codehaus.plexus.components.io.fileselectors.FileSelector;
@@ -38,6 +34,11 @@ import org.codehaus.plexus.components.io.fileselectors.IncludeExcludeFileSelecto
 public class ExtBuilderMojo extends AbstractLiferayMojo {
 
 	protected void doExecute() throws Exception {
+		if (dependencyAddVersionAndClassifier) {
+			dependencyAddVersion = true;
+			dependencyAddClassifier = true;
+		}
+
 		File implDir = new File(webappDir, "WEB-INF/ext-impl");
 
 		implDir.mkdirs();
@@ -100,35 +101,63 @@ public class ExtBuilderMojo extends AbstractLiferayMojo {
 				extImplFile = artifact.getFile();
 
 				copyJarAndClasses(artifact, implDir, "ext-impl.jar");
+
+				copyLibraryDependencies(
+					portalLibDir, artifact, dependencyAddVersion,
+					dependencyAddClassifier, dependencyCopyTransitive);
 			}
 			else if (artifactId.endsWith("ext-lib-global")) {
-				copyLibraryDependencies(globalLibDir, artifact);
+				copyLibraryDependencies(
+					globalLibDir, artifact, dependencyAddVersion,
+					dependencyAddClassifier, dependencyCopyTransitive);
 			}
 			else if (artifactId.endsWith("ext-lib-portal")) {
-				copyLibraryDependencies(portalLibDir, artifact);
+				copyLibraryDependencies(
+					portalLibDir, artifact, dependencyAddVersion,
+					dependencyAddClassifier, dependencyCopyTransitive);
 			}
 			else if (artifactId.endsWith("ext-service")) {
 				copyJarAndClasses(artifact, serviceDir, "ext-service.jar");
+
+				copyLibraryDependencies(
+					globalLibDir, artifact, dependencyAddVersion,
+					dependencyAddClassifier, dependencyCopyTransitive);
 			}
 			else if (artifactId.endsWith("ext-util-bridges")) {
 				copyUtilLibrary(
 					artifact, utilBridgesDir, implClassesDir,
 					"util-bridges.jar");
+
+				copyLibraryDependencies(
+					portalLibDir, artifact, dependencyAddVersion,
+					dependencyAddClassifier, dependencyCopyTransitive);
 			}
 			else if (artifactId.endsWith("ext-util-java")) {
 				copyUtilLibrary(
 					artifact, utilJavaDir, implClassesDir,
 					"util-java.jar");
+
+				copyLibraryDependencies(
+					portalLibDir, artifact, dependencyAddVersion,
+					dependencyAddClassifier, dependencyCopyTransitive);
 			}
 			else if (artifactId.endsWith("ext-util-taglib")) {
 				copyUtilLibrary(
 					artifact, utilTaglibDir, implClassesDir,
 					"util-taglib.jar");
+
+				copyLibraryDependencies(
+					portalLibDir, artifact, dependencyAddVersion,
+					dependencyAddClassifier, dependencyCopyTransitive);
 			}
 			else if (artifactId.endsWith("ext-web")) {
 				String[] excludes = new String[] {"META-INF/**"};
 
 				unpack(artifact.getFile(), webDir, excludes, null);
+
+				copyLibraryDependencies(
+					portalLibDir, artifact, dependencyAddVersion,
+					dependencyAddClassifier, dependencyCopyTransitive);
 			}
 		}
 
@@ -165,56 +194,6 @@ public class ExtBuilderMojo extends AbstractLiferayMojo {
 		};
 
 		unpack(artifact.getFile(), classesDir, excludes, null);
-	}
-
-	protected void copyLibraryDependencies(File libDir, Artifact artifact)
-		throws Exception {
-
-		MavenProject libProject = resolveProject(artifact);
-
-		List<Dependency> dependencies = libProject.getDependencies();
-
-		for (Dependency dependency : dependencies) {
-			String scope = dependency.getScope();
-
-			if (Validator.isNotNull(scope) &&
-				(scope.equalsIgnoreCase("provided") ||
-				 scope.equalsIgnoreCase("test"))) {
-
-				continue;
-			}
-
-			String type = dependency.getType();
-
-			if (type.equalsIgnoreCase("pom")) {
-				continue;
-			}
-
-			Artifact libArtifact = resolveArtifact(dependency);
-
-			String libJarFileName = libArtifact.getArtifactId();
-
-			if (dependencyAddVersion || dependencyAddVersionAndClassifier) {
-				if (Validator.isNotNull(libArtifact.getVersion())) {
-					libJarFileName += "-" + libArtifact.getVersion();
-				}
-			}
-
-			if (dependencyAddClassifier || dependencyAddVersionAndClassifier) {
-				if (Validator.isNotNull(libArtifact.getClassifier())) {
-					libJarFileName += "-" + libArtifact.getClassifier();
-				}
-			}
-
-			File libArtifactFile = libArtifact.getFile();
-
-			libJarFileName +=
-				"." + FileUtil.getExtension(libArtifactFile.getName());
-
-			File libJarFile = new File(libDir, libJarFileName);
-
-			FileUtil.copyFile(libArtifact.getFile(), libJarFile);
-		}
 	}
 
 	protected void copyUtilLibrary(
@@ -267,6 +246,13 @@ public class ExtBuilderMojo extends AbstractLiferayMojo {
 	 * @parameter default-value="false"
 	 */
 	private boolean dependencyAddVersionAndClassifier;
+
+	/**
+	 * Setting this property true copies dependencies of dependencies
+	 * 
+	 * @parameter default-value="false"
+	 */
+	private boolean dependencyCopyTransitive;
 
 	/**
 	 * @parameter default-value="${project.artifactId}" expression="${pluginName}"
