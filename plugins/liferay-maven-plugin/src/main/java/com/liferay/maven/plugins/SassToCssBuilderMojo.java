@@ -15,16 +15,12 @@
 package com.liferay.maven.plugins;
 
 import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.tools.SassToCssBuilder;
-import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.util.PropsUtil;
 
 import java.io.File;
 
 import java.lang.reflect.Method;
-
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
