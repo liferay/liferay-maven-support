@@ -14,11 +14,21 @@
 
 package com.liferay.maven.plugins;
 
+import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.tools.SassToCssBuilder;
 
+import java.io.File;
+
+import java.lang.reflect.Method;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLClassLoader;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.maven.plugin.MojoExecutionException;
 
 /**
  * @author Mika Koivisto
@@ -28,6 +38,11 @@ import java.util.List;
 public class SassToCssBuilderMojo extends AbstractLiferayMojo {
 
 	protected void doExecute() throws Exception {
+		if (appServerPortalDir == null) {
+			throw new MojoExecutionException(
+				"The parameter appServerPortalDir is required");
+		}
+
 		List<String> dirNames = new ArrayList<String>();
 
 		for (String dirName : StringUtil.split(sassDirNames)) {
@@ -35,6 +50,32 @@ public class SassToCssBuilderMojo extends AbstractLiferayMojo {
 		}
 
 		new SassToCssBuilder(dirNames);
+	}
+
+	protected void initClassLoader() throws Exception {
+		super.initClassLoader();
+
+		synchronized (SassToCssBuilderMojo.class) {
+			Class<?> clazz = getClass();
+
+			URLClassLoader urlClassLoader =
+				(URLClassLoader)clazz.getClassLoader();
+
+			Method method = URLClassLoader.class.getDeclaredMethod(
+				"addURL", URL.class);
+
+			method.setAccessible(true);
+
+			String[] fileNames = FileUtil.listFiles(appServerLibPortalDir);
+
+			for (String fileName : fileNames) {
+				File file = new File(appServerLibPortalDir, fileName);
+
+				URI uri = file.toURI();
+
+				method.invoke(urlClassLoader, uri.toURL());
+			}
+		}
 	}
 
 	/**

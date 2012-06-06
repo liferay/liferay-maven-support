@@ -92,6 +92,21 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 	}
 
 	protected void initPortal() throws Exception {
+		if (appServerPortalDir != null) {
+			if (Validator.isNull(appServerClassesPortalDir)) {
+				appServerClassesPortalDir =
+					new File(appServerPortalDir, "WEB-INF/classes");
+			}
+			if (Validator.isNull(appServerLibPortalDir)) {
+				appServerLibPortalDir =
+					new File(appServerPortalDir, "WEB-INF/lib");
+			}
+			if (Validator.isNull(appServerTldPortalDir)) {
+				appServerTldPortalDir = new File(
+					appServerPortalDir, "WEB-INF/tld");
+			}
+		}
+
 		if (appServerLibPortalDir != null) {
 			System.setProperty(
 				"liferay.lib.portal.dir",
@@ -239,14 +254,29 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 	}
 
 	/**
+	 * @parameter expression="${appServerClassesPortalDir}"
+	 */
+	protected File appServerClassesPortalDir;
+
+	/**
+	 * @parameter expression="${appServerLibGlobalDir}"
+	 */
+	protected File appServerLibGlobalDir;
+
+	/**
 	 * @parameter expression="${appServerPortalDir}"
 	 */
 	protected File appServerPortalDir;
 
 	/**
-	 * @parameter default-value="${appServerPortalDir}/WEB-INF/lib" expression="${appServerLibPortalDir}"
+	 * @parameter expression="${appServerLibPortalDir}"
 	 */
 	protected File appServerLibPortalDir;
+
+	/**
+	 * @parameter expression="${appServerTldPortalDir}"
+	 */
+	protected File appServerTldPortalDir;
 
 	/**
 	 * @component
