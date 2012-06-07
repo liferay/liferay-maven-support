@@ -15,20 +15,11 @@
 package com.liferay.maven.plugins;
 
 import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.tools.servicebuilder.ServiceBuilder;
-import com.liferay.portal.util.InitUtil;
-import com.liferay.portal.util.PropsUtil;
 
 import java.io.File;
-
-import java.lang.reflect.Method;
-
-import java.net.URI;
-import java.net.URL;
-import java.net.URLClassLoader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,6 +53,24 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 	}
 
 	protected void doExecute() throws Exception {
+		if (project.getPackaging().equalsIgnoreCase("pom")) {
+			getLog().info("Skipping " + project.getArtifactId());
+
+			return;
+		}
+
+		String artifactId = project.getArtifactId();
+
+		if (pluginType.equals("ext") &&
+			(artifactId.endsWith("ext-util-bridges") ||
+			 artifactId.endsWith("ext-util-java") ||
+			 artifactId.endsWith("ext-util-taglib"))) {
+
+			getLog().info("Skipping " + artifactId);
+
+			return;
+		}
+
 		if (pluginType.equals("ext")) {
 			StringBuilder sb = new StringBuilder();
 
