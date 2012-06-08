@@ -27,10 +27,13 @@ import com.liferay.portal.util.PropsUtil;
 import com.liferay.util.ant.CopyTask;
 
 import java.io.File;
+
 import java.lang.reflect.Method;
+
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
+
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
@@ -42,6 +45,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
+
 import org.codehaus.plexus.archiver.manager.ArchiverManager;
 
 /**
@@ -67,85 +71,6 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 		}
 	}
 
-	protected void initClassLoader() throws Exception {
-		synchronized (AbstractLiferayMojo.class) {
-			Class<?> clazz = getClass();
-
-			URLClassLoader urlClassLoader =
-				(URLClassLoader)clazz.getClassLoader();
-
-			Method method = URLClassLoader.class.getDeclaredMethod(
-				"addURL", URL.class);
-
-			method.setAccessible(true);
-
-			for (Object object : project.getCompileClasspathElements()) {
-				String path = (String)object;
-
-				File file = new File(path);
-
-				URI uri = file.toURI();
-
-				method.invoke(urlClassLoader, uri.toURL());
-			}
-		}
-	}
-
-	protected void initPortal() throws Exception {
-		if (appServerPortalDir != null) {
-			if (Validator.isNull(appServerClassesPortalDir)) {
-				appServerClassesPortalDir =
-					new File(appServerPortalDir, "WEB-INF/classes");
-			}
-			if (Validator.isNull(appServerLibPortalDir)) {
-				appServerLibPortalDir =
-					new File(appServerPortalDir, "WEB-INF/lib");
-			}
-			if (Validator.isNull(appServerTldPortalDir)) {
-				appServerTldPortalDir = new File(
-					appServerPortalDir, "WEB-INF/tld");
-			}
-		}
-
-		if (appServerLibPortalDir != null) {
-			System.setProperty(
-				"liferay.lib.portal.dir",
-				appServerLibPortalDir.getAbsolutePath());
-		}
-
-		PropsUtil.reload();
-
-		PropsUtil.set(
-			PropsKeys.RESOURCE_ACTIONS_READ_PORTLET_RESOURCES,
-			Boolean.FALSE.toString());
-
-		PropsUtil.set(
-			PropsKeys.SPRING_CONFIGS, "META-INF/service-builder-spring.xml");
-
-		PropsUtil.set(
-			PropsKeys.VELOCITY_ENGINE_LOGGER,
-			"org.apache.velocity.runtime.log.NullLogSystem");
-
-		InitUtil.initWithSpring();
-
-		HtmlUtil htmlUtil = new HtmlUtil();
-
-		htmlUtil.setHtml(new HtmlImpl());
-
-		MemoryPortalCacheManager memoryPortalCacheManager =
-			new MemoryPortalCacheManager();
-
-		memoryPortalCacheManager.afterPropertiesSet();
-
-		MultiVMPoolImpl multiVMPoolImpl = new MultiVMPoolImpl();
-
-		multiVMPoolImpl.setPortalCacheManager(memoryPortalCacheManager);
-
-		MultiVMPoolUtil multiVMPoolUtil = new MultiVMPoolUtil();
-
-		multiVMPoolUtil.setMultiVMPool(multiVMPoolImpl);
-	}
-
 	protected void copyLibraryDependencies(File libDir, Artifact artifact)
 		throws Exception {
 
@@ -157,14 +82,14 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 			boolean dependencyAddClassifier, boolean copyTransitive)
 		throws Exception {
 
-		MavenProject libProject = resolveProject(artifact);
+		MavenProject mavenProject = resolveProject(artifact);
 
-		List<Dependency> dependencies = libProject.getDependencies();
+		List<Dependency> dependencies = mavenProject.getDependencies();
 
 		for (Dependency dependency : dependencies) {
 			String scope = dependency.getScope();
 
-			if (Validator.isNotNull(scope) && 
+			if (Validator.isNotNull(scope) &&
 				(scope.equalsIgnoreCase("provided") ||
 				 scope.equalsIgnoreCase("test"))) {
 
@@ -226,6 +151,87 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 
 	protected abstract void doExecute() throws Exception;
 
+	protected void initClassLoader() throws Exception {
+		synchronized (AbstractLiferayMojo.class) {
+			Class<?> clazz = getClass();
+
+			URLClassLoader urlClassLoader =
+				(URLClassLoader)clazz.getClassLoader();
+
+			Method method = URLClassLoader.class.getDeclaredMethod(
+				"addURL", URL.class);
+
+			method.setAccessible(true);
+
+			for (Object object : project.getCompileClasspathElements()) {
+				String path = (String)object;
+
+				File file = new File(path);
+
+				URI uri = file.toURI();
+
+				method.invoke(urlClassLoader, uri.toURL());
+			}
+		}
+	}
+
+	protected void initPortal() throws Exception {
+		if (appServerPortalDir != null) {
+			if (Validator.isNull(appServerClassesPortalDir)) {
+				appServerClassesPortalDir = new File(
+					appServerPortalDir, "WEB-INF/classes");
+			}
+
+			if (Validator.isNull(appServerLibPortalDir)) {
+				appServerLibPortalDir = new File(
+					appServerPortalDir, "WEB-INF/lib");
+			}
+
+			if (Validator.isNull(appServerTldPortalDir)) {
+				appServerTldPortalDir = new File(
+					appServerPortalDir, "WEB-INF/tld");
+			}
+		}
+
+		if (appServerLibPortalDir != null) {
+			System.setProperty(
+				"liferay.lib.portal.dir",
+				appServerLibPortalDir.getAbsolutePath());
+		}
+
+		PropsUtil.reload();
+
+		PropsUtil.set(
+			PropsKeys.RESOURCE_ACTIONS_READ_PORTLET_RESOURCES,
+			Boolean.FALSE.toString());
+
+		PropsUtil.set(
+			PropsKeys.SPRING_CONFIGS, "META-INF/service-builder-spring.xml");
+
+		PropsUtil.set(
+			PropsKeys.VELOCITY_ENGINE_LOGGER,
+			"org.apache.velocity.runtime.log.NullLogSystem");
+
+		InitUtil.initWithSpring();
+
+		HtmlUtil htmlUtil = new HtmlUtil();
+
+		htmlUtil.setHtml(new HtmlImpl());
+
+		MemoryPortalCacheManager memoryPortalCacheManager =
+			new MemoryPortalCacheManager();
+
+		memoryPortalCacheManager.afterPropertiesSet();
+
+		MultiVMPoolImpl multiVMPoolImpl = new MultiVMPoolImpl();
+
+		multiVMPoolImpl.setPortalCacheManager(memoryPortalCacheManager);
+
+		MultiVMPoolUtil multiVMPoolUtil = new MultiVMPoolUtil();
+
+		multiVMPoolUtil.setMultiVMPool(multiVMPoolImpl);
+	}
+
 	protected Artifact resolveArtifact(Dependency dependency) throws Exception {
 		Artifact artifact = artifactFactory.createArtifact(
 			dependency.getGroupId(), dependency.getArtifactId(),
@@ -264,14 +270,14 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 	protected File appServerLibGlobalDir;
 
 	/**
-	 * @parameter expression="${appServerPortalDir}"
-	 */
-	protected File appServerPortalDir;
-
-	/**
 	 * @parameter expression="${appServerLibPortalDir}"
 	 */
 	protected File appServerLibPortalDir;
+
+	/**
+	 * @parameter expression="${appServerPortalDir}"
+	 */
+	protected File appServerPortalDir;
 
 	/**
 	 * @parameter expression="${appServerTldPortalDir}"
