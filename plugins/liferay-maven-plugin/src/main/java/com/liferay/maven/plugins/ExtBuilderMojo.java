@@ -33,6 +33,40 @@ import org.codehaus.plexus.components.io.fileselectors.IncludeExcludeFileSelecto
  */
 public class ExtBuilderMojo extends AbstractLiferayMojo {
 
+	protected void copyJarAndClasses(
+			Artifact artifact, File jarDir, String jarName)
+		throws Exception {
+
+		File serviceJarFile = new File(jarDir, jarName);
+
+		FileUtil.copyFile(artifact.getFile(), serviceJarFile);
+
+		File classesDir = new File(jarDir, "classes");
+
+		classesDir.mkdirs();
+
+		String[] excludes = {
+			"META-INF/**", "portal-*.properties", "system-*.properties"
+		};
+
+		unpack(artifact.getFile(), classesDir, excludes, null);
+	}
+
+	protected void copyUtilLibrary(
+			Artifact artifact, File utilDir, File implClassesDir,
+			String utilJarName)
+		throws Exception {
+
+		File utilJarFile = new File(utilDir, "ext-" + utilJarName);
+
+		FileUtil.copyFile(artifact.getFile(), utilJarFile);
+
+		File dependencyUtilJarFile = new File(
+			implClassesDir, "ext-" + pluginName + "-" + utilJarName);
+
+		FileUtil.copyFile(artifact.getFile(), dependencyUtilJarFile);
+	}
+
 	protected void doExecute() throws Exception {
 		if (dependencyAddVersionAndClassifier) {
 			dependencyAddVersion = true;
@@ -134,8 +168,7 @@ public class ExtBuilderMojo extends AbstractLiferayMojo {
 			}
 			else if (artifactId.endsWith("ext-util-java")) {
 				copyUtilLibrary(
-					artifact, utilJavaDir, implClassesDir,
-					"util-java.jar");
+					artifact, utilJavaDir, implClassesDir, "util-java.jar");
 
 				copyLibraryDependencies(
 					portalLibDir, artifact, dependencyAddVersion,
@@ -143,8 +176,7 @@ public class ExtBuilderMojo extends AbstractLiferayMojo {
 			}
 			else if (artifactId.endsWith("ext-util-taglib")) {
 				copyUtilLibrary(
-					artifact, utilTaglibDir, implClassesDir,
-					"util-taglib.jar");
+					artifact, utilTaglibDir, implClassesDir, "util-taglib.jar");
 
 				copyLibraryDependencies(
 					portalLibDir, artifact, dependencyAddVersion,
@@ -175,40 +207,6 @@ public class ExtBuilderMojo extends AbstractLiferayMojo {
 
 		ExtInfoBuilder infoBuilder = new ExtInfoBuilder(
 			dirName, dirName, pluginName);
-	}
-
-	protected void copyJarAndClasses(
-			Artifact artifact, File jarDir, String jarName)
-		throws Exception {
-
-		File serviceJarFile = new File(jarDir, jarName);
-
-		FileUtil.copyFile(artifact.getFile(), serviceJarFile);
-
-		File classesDir = new File(jarDir, "classes");
-
-		classesDir.mkdirs();
-
-		String[] excludes = {
-			"META-INF/**", "portal-*.properties", "system-*.properties"
-		};
-
-		unpack(artifact.getFile(), classesDir, excludes, null);
-	}
-
-	protected void copyUtilLibrary(
-			Artifact artifact, File utilDir, File implClassesDir,
-			String utilJarName)
-		throws Exception {
-
-		File utilJarFile = new File(utilDir, "ext-" + utilJarName);
-
-		FileUtil.copyFile(artifact.getFile(), utilJarFile);
-
-		File dependencyUtilJarFile = new File(
-			implClassesDir, "ext-" + pluginName + "-" + utilJarName);
-
-		FileUtil.copyFile(artifact.getFile(), dependencyUtilJarFile);
 	}
 
 	protected void unpack(
@@ -248,8 +246,6 @@ public class ExtBuilderMojo extends AbstractLiferayMojo {
 	private boolean dependencyAddVersionAndClassifier;
 
 	/**
-	 * Setting this property true copies dependencies of dependencies
-	 * 
 	 * @parameter default-value="false"
 	 */
 	private boolean dependencyCopyTransitive;

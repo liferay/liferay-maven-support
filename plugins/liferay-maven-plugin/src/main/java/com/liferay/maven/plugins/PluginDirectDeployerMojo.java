@@ -39,65 +39,15 @@ import org.apache.maven.plugin.MojoExecutionException;
  */
 public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 
-	protected void doExecute() throws Exception {
-		if (appServerLibGlobalDir == null) {
-			throw new MojoExecutionException(
-				"The parameter appServerLibGlobalDir is required");
-		}
-		if (appServerLibPortalDir == null) {
-			throw new MojoExecutionException(
-				"The parameter appServerLibPortalDir is required");
-		}
-
-		getLog().info("Directly deploying " + project.getArtifactId());
-
-		getLog().debug("appServerType: " + appServerType);
-		getLog().debug("baseDir: " + baseDir);
-		getLog().debug("deployDir: " + appServerDeployDir.getAbsolutePath());
-		getLog().debug("jbossPrefix: " + jbossPrefix);
-		getLog().debug("pluginType: " + pluginType);
-		getLog().debug("unpackWar: " + unpackWar);
-
-		if (dependencyAddVersionAndClassifier) {
-			dependencyAddVersion = true;
-			dependencyAddClassifier = true;
-		}
-
-		System.setProperty("deployer.app.server.type", appServerType);
-		System.setProperty("deployer.base.dir", baseDir);
-		System.setProperty(
-			"deployer.dest.dir", appServerDeployDir.getAbsolutePath());
-		System.setProperty("deployer.file.pattern", warFileName);
-		System.setProperty("deployer.unpack.war", String.valueOf(unpackWar));
-
-		if (pluginType.equals("ext")) {
-			deployExt();
-		}
-		else if (pluginType.equals("hook")) {
-			deployHook();
-		}
-		else if (pluginType.equals("layouttpl")) {
-			deployLayoutTemplate();
-		}
-		else if (pluginType.equals("portlet")) {
-			deployPortlet();
-		}
-		else if (pluginType.equals("theme")) {
-			deployTheme();
-		}
-		else if (pluginType.equals("web")) {
-			deployWeb();
-		}
-	}
-
 	protected void deployExt() throws Exception {
 		String artifactId = project.getArtifactId();
 		Build build = project.getBuild();
 
 		if (artifactId.endsWith("ext-service")) {
 			File sourceFile = new File(
-				build.getDirectory(), build.getFinalName()
-				+ StringPool.PERIOD + project.getPackaging());
+				build.getDirectory(),
+				build.getFinalName() + StringPool.PERIOD +
+					project.getPackaging());
 
 			CopyTask.copyFile(
 				sourceFile, appServerLibGlobalDir,
@@ -111,13 +61,15 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 
 		if (artifactId.endsWith("ext-impl")) {
 			File sourceFile = new File(
-				build.getDirectory(), build.getFinalName()
-				+ StringPool.PERIOD +  project.getPackaging());
-			File sourceDir = new File(build.getOutputDirectory());
+				build.getDirectory(),
+				build.getFinalName() + StringPool.PERIOD +
+					project.getPackaging());
 
 			CopyTask.copyFile(
 				sourceFile, appServerLibPortalDir,
 				"ext-" + pluginName + "-impl.jar", null, true, true);
+
+			File sourceDir = new File(build.getOutputDirectory());
 
 			CopyTask.copyDirectory(
 				sourceDir, appServerClassesPortalDir,
@@ -129,21 +81,22 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 				dependencyCopyTransitive);
 		}
 
-		if (artifactId.endsWith("ext-util-bridges")
-			|| artifactId.endsWith("ext-util-java")
-			|| artifactId.endsWith("ext-util-taglib")) {
+		if (artifactId.endsWith("ext-util-bridges") ||
+			artifactId.endsWith("ext-util-java") ||
+			artifactId.endsWith("ext-util-taglib")) {
 
 			File sourceFile = new File(
-				build.getDirectory(), build.getFinalName()
-				+ StringPool.PERIOD +  project.getPackaging());
+				build.getDirectory(),
+				build.getFinalName() + StringPool.PERIOD +
+					project.getPackaging());
 
-			String finalJarName = "ext-" + pluginName;
-			finalJarName += artifactId.substring(artifactId.lastIndexOf('-'));
-			finalJarName += ".jar";
+			String fileName = "ext-" + pluginName;
+
+			fileName += artifactId.substring(artifactId.lastIndexOf('-'));
+			fileName += ".jar";
 
 			CopyTask.copyFile(
-				sourceFile, appServerLibPortalDir, finalJarName, null, true,
-				true);
+				sourceFile, appServerLibPortalDir, fileName, null, true, true);
 
 			copyLibraryDependencies(
 				appServerLibPortalDir, project.getArtifact(),
@@ -152,14 +105,8 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 		}
 
 		if (artifactId.endsWith("ext-web")) {
-			File originalWebXml = new File(
-				appServerPortalDir, "WEB-INF/web.xml");
-			File mergedWebXml = new File(
-				appServerPortalDir, "WEB-INF/web.xml.merged");
-
-			File sourceDir =
-				new File(build.getDirectory(), build.getFinalName());
-			String customWebXml = sourceDir + "/WEB-INF/web.xml";
+			File sourceDir = new File(
+				build.getDirectory(), build.getFinalName());
 
 			CopyTask.copyDirectory(
 				sourceDir, appServerDeployDir, null, "WEB-INF/web.xml", true,
@@ -170,19 +117,24 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 				dependencyAddVersion, dependencyAddClassifier,
 				dependencyCopyTransitive);
 
+			File originalWebXml = new File(
+				appServerPortalDir, "WEB-INF/web.xml");
+			File mergedWebXml = new File(
+				appServerPortalDir, "WEB-INF/web.xml.merged");
+
 			new WebXMLBuilder(
-				originalWebXml.getAbsolutePath(), customWebXml,
-				mergedWebXml.getAbsolutePath());
+				originalWebXml.getAbsolutePath(),
+				sourceDir + "/WEB-INF/web.xml", mergedWebXml.getAbsolutePath());
 
 			FileUtil.move(mergedWebXml, originalWebXml);
 		}
 
-		if (artifactId.endsWith("-ext")
-			&& project.getPackaging().equals("war")) {
+		String packaging = project.getPackaging();
 
+		if (artifactId.endsWith("-ext") && packaging.equals("war")) {
 			File buildDir = new File(
 				build.getDirectory(), build.getFinalName());
-	
+
 			File sourceFile = new File(
 				buildDir, "WEB-INF/ext-" + pluginName + ".xml");
 
@@ -272,6 +224,58 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 		new WebDeployer(wars, jars);
 	}
 
+	protected void doExecute() throws Exception {
+		if (appServerLibGlobalDir == null) {
+			throw new MojoExecutionException(
+				"The parameter appServerLibGlobalDir is required");
+		}
+
+		if (appServerLibPortalDir == null) {
+			throw new MojoExecutionException(
+				"The parameter appServerLibPortalDir is required");
+		}
+
+		getLog().info("Directly deploying " + project.getArtifactId());
+
+		getLog().debug("appServerType: " + appServerType);
+		getLog().debug("baseDir: " + baseDir);
+		getLog().debug("deployDir: " + appServerDeployDir.getAbsolutePath());
+		getLog().debug("jbossPrefix: " + jbossPrefix);
+		getLog().debug("pluginType: " + pluginType);
+		getLog().debug("unpackWar: " + unpackWar);
+
+		System.setProperty("deployer.app.server.type", appServerType);
+		System.setProperty("deployer.base.dir", baseDir);
+		System.setProperty(
+			"deployer.dest.dir", appServerDeployDir.getAbsolutePath());
+		System.setProperty("deployer.file.pattern", warFileName);
+		System.setProperty("deployer.unpack.war", String.valueOf(unpackWar));
+
+		if (dependencyAddVersionAndClassifier) {
+			dependencyAddVersion = true;
+			dependencyAddClassifier = true;
+		}
+
+		if (pluginType.equals("ext")) {
+			deployExt();
+		}
+		else if (pluginType.equals("hook")) {
+			deployHook();
+		}
+		else if (pluginType.equals("layouttpl")) {
+			deployLayoutTemplate();
+		}
+		else if (pluginType.equals("portlet")) {
+			deployPortlet();
+		}
+		else if (pluginType.equals("theme")) {
+			deployTheme();
+		}
+		else if (pluginType.equals("web")) {
+			deployWeb();
+		}
+	}
+
 	/**
 	 * @parameter default-value="${deployDir}" expression="${appServerDeployDir}"
 	 * @required
@@ -312,8 +316,6 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 	private boolean dependencyAddVersionAndClassifier;
 
 	/**
-	 * Setting this property true makes deploy copy dependencies of dependencies
-	 * 
 	 * @parameter default-value="false"
 	 */
 	private boolean dependencyCopyTransitive;

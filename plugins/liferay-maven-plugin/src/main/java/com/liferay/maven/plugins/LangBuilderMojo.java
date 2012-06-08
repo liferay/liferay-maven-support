@@ -14,14 +14,7 @@
 
 package com.liferay.maven.plugins;
 
-import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.tools.LangBuilder;
-import com.liferay.portal.util.FileImpl;
-import com.liferay.portal.util.HttpImpl;
-
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
 
 /**
  * @author Mika Koivisto
