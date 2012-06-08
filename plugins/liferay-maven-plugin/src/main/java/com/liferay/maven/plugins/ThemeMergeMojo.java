@@ -146,8 +146,7 @@ public class ThemeMergeMojo extends AbstractLiferayMojo {
 	}
 
 	/**
-	 * Parent theme. Can be _styled | _unstyled | classic | control_panel |
-	 * artifactGroupId:artifactId:artifactVersion
+	 * The parent theme can be _styled, _unstyled, classic, control_panel, or artifactGroupId:artifactId:artifactVersion.
 	 *
 	 * @parameter default-value="_styled"
 	 */
