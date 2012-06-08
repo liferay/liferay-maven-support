@@ -67,13 +67,13 @@ public class DBBuilderMojo extends AbstractLiferayMojo {
 	/**
 	 * @parameter
 	 */
-	public String apiBaseDir;
+	private String apiBaseDir;
 
 	/**
 	 * @parameter default-value="${basedir}"
 	 * @required
 	 */
-	public String baseDir;
+	private String baseDir;
 
 	/**
 	 * @parameter default-value="lportal" expression="${databaseName}"
@@ -90,16 +90,16 @@ public class DBBuilderMojo extends AbstractLiferayMojo {
 	/**
 	 * @parameter
 	 */
-	public String implBaseDir;
+	private String implBaseDir;
 
 	/**
 	 * @parameter
 	 */
-	public String sqlDir;
+	private String sqlDir;
 
 	/**
 	 * @parameter
 	 */
-	public String webappBaseDir;
+	private String webappBaseDir;
 
 }

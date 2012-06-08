@@ -53,7 +53,9 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 	}
 
 	protected void doExecute() throws Exception {
-		if (project.getPackaging().equalsIgnoreCase("pom")) {
+		String packaging = project.getPackaging();
+
+		if (packaging.equals("pom")) {
 			getLog().info("Skipping " + project.getArtifactId());
 
 			return;
@@ -124,9 +126,9 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 			serviceFileName, hbmFileName, ormFileName, modelHintsFileName,
 			springFileName, springBaseFileName, springClusterFileName,
 			springDynamicDataSourceFileName, springHibernateFileName,
-			springInfrastructureFileName, springShardDataSourceFileName,
-			apiDir, implDir, jsonFileName, remotingFileName, sqlDir,
-			sqlFileName, sqlIndexesFileName, sqlIndexesPropertiesFileName,
+			springInfrastructureFileName, springShardDataSourceFileName, apiDir,
+			implDir, jsonFileName, remotingFileName, sqlDir, sqlFileName,
+			sqlIndexesFileName, sqlIndexesPropertiesFileName,
 			sqlSequencesFileName, autoNamespaceTables, beanLocatorUtil,
 			propsUtil, pluginName, null);
 
@@ -333,7 +335,7 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 	}
 
 	/**
-	 * @deprecated 
+	 * @deprecated
 	 * @since 6.1.0
 	 */
 	protected void invokeDependencyBuild() throws Exception {
