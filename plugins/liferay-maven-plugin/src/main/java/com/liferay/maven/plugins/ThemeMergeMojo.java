@@ -146,12 +146,6 @@ public class ThemeMergeMojo extends AbstractLiferayMojo {
 	}
 
 	/**
-	 * @parameter
-	 * @required
-	 */
-	private String liferayVersion;
-
-	/**
 	 * Parent theme. Can be _styled | _unstyled | classic | control_panel |
 	 * artifactGroupId:artifactId:artifactVersion
 	 *
@@ -170,11 +164,5 @@ public class ThemeMergeMojo extends AbstractLiferayMojo {
 	 * @required
 	 */
 	private File webappDir;
-
-	/**
-	 * @parameter default-value="${project.build.directory}/liferay-theme/work"
-	 * @required
-	 */
-	private File workDir;
 
 }

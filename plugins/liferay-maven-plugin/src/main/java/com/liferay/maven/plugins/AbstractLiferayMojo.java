@@ -46,7 +46,10 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 
+import org.codehaus.plexus.archiver.UnArchiver;
 import org.codehaus.plexus.archiver.manager.ArchiverManager;
+import org.codehaus.plexus.components.io.fileselectors.FileSelector;
+import org.codehaus.plexus.components.io.fileselectors.IncludeExcludeFileSelector;
 
 /**
  * @author Mika Koivisto
@@ -172,24 +175,75 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 
 				method.invoke(urlClassLoader, uri.toURL());
 			}
+
+			if ((appServerLibPortalDir != null) &&
+				 appServerLibPortalDir.exists()) {
+
+				String[] fileNames = FileUtil.listFiles(appServerLibPortalDir);
+
+				for (String fileName : fileNames) {
+					File file = new File(appServerLibPortalDir, fileName);
+
+					URI uri = file.toURI();
+
+					method.invoke(urlClassLoader, uri.toURL());
+				}
+			}
 		}
 	}
 
 	protected void initPortal() throws Exception {
-		if (appServerPortalDir != null) {
+		if ((appServerPortalDir != null) && appServerPortalDir.exists()) {
 			if (Validator.isNull(appServerClassesPortalDir)) {
-				appServerClassesPortalDir = new File(
-					appServerPortalDir, "WEB-INF/classes");
+				appServerClassesPortalDir =
+					new File(appServerPortalDir, "WEB-INF/classes");
 			}
-
 			if (Validator.isNull(appServerLibPortalDir)) {
-				appServerLibPortalDir = new File(
-					appServerPortalDir, "WEB-INF/lib");
+				appServerLibPortalDir =
+					new File(appServerPortalDir, "WEB-INF/lib");
 			}
-
 			if (Validator.isNull(appServerTldPortalDir)) {
 				appServerTldPortalDir = new File(
 					appServerPortalDir, "WEB-INF/tld");
+			}
+		}
+
+		if (((appServerPortalDir == null) || !appServerPortalDir.exists()) &&
+			 Validator.isNotNull(liferayVersion)) {
+
+			appServerPortalDir = new File(workDir, "appServerPortalDir");
+
+			if (!appServerPortalDir.exists()) {
+				appServerPortalDir.mkdirs();
+			}
+
+			Dependency dependency = createDependency(
+				"com.liferay.portal", "portal-web", liferayVersion, "", "war");
+
+			Artifact artifact = resolveArtifact(dependency);
+
+			UnArchiver unArchiver = archiverManager.getUnArchiver(
+				artifact.getFile());
+
+			unArchiver.setDestDirectory(appServerPortalDir);
+			unArchiver.setSourceFile(artifact.getFile());
+			unArchiver.setOverwrite(false);
+
+			IncludeExcludeFileSelector includeExcludeFileSelector =
+				new IncludeExcludeFileSelector();
+
+			includeExcludeFileSelector.setExcludes(null);
+			includeExcludeFileSelector.setIncludes(
+				new String[] {"WEB-INF/lib/*.jar"});
+
+			unArchiver.setFileSelectors(
+				new FileSelector[] {includeExcludeFileSelector});
+
+			unArchiver.extract();
+
+			if (Validator.isNull(appServerLibPortalDir)) {
+				appServerLibPortalDir =
+					new File(appServerPortalDir, "WEB-INF/lib");
 			}
 		}
 
@@ -300,6 +354,11 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 	protected ArtifactResolver artifactResolver;
 
 	/**
+	 * @parameter expression="${liferayVersion}"
+	 */
+	protected String liferayVersion;
+
+	/**
 	 * @parameter expression="${localRepository}"
 	 * @readonly
 	 * @required
@@ -332,5 +391,11 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 	 * @required
 	 */
 	protected List remoteArtifactRepositories;
+
+	/**
+	 * @parameter default-value="${project.build.directory}/liferay-work"
+	 * @required
+	 */
+	protected File workDir;
 
 }
