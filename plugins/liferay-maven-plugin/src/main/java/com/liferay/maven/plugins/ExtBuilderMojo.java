@@ -268,10 +268,4 @@ public class ExtBuilderMojo extends AbstractLiferayMojo {
 	 */
 	private File webappDir;
 
-	/**
-	 * @parameter default-value="${project.build.directory}/liferay-work"
-	 * @required
-	 */
-	private File workDir;
-
 }
