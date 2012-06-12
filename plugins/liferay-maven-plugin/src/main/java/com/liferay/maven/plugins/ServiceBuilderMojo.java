@@ -526,7 +526,7 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 	 * @parameter default-value="1" expression="${serviceBuildNumber}"
 	 */
 	private long serviceBuildNumber;
- 
+
 	/**
 	 * @parameter default-value="true" expression="${serviceBuildNumberIncrement}"
 	 */
