@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+
+<archetype>
+	<id>liferay-portlet-primefaces-archetype</id>
+	<resources>
+		<resource>src/main/webapp/css/main.css</resource>
+		<resource>src/main/webapp/js/main.js</resource>
+		<resource>src/main/webapp/WEB-INF/faces-config.xml</resource>
+		<resource>src/main/webapp/WEB-INF/liferay-display.xml</resource>
+		<resource>src/main/webapp/WEB-INF/liferay-plugin-package.properties</resource>
+		<resource>src/main/webapp/WEB-INF/liferay-portlet.xml</resource>
+		<resource>src/main/webapp/WEB-INF/portlet.xml</resource>
+		<resource>src/main/webapp/WEB-INF/web.xml</resource>
+		<resource>src/main/webapp/icon.png</resource>
+		<resource>src/main/webapp/view.xhtml</resource>
+	</resources>
+</archetype>

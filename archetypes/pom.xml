@@ -17,6 +17,11 @@
 		<module>liferay-hook-archetype</module>
 		<module>liferay-layouttpl-archetype</module>
 		<module>liferay-portlet-archetype</module>
+		<module>liferay-portlet-icefaces-archetype</module>
+		<module>liferay-portlet-jsf-archetype</module>
+		<module>liferay-portlet-liferay-faces-alloy-archetype</module>
+		<module>liferay-portlet-primefaces-archetype</module>
+		<module>liferay-portlet-richfaces-archetype</module>
 		<module>liferay-servicebuilder-archetype</module>
 		<module>liferay-theme-archetype</module>
 		<module>liferay-web-archetype</module>
