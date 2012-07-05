@@ -86,6 +86,18 @@
 			<version>2.0</version>
 			<scope>provided</scope>
 		</dependency>
+        <dependency>
+            <groupId>struts</groupId>
+            <artifactId>struts</artifactId>
+            <version>1.2.9</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>struts</groupId>
+            <artifactId>struts-el</artifactId>
+            <version>1.2.9</version>
+            <scope>compile</scope>
+        </dependency>
 	</dependencies>
 	<properties>
 		<liferay.theme.parent>_styled</liferay.theme.parent>
