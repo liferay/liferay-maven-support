@@ -54,17 +54,17 @@
 		<dependency>
 			<groupId>com.liferay.faces</groupId>
 			<artifactId>liferay-faces-alloy</artifactId>
-			<version>3.1.0</version>
+			<version>3.1.0-rc2</version>
 		</dependency>
 		<dependency>
 			<groupId>com.liferay.faces</groupId>
 			<artifactId>liferay-faces-bridge-impl</artifactId>
-			<version>3.1.0</version>
+			<version>3.1.0-rc2</version>
 		</dependency>
 		<dependency>
 			<groupId>com.liferay.faces</groupId>
 			<artifactId>liferay-faces-portal</artifactId>
-			<version>3.1.0</version>
+			<version>3.1.0-rc2</version>
 		</dependency>
 		<dependency>
 			<groupId>com.liferay.portal</groupId>
