@@ -130,8 +130,8 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 			implDir, jsonFileName, remotingFileName, sqlDir, sqlFileName,
 			sqlIndexesFileName, sqlIndexesPropertiesFileName,
 			sqlSequencesFileName, autoNamespaceTables, beanLocatorUtil,
-			propsUtil, pluginName, targetEntityName, null, true, serviceBuildNumber,
-			serviceBuildNumberIncrement);
+			propsUtil, pluginName, targetEntityName, null, true,
+			serviceBuildNumber, serviceBuildNumberIncrement);
 
 		if (tempServiceFile != null) {
 			FileUtil.delete(tempServiceFile);
