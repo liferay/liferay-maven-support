@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,44 +14,18 @@
 
 package com.liferay.maven.plugins;
 
-import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.tools.LangBuilder;
-import com.liferay.portal.util.FileImpl;
-import com.liferay.portal.util.HttpImpl;
-
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
 
 /**
  * @author Mika Koivisto
  * @goal   build-lang
  */
-public class LangBuilderMojo extends AbstractMojo {
-
-	public void execute() throws MojoExecutionException {
-		try {
-			initPortal();
-
-			doExecute();
-		}
-		catch (Exception e) {
-			throw new MojoExecutionException(e.getMessage(), e);
-		}
-	}
+public class LangBuilderMojo extends AbstractLiferayMojo {
 
 	protected void doExecute() throws Exception {
+		initPortal();
+
 		new LangBuilder(langDir, langFile, langPlugin, langTranslate);
-	}
-
-	protected void initPortal() {
-		FileUtil fileUtil = new FileUtil();
-
-		fileUtil.setFile(new FileImpl());
-
-		HttpUtil httpUtil = new HttpUtil();
-
-		httpUtil.setHttp(new HttpImpl());
 	}
 
 	/**

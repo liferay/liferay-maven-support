@@ -21,6 +21,8 @@
 				<version>${liferay.version}</version>
 				<configuration>
 					<apiBaseDir>${basedir}/../${artifactId}-ext-service</apiBaseDir>
+					<implBaseDir>${basedir}</implBaseDir>
+					<sqlDir>${basedir}/../${artifactId}-ext/src/main/webapp/WEB-INF/sql</sqlDir>
 					<webappBaseDir>${basedir}/../${artifactId}-ext-web</webappBaseDir>
 				</configuration>
 			</plugin>
@@ -43,6 +45,7 @@
 			<groupId>${project.groupId}</groupId>
 			<artifactId>${artifactId}-ext-service</artifactId>
 			<version>${project.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
@@ -64,26 +67,31 @@
 			<groupId>com.liferay.portal</groupId>
 			<artifactId>portal-impl</artifactId>
 			<version>${liferay.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.liferay.portal</groupId>
 			<artifactId>portal-service</artifactId>
 			<version>${liferay.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.liferay.portal</groupId>
 			<artifactId>util-bridges</artifactId>
 			<version>${liferay.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.liferay.portal</groupId>
 			<artifactId>util-java</artifactId>
 			<version>${liferay.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.liferay.portal</groupId>
 			<artifactId>util-taglib</artifactId>
 			<version>${liferay.version}</version>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 </project>

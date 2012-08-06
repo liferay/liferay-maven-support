@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -17,18 +17,12 @@ package com.liferay.maven.plugins;
 import java.io.File;
 
 import java.util.Iterator;
-import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.model.Dependency;
 
 import org.codehaus.plexus.archiver.UnArchiver;
-import org.codehaus.plexus.archiver.manager.ArchiverManager;
 import org.codehaus.plexus.components.io.fileselectors.FileSelector;
 import org.codehaus.plexus.components.io.fileselectors.IncludeExcludeFileSelector;
 
@@ -37,16 +31,7 @@ import org.codehaus.plexus.components.io.fileselectors.IncludeExcludeFileSelecto
  * @goal   theme-merge
  * @phase  process-sources
  */
-public class ThemeMergeMojo extends AbstractMojo {
-
-	public void execute() throws MojoExecutionException {
-		try {
-			doExecute();
-		}
-		catch (Exception e) {
-			throw new MojoExecutionException(e.getMessage(), e);
-		}
-	}
+public class ThemeMergeMojo extends AbstractLiferayMojo {
 
 	protected void doExecute() throws Exception {
 		if (!workDir.exists()) {
@@ -83,12 +68,11 @@ public class ThemeMergeMojo extends AbstractMojo {
 			includes = null;
 		}
 
-		Artifact artifact = artifactFactory.createArtifact(
+		Dependency dependency = createDependency(
 			parentThemeGroupId, parentThemeArtifactId, parentThemeVersion, "",
 			"war");
 
-		artifactResolver.resolve(
-			artifact, remoteArtifactRepositories, localArtifactRepository);
+		Artifact artifact = resolveArtifact(dependency);
 
 		UnArchiver unArchiver = archiverManager.getUnArchiver(
 			artifact.getFile());
@@ -162,47 +146,11 @@ public class ThemeMergeMojo extends AbstractMojo {
 	}
 
 	/**
-	 * @component
-	 */
-	private ArchiverManager archiverManager;
-
-	/**
-	 * @component
-	 */
-	private ArtifactFactory artifactFactory;
-
-	/**
-	 * @component
-	 */
-	private ArtifactResolver artifactResolver;
-
-	/**
-	 * @parameter
-	 * @required
-	 */
-	private String liferayVersion;
-
-	/**
-	 * @parameter expression="${localRepository}"
-	 * @readonly
-	 * @required
-	 */
-	private ArtifactRepository localArtifactRepository;
-
-	/**
-	 * Parent theme. Can be _styled | _unstyled | classic | control_panel |
-	 * artifactGroupId:artifactId:artifactVersion
+	 * The parent theme can be _styled, _unstyled, classic, control_panel, or artifactGroupId:artifactId:artifactVersion.
 	 *
 	 * @parameter default-value="_styled"
 	 */
 	private String parentTheme;
-
-	/**
-	 * @parameter expression="${project.remoteArtifactRepositories}"
-	 * @readonly
-	 * @required
-	 */
-	private List remoteArtifactRepositories;
 
 	/**
 	 * @parameter default-value="vm"
@@ -211,16 +159,9 @@ public class ThemeMergeMojo extends AbstractMojo {
 	private String themeType;
 
 	/**
-	 * @parameter expression=
-	 *			  "${project.build.directory}/${project.build.finalName}"
+	 * @parameter default-value="${project.build.directory}/${project.build.finalName}"
 	 * @required
 	 */
 	private File webappDir;
-
-	/**
-	 * @parameter expression="${project.build.directory}/liferay-theme/work"
-	 * @required
-	 */
-	private File workDir;
 
 }

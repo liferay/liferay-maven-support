@@ -18,12 +18,16 @@
 						<phase>generate-sources</phase>
 						<goals>
 							<goal>theme-merge</goal>
+							<goal>build-css</goal>
 							<goal>build-thumbnail</goal>
 						</goals>
 					</execution>
 				</executions>
 				<configuration>
 					<autoDeployDir>${liferay.auto.deploy.dir}</autoDeployDir>
+					<appServerDeployDir>${liferay.app.server.deploy.dir}</appServerDeployDir>
+					<appServerLibGlobalDir>${liferay.app.server.lib.global.dir}</appServerLibGlobalDir>
+					<appServerPortalDir>${liferay.app.server.portal.dir}</appServerPortalDir>
 					<liferayVersion>${liferay.version}</liferayVersion>
 					<parentTheme>${liferay.theme.parent}</parentTheme>
 					<pluginType>theme</pluginType>
@@ -32,6 +36,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.5</version>
 				<configuration>
 					<encoding>UTF-8</encoding>
 				</configuration>
@@ -83,9 +88,7 @@
 		</dependency>
 	</dependencies>
 	<properties>
-		<liferay.auto.deploy.dir>../bundles/deploy</liferay.auto.deploy.dir>
 		<liferay.theme.parent>_styled</liferay.theme.parent>
 		<liferay.theme.type>vm</liferay.theme.type>
-		<liferay.version>6.1.0-SNAPSHOT</liferay.version>
 	</properties>
 </project>

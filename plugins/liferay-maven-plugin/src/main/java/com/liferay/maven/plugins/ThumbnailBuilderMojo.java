@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,17 +18,14 @@ import com.liferay.portal.tools.ThumbnailBuilder;
 
 import java.io.File;
 
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-
 /**
  * @author Mika Koivisto
  * @goal   build-thumbnail
  * @phase  process-sources
  */
-public class ThumbnailBuilderMojo extends AbstractMojo {
+public class ThumbnailBuilderMojo extends AbstractLiferayMojo {
 
-	public void execute() throws MojoExecutionException {
+	protected void doExecute() throws Exception {
 		new ThumbnailBuilder(
 			originalFile, thumbnailFile, height, width, overwrite);
 	}
@@ -40,7 +37,7 @@ public class ThumbnailBuilderMojo extends AbstractMojo {
 	private int height;
 
 	/**
-	 * @parameter expression="${basedir}/src/main/webapp/images/screenshot.png"
+	 * @parameter default-value="${basedir}/src/main/webapp/images/screenshot.png"
 	 * @required
 	 */
 	private File originalFile;
@@ -52,7 +49,7 @@ public class ThumbnailBuilderMojo extends AbstractMojo {
 	private boolean overwrite;
 
 	/**
-	 * @parameter expression="${basedir}/src/main/webapp/images/thumbnail.png"
+	 * @parameter default-value="${basedir}/src/main/webapp/images/thumbnail.png"
 	 * @required
 	 */
 	private File thumbnailFile;

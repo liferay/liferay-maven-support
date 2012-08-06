@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,118 +14,132 @@
 
 package com.liferay.maven.plugins;
 
-import com.liferay.portal.bean.BeanLocatorImpl;
-import com.liferay.portal.kernel.bean.PortalBeanLocatorUtil;
-import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.kernel.util.HtmlUtil;
-import com.liferay.portal.kernel.xml.SAXReaderUtil;
-import com.liferay.portal.tools.deploy.ExtDeployer;
+import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.tools.WebXMLBuilder;
 import com.liferay.portal.tools.deploy.HookDeployer;
 import com.liferay.portal.tools.deploy.LayoutTemplateDeployer;
 import com.liferay.portal.tools.deploy.PortletDeployer;
 import com.liferay.portal.tools.deploy.ThemeDeployer;
 import com.liferay.portal.tools.deploy.WebDeployer;
-import com.liferay.portal.util.FastDateFormatFactoryImpl;
-import com.liferay.portal.util.FileImpl;
-import com.liferay.portal.util.HtmlImpl;
-import com.liferay.portal.util.InitUtil;
-import com.liferay.portal.util.PortalImpl;
-import com.liferay.portal.util.PortalUtil;
-import com.liferay.portal.xml.SAXReaderImpl;
+import com.liferay.util.ant.CopyTask;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
-import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.model.Build;
 import org.apache.maven.plugin.MojoExecutionException;
-
-import org.codehaus.plexus.archiver.UnArchiver;
-import org.codehaus.plexus.archiver.manager.ArchiverManager;
-import org.codehaus.plexus.components.io.fileselectors.FileSelector;
-import org.codehaus.plexus.components.io.fileselectors.IncludeExcludeFileSelector;
 
 /**
  * @author Mika Koivisto
+ * @author Thiago Moreira
  * @goal   direct-deploy
  */
-public class PluginDirectDeployerMojo extends AbstractMojo {
-
-	public void execute() throws MojoExecutionException {
-		try {
-			doExecute();
-		}
-		catch (Exception e) {
-			throw new MojoExecutionException(e.getMessage(), e);
-		}
-	}
-
-	protected void doExecute() throws Exception {
-		if (!warFile.exists()) {
-			getLog().error(warFileName + " does not exist");
-
-			throw new FileNotFoundException(warFileName + " does not exist!");
-		}
-
-		getLog().info("Directly deploying " + warFileName);
-
-		getLog().debug("appServerType: " + appServerType);
-		getLog().debug("baseDir: " + baseDir);
-		getLog().debug("deployDir: " + deployDir.getAbsolutePath());
-		getLog().debug("jbossPrefix: " + jbossPrefix);
-		getLog().debug("pluginType: " + pluginType);
-		getLog().debug("unpackWar: " + unpackWar);
-
-		preparePortalDependencies();
-
-		System.setProperty("deployer.app.server.type", appServerType);
-		System.setProperty("deployer.base.dir", baseDir);
-		System.setProperty("deployer.dest.dir", deployDir.getAbsolutePath());
-		System.setProperty("deployer.file.pattern", warFileName);
-		System.setProperty("deployer.unpack.war", String.valueOf(unpackWar));
-		System.setProperty(
-			"liferay.lib.portal.dir",
-			workDir.getAbsolutePath() + "/WEB-INF/lib");
-
-		initPortal();
-
-		if (pluginType.equals("ext")) {
-			deployExt();
-		}
-		else if (pluginType.equals("hook")) {
-			deployHook();
-		}
-		else if (pluginType.equals("layouttpl")) {
-			deployLayoutTemplate();
-		}
-		else if (pluginType.equals("portlet")) {
-			deployPortlet();
-		}
-		else if (pluginType.equals("theme")) {
-			deployTheme();
-		}
-		else if (pluginType.equals("web")) {
-			deployWeb();
-		}
-	}
+public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 
 	protected void deployExt() throws Exception {
-		List<String> wars = new ArrayList<String>();
+		String artifactId = project.getArtifactId();
+		Build build = project.getBuild();
 
-		List<String> jars = new ArrayList<String>();
+		if (artifactId.endsWith("ext-service")) {
+			File sourceFile = new File(
+				build.getDirectory(),
+				build.getFinalName() + StringPool.PERIOD +
+					project.getPackaging());
 
-		String libPath = workDir.getAbsolutePath() + "/WEB-INF/lib";
+			CopyTask.copyFile(
+				sourceFile, appServerLibGlobalDir,
+				"ext-" + pluginName + "-service.jar", null, true, true);
 
-		jars.add(libPath + "/util-java.jar");
+			copyLibraryDependencies(
+				appServerLibGlobalDir, project.getArtifact(),
+				dependencyAddVersion, dependencyAddClassifier,
+				dependencyCopyTransitive);
+		}
 
-		new ExtDeployer(wars, jars);
+		if (artifactId.endsWith("ext-impl")) {
+			File sourceFile = new File(
+				build.getDirectory(),
+				build.getFinalName() + StringPool.PERIOD +
+					project.getPackaging());
+
+			CopyTask.copyFile(
+				sourceFile, appServerLibPortalDir,
+				"ext-" + pluginName + "-impl.jar", null, true, true);
+
+			File sourceDir = new File(build.getOutputDirectory());
+
+			CopyTask.copyDirectory(
+				sourceDir, appServerClassesPortalDir,
+				"portal-*.properties,system-*.properties", null);
+
+			copyLibraryDependencies(
+				appServerLibPortalDir, project.getArtifact(),
+				dependencyAddVersion, dependencyAddClassifier,
+				dependencyCopyTransitive);
+		}
+
+		if (artifactId.endsWith("ext-util-bridges") ||
+			artifactId.endsWith("ext-util-java") ||
+			artifactId.endsWith("ext-util-taglib")) {
+
+			File sourceFile = new File(
+				build.getDirectory(),
+				build.getFinalName() + StringPool.PERIOD +
+					project.getPackaging());
+
+			String fileName = "ext-" + pluginName;
+
+			fileName += artifactId.substring(artifactId.lastIndexOf('-'));
+			fileName += ".jar";
+
+			CopyTask.copyFile(
+				sourceFile, appServerLibPortalDir, fileName, null, true, true);
+
+			copyLibraryDependencies(
+				appServerLibPortalDir, project.getArtifact(),
+				dependencyAddVersion, dependencyAddClassifier,
+				dependencyCopyTransitive);
+		}
+
+		if (artifactId.endsWith("ext-web")) {
+			File sourceDir = new File(
+				build.getDirectory(), build.getFinalName());
+
+			CopyTask.copyDirectory(
+				sourceDir, appServerDeployDir, null, "WEB-INF/web.xml", true,
+				true);
+
+			copyLibraryDependencies(
+				appServerLibPortalDir, project.getArtifact(),
+				dependencyAddVersion, dependencyAddClassifier,
+				dependencyCopyTransitive);
+
+			File originalWebXml = new File(
+				appServerPortalDir, "WEB-INF/web.xml");
+			File mergedWebXml = new File(
+				appServerPortalDir, "WEB-INF/web.xml.merged");
+
+			new WebXMLBuilder(
+				originalWebXml.getAbsolutePath(),
+				sourceDir + "/WEB-INF/web.xml", mergedWebXml.getAbsolutePath());
+
+			FileUtil.move(mergedWebXml, originalWebXml);
+		}
+
+		String packaging = project.getPackaging();
+
+		if (artifactId.endsWith("-ext") && packaging.equals("war")) {
+			File buildDir = new File(
+				build.getDirectory(), build.getFinalName());
+
+			File sourceFile = new File(
+				buildDir, "WEB-INF/ext-" + pluginName + ".xml");
+
+			CopyTask.copyFile(sourceFile, appServerPortalDir, true, true);
+		}
 	}
 
 	protected void deployHook() throws Exception {
@@ -133,9 +147,7 @@ public class PluginDirectDeployerMojo extends AbstractMojo {
 
 		List<String> jars = new ArrayList<String>();
 
-		String libPath = workDir.getAbsolutePath() + "/WEB-INF/lib";
-
-		jars.add(libPath + "/util-java.jar");
+		jars.add(appServerLibPortalDir.getAbsolutePath() + "/util-java.jar");
 
 		new HookDeployer(wars, jars);
 	}
@@ -148,7 +160,7 @@ public class PluginDirectDeployerMojo extends AbstractMojo {
 	}
 
 	protected void deployPortlet() throws Exception {
-		String tldPath = workDir.getAbsolutePath() + "/WEB-INF/tld";
+		String tldPath = appServerTldPortalDir.getAbsolutePath();
 
 		System.setProperty("deployer.aui.taglib.dtd", tldPath + "/aui.tld");
 		System.setProperty(
@@ -171,7 +183,7 @@ public class PluginDirectDeployerMojo extends AbstractMojo {
 
 		List<String> jars = new ArrayList<String>();
 
-		String libPath = workDir.getAbsolutePath() + "/WEB-INF/lib";
+		String libPath = appServerLibPortalDir.getAbsolutePath() ;
 
 		jars.add(libPath + "/util-bridges.jar");
 		jars.add(libPath + "/util-java.jar");
@@ -181,7 +193,7 @@ public class PluginDirectDeployerMojo extends AbstractMojo {
 	}
 
 	protected void deployTheme() throws Exception {
-		String tldPath = workDir.getAbsolutePath() + "/WEB-INF/tld";
+		String tldPath = appServerTldPortalDir.getAbsolutePath();
 
 		System.setProperty(
 			"deployer.theme.taglib.dtd", tldPath + "/liferay-theme.tld");
@@ -192,7 +204,7 @@ public class PluginDirectDeployerMojo extends AbstractMojo {
 
 		List<String> jars = new ArrayList<String>();
 
-		String libPath = workDir.getAbsolutePath() + "/WEB-INF/lib";
+		String libPath = appServerLibPortalDir.getAbsolutePath();
 
 		jars.add(libPath + "/util-java.jar");
 		jars.add(libPath + "/util-taglib.jar");
@@ -205,91 +217,76 @@ public class PluginDirectDeployerMojo extends AbstractMojo {
 
 		List<String> jars = new ArrayList<String>();
 
-		String libPath = workDir.getAbsolutePath() + "/WEB-INF/lib";
+		String libPath = appServerLibPortalDir.getAbsolutePath();
 
 		jars.add(libPath + "/util-java.jar");
 
 		new WebDeployer(wars, jars);
 	}
 
-	protected void initPortal() {
-		InitUtil.init();
-
-		PortalBeanLocatorUtil.setBeanLocator(new BeanLocatorImpl(null, null));
-
-		FastDateFormatFactoryUtil fastDateFormatFactoryUtil =
-			new FastDateFormatFactoryUtil();
-
-		fastDateFormatFactoryUtil.setFastDateFormatFactory(
-			new FastDateFormatFactoryImpl());
-
-		FileUtil fileUtil = new FileUtil();
-
-		fileUtil.setFile(new FileImpl());
-
-		HtmlUtil htmlUtil = new HtmlUtil();
-
-		htmlUtil.setHtml(new HtmlImpl());
-
-		PortalUtil portalUtil = new PortalUtil();
-
-		portalUtil.setPortal(new PortalImpl());
-
-		SAXReaderUtil saxReaderUtil = new SAXReaderUtil();
-
-		saxReaderUtil.setSAXReader(new SAXReaderImpl());
-	}
-
-	protected void preparePortalDependencies() throws Exception {
-		Artifact artifact = artifactFactory.createArtifact(
-			"com.liferay.portal", "portal-web", liferayVersion, "", "war");
-
-		artifactResolver.resolve(
-			artifact, remoteArtifactRepositories, localArtifactRepository);
-
-		if (!workDir.exists()) {
-			workDir.mkdirs();
+	protected void doExecute() throws Exception {
+		if (appServerLibGlobalDir == null) {
+			throw new MojoExecutionException(
+				"The parameter appServerLibGlobalDir is required");
 		}
 
-		UnArchiver unArchiver = archiverManager.getUnArchiver(
-			artifact.getFile());
+		if (appServerLibPortalDir == null) {
+			throw new MojoExecutionException(
+				"The parameter appServerLibPortalDir is required");
+		}
 
-		unArchiver.setDestDirectory(workDir);
-		unArchiver.setSourceFile(artifact.getFile());
+		getLog().info("Directly deploying " + project.getArtifactId());
 
-		IncludeExcludeFileSelector includeExcludeFileSelector =
-			new IncludeExcludeFileSelector();
+		getLog().debug("appServerType: " + appServerType);
+		getLog().debug("baseDir: " + baseDir);
+		getLog().debug("deployDir: " + appServerDeployDir.getAbsolutePath());
+		getLog().debug("jbossPrefix: " + jbossPrefix);
+		getLog().debug("pluginType: " + pluginType);
+		getLog().debug("unpackWar: " + unpackWar);
 
-		includeExcludeFileSelector.setExcludes(new String[]{});
-		includeExcludeFileSelector.setIncludes(
-			new String[] {"WEB-INF/tld/**", "WEB-INF/lib/**"});
+		System.setProperty("deployer.app.server.type", appServerType);
+		System.setProperty("deployer.base.dir", baseDir);
+		System.setProperty(
+			"deployer.dest.dir", appServerDeployDir.getAbsolutePath());
+		System.setProperty("deployer.file.pattern", warFileName);
+		System.setProperty("deployer.unpack.war", String.valueOf(unpackWar));
 
-		unArchiver.setFileSelectors(
-			new FileSelector[] {includeExcludeFileSelector});
+		if (dependencyAddVersionAndClassifier) {
+			dependencyAddVersion = true;
+			dependencyAddClassifier = true;
+		}
 
-		unArchiver.extract();
+		if (pluginType.equals("ext")) {
+			deployExt();
+		}
+		else if (pluginType.equals("hook")) {
+			deployHook();
+		}
+		else if (pluginType.equals("layouttpl")) {
+			deployLayoutTemplate();
+		}
+		else if (pluginType.equals("portlet")) {
+			deployPortlet();
+		}
+		else if (pluginType.equals("theme")) {
+			deployTheme();
+		}
+		else if (pluginType.equals("web")) {
+			deployWeb();
+		}
 	}
+
+	/**
+	 * @parameter default-value="${deployDir}" expression="${appServerDeployDir}"
+	 * @required
+	 */
+	private File appServerDeployDir;
 
 	/**
 	 * @parameter default-value="tomcat" expression="${appServerType}"
 	 * @required
 	 */
 	private String appServerType;
-
-	/**
-	 * @component
-	 */
-	private ArchiverManager archiverManager;
-
-	/**
-	 * @component
-	 */
-	private ArtifactFactory artifactFactory;
-
-	/**
-	 * @component
-	 */
-	private ArtifactResolver artifactResolver;
 
 	/**
 	 * @parameter expression="${project.build.directory}"
@@ -304,65 +301,53 @@ public class PluginDirectDeployerMojo extends AbstractMojo {
 	private boolean customPortletXml;
 
 	/**
+	 * @parameter default-value="false"
+	 */
+	private boolean dependencyAddClassifier;
+
+	/**
+	 * @parameter default-value="false"
+	 */
+	private boolean dependencyAddVersion;
+
+	/**
+	 * @parameter default-value="false"
+	 */
+	private boolean dependencyAddVersionAndClassifier;
+
+	/**
+	 * @parameter default-value="false"
+	 */
+	private boolean dependencyCopyTransitive;
+
+	/**
+	 * @deprecated
 	 * @parameter expression="${deployDir}"
-	 * @required
+	 * @since 6.1.1
 	 */
 	private File deployDir;
 
 	/**
-	 * @parameter default-value="" expression="${jbossPrefix}"
-	 * @required
+	 * @parameter expression="${jbossPrefix}"
 	 */
 	private String jbossPrefix;
 
 	/**
-	 * @parameter expression="${liferayVersion}"
+	 * @parameter default-value="${project.artifactId}" expression="${pluginName}"
 	 * @required
 	 */
-	private String liferayVersion;
+	private String pluginName;
 
 	/**
-	 * @parameter expression="${localRepository}"
-	 * @readonly
-	 * @required
-	 */
-	private ArtifactRepository localArtifactRepository;
-
-	/**
-	 * @parameter default-value="portlet" expression="${pluginType}"
-	 * @required
-	 */
-	private String pluginType;
-
-	/**
-	 * @parameter expression="${project.remoteArtifactRepositories}"
-	 * @readonly
-	 * @required
-	 */
-	private List remoteArtifactRepositories;
-
-	/**
-	 * @parameter expression="${unpackWar}" default-value="true"
+	 * @parameter default-value="true" expression="${unpackWar}"
 	 * @required
 	 */
 	private boolean unpackWar;
 
 	/**
-	 * @parameter expression="${project.build.directory}/${project.build.finalName}.war"
-	 * @required
-	 */
-	private File warFile;
-
-	/**
-	 * @parameter expression="${project.build.finalName}.war"
+	 * @parameter default-value="${project.build.finalName}.war" expression="${warFileName}
 	 * @required
 	 */
 	private String warFileName;
-
-	/**
-	 * @parameter expression="${project.build.directory}/liferay-work"
-	 * @required
-	 */
-	private File workDir;
 
 }

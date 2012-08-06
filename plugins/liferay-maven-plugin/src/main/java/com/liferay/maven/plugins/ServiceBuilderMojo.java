@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2011 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,26 +15,16 @@
 package com.liferay.maven.plugins;
 
 import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.tools.servicebuilder.ServiceBuilder;
-import com.liferay.portal.util.InitUtil;
-import com.liferay.portal.util.PropsUtil;
 
 import java.io.File;
-
-import java.lang.reflect.Method;
-
-import java.net.URI;
-import java.net.URL;
-import java.net.URLClassLoader;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.model.Dependency;
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.invoker.DefaultInvocationRequest;
@@ -50,24 +40,7 @@ import org.apache.maven.shared.invoker.MavenCommandLineBuilder;
  * @author Thiago Moreira
  * @goal   build-service
  */
-public class ServiceBuilderMojo extends AbstractMojo {
-
-	public void execute() throws MojoExecutionException {
-		try {
-			initClassLoader();
-
-			doExecute();
-		}
-		catch (Exception e) {
-			if (e instanceof MojoExecutionException) {
-				throw (MojoExecutionException)e;
-			}
-			else {
-				throw new MojoExecutionException(
-					"Unable to execute Service Builder: " + e.getMessage(), e);
-			}
-		}
-	}
+public class ServiceBuilderMojo extends AbstractLiferayMojo {
 
 	protected void copyServicePropertiesFile() throws Exception {
 		File servicePropertiesFile = new File(
@@ -80,23 +53,56 @@ public class ServiceBuilderMojo extends AbstractMojo {
 	}
 
 	protected void doExecute() throws Exception {
+		String packaging = project.getPackaging();
+
+		if (packaging.equals("pom")) {
+			getLog().info("Skipping " + project.getArtifactId());
+
+			return;
+		}
+
+		String artifactId = project.getArtifactId();
+
+		if (pluginType.equals("ext") &&
+			(artifactId.endsWith("ext-util-bridges") ||
+			 artifactId.endsWith("ext-util-java") ||
+			 artifactId.endsWith("ext-util-taglib"))) {
+
+			getLog().info("Skipping " + artifactId);
+
+			return;
+		}
+
+		if (pluginType.equals("ext")) {
+			StringBuilder sb = new StringBuilder();
+
+			sb.append("WARNING: Support for ServiceBuilder in EXT plugins ");
+			sb.append("will be deprecated in future versions. EXT plugins ");
+			sb.append("are designed to override the portal's core code that ");
+			sb.append("cannot be done with hooks, layout templates, ");
+			sb.append("portlets, or themes. EXT plugins are not meant to ");
+			sb.append("contain new custom services. Please migrate your ");
+			sb.append("service.xml to a portlet plugin.");
+
+			getLog().warn(sb.toString());
+		}
+
 		initProperties();
+
+		if (Validator.isNull(serviceFileName)) {
+			throw new MojoExecutionException(
+				"Unable to find service.xml with path " + serviceFileName);
+		}
 
 		File inputFile = new File(serviceFileName);
 
 		if (!inputFile.exists()) {
 			throw new MojoExecutionException(
-				"Unable to find service.xml with path: " +
+				"Unable to find service.xml with path " +
 					inputFile.getAbsolutePath());
 		}
 
 		getLog().info("Building from " + serviceFileName);
-
-		PropsUtil.set("spring.configs", "META-INF/service-builder-spring.xml");
-		PropsUtil.set(
-			PropsKeys.RESOURCE_ACTIONS_READ_PORTLET_RESOURCES, "false");
-
-		InitUtil.initWithSpring();
 
 		copyServicePropertiesFile();
 
@@ -120,11 +126,12 @@ public class ServiceBuilderMojo extends AbstractMojo {
 			serviceFileName, hbmFileName, ormFileName, modelHintsFileName,
 			springFileName, springBaseFileName, springClusterFileName,
 			springDynamicDataSourceFileName, springHibernateFileName,
-			springInfrastructureFileName, springShardDataSourceFileName,
-			apiDir, implDir, jsonFileName, remotingFileName, sqlDir,
-			sqlFileName, sqlIndexesFileName, sqlIndexesPropertiesFileName,
+			springInfrastructureFileName, springShardDataSourceFileName, apiDir,
+			implDir, jsonFileName, remotingFileName, sqlDir, sqlFileName,
+			sqlIndexesFileName, sqlIndexesPropertiesFileName,
 			sqlSequencesFileName, autoNamespaceTables, beanLocatorUtil,
-			propsUtil, pluginName, null);
+			propsUtil, pluginName, targetEntityName, null, true,
+			serviceBuildNumber, serviceBuildNumberIncrement);
 
 		if (tempServiceFile != null) {
 			FileUtil.delete(tempServiceFile);
@@ -133,29 +140,6 @@ public class ServiceBuilderMojo extends AbstractMojo {
 		moveServicePropertiesFile();
 
 		invokeDependencyBuild();
-	}
-
-	protected void initClassLoader() throws Exception {
-		synchronized (ServiceBuilderMojo.class) {
-			Class<?> clazz = getClass();
-
-			URLClassLoader classLoader = (URLClassLoader)clazz.getClassLoader();
-
-			Method method = URLClassLoader.class.getDeclaredMethod(
-				"addURL", URL.class);
-
-			method.setAccessible(true);
-
-			for (Object object : project.getCompileClasspathElements()) {
-				String path = (String)object;
-
-				File file = new File(path);
-
-				URI uri = file.toURI();
-
-				method.invoke(classLoader, uri.toURL());
-			}
-		}
 	}
 
 	protected void initProperties() {
@@ -178,13 +162,7 @@ public class ServiceBuilderMojo extends AbstractMojo {
 				implBaseDir = baseDir;
 			}
 
-			if (Validator.isNull(webappBaseDir) &&
-				Validator.isNotNull(implBaseDir)) {
-
-				webappBaseDir = implBaseDir;
-			}
-			else if (Validator.isNull(webappBaseDir) &&
-					 Validator.isNotNull(apiBaseDir)) {
+			if (Validator.isNull(webappBaseDir)) {
 
 				webappBaseDir = baseDir;
 			}
@@ -358,7 +336,7 @@ public class ServiceBuilderMojo extends AbstractMojo {
 	}
 
 	/**
-	 * @deprecated 
+	 * @deprecated
 	 * @since 6.1.0
 	 */
 	protected void invokeDependencyBuild() throws Exception {
@@ -535,13 +513,6 @@ public class ServiceBuilderMojo extends AbstractMojo {
 	private List<String> postBuildGoals;
 
 	/**
-	 * @parameter expression="${project}"
-	 * @required
-	 * @readonly
-	 */
-	private MavenProject project;
-
-	/**
 	 * @parameter
 	 */
 	private String propsUtil;
@@ -550,6 +521,16 @@ public class ServiceBuilderMojo extends AbstractMojo {
 	 * @parameter
 	 */
 	private String remotingFileName;
+
+	/**
+	 * @parameter default-value="1" expression="${serviceBuildNumber}"
+	 */
+	private long serviceBuildNumber;
+
+	/**
+	 * @parameter default-value="true" expression="${serviceBuildNumberIncrement}"
+	 */
+	private boolean serviceBuildNumberIncrement;
 
 	/**
 	 * @parameter default-value="" expression="${serviceFileName}"
@@ -618,6 +599,11 @@ public class ServiceBuilderMojo extends AbstractMojo {
 	 * @required
 	 */
 	private String sqlSequencesFileName;
+
+	/**
+	 * @parameter
+	 */
+	private String targetEntityName;
 
 	/**
 	 * @parameter

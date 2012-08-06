@@ -104,14 +104,14 @@
 	</pluginRepositories>
 	<distributionManagement>
 		<repository>
-			<id>sonatype-staging</id>
-			<name>Sonatype Staging Repository</name>
-			<url>http://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+			<id>${liferay.repository.release.id}</id>
+			<name>${liferay.repository.release.name}</name>
+			<url>${liferay.repository.release.url}</url>
 		</repository>
 		<snapshotRepository>
-			<id>sonatype-snapshot</id>
-			<name>Sonatype Snapshot Repository</name>
-			<url>http://oss.sonatype.org/content/repositories/snapshots</url>
+			<id>${liferay.repository.snapshots.id}</id>
+			<name>${liferay.repository.snapshots.name}</name>
+			<url>${liferay.repository.snapshots.url}</url>
 		</snapshotRepository>
 	</distributionManagement>
 	<profiles>
@@ -137,8 +137,14 @@
 		</profile>
 	</profiles>
 	<properties>
-		<liferay.version>6.1.0</liferay.version>
+		<liferay.version>6.1.10</liferay.version>
 		<maven.version>2.0.10</maven.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<liferay.repository.release.id>sonatype-staging</liferay.repository.release.id>
+		<liferay.repository.release.name>Sonatype Staging Repository</liferay.repository.release.name>
+		<liferay.repository.release.url>http://oss.sonatype.org/service/local/staging/deploy/maven2</liferay.repository.release.url>
+		<liferay.repository.snapshots.id>sonatype-snapshot</liferay.repository.snapshots.id>
+		<liferay.repository.snapshots.name>Sonatype Snapshot Repository</liferay.repository.snapshots.name>
+		<liferay.repository.snapshots.url>http://oss.sonatype.org/content/repositories/snapshots</liferay.repository.snapshots.url>
 	</properties>
 </project>

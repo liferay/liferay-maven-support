@@ -21,6 +21,7 @@
 				<version>${liferay.version}</version>
 				<configuration>
 					<implBaseDir>${basedir}/../${artifactId}-ext-impl</implBaseDir>
+					<sqlDir>${basedir}/../${artifactId}-ext/src/main/webapp/WEB-INF/sql</sqlDir>
 					<webappBaseDir>${basedir}/../${artifactId}-ext-web</webappBaseDir>
 				</configuration>
 			</plugin>
@@ -38,6 +39,7 @@
 			<groupId>com.liferay.portal</groupId>
 			<artifactId>portal-service</artifactId>
 			<version>${liferay.version}</version>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 </project>

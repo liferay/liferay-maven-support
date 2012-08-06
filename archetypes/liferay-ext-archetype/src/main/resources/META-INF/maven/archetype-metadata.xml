@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<archetype-descriptor name="liferay-servicebuilder-archetype">
+<archetype-descriptor name="liferay-ext-archetype">
 	<fileSets>
 		<fileSet encoding="UTF-8" filtered="true">
 			<directory>__artifactId__-ext</directory>
