@@ -177,7 +177,7 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 			}
 
 			if ((appServerLibPortalDir != null) &&
-				appServerLibPortalDir.exists()) {
+				 appServerLibPortalDir.exists()) {
 
 				String[] fileNames = FileUtil.listFiles(appServerLibPortalDir);
 
@@ -195,15 +195,13 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 	protected void initPortal() throws Exception {
 		if ((appServerPortalDir != null) && appServerPortalDir.exists()) {
 			if (Validator.isNull(appServerClassesPortalDir)) {
-				appServerClassesPortalDir = new File(
-					appServerPortalDir, "WEB-INF/classes");
+				appServerClassesPortalDir =
+					new File(appServerPortalDir, "WEB-INF/classes");
 			}
-
 			if (Validator.isNull(appServerLibPortalDir)) {
-				appServerLibPortalDir = new File(
-					appServerPortalDir, "WEB-INF/lib");
+				appServerLibPortalDir =
+					new File(appServerPortalDir, "WEB-INF/lib");
 			}
-
 			if (Validator.isNull(appServerTldPortalDir)) {
 				appServerTldPortalDir = new File(
 					appServerPortalDir, "WEB-INF/tld");
@@ -228,6 +226,8 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 				artifact.getFile());
 
 			unArchiver.setDestDirectory(appServerPortalDir);
+			unArchiver.setSourceFile(artifact.getFile());
+			unArchiver.setOverwrite(false);
 
 			IncludeExcludeFileSelector includeExcludeFileSelector =
 				new IncludeExcludeFileSelector();
@@ -239,14 +239,11 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 			unArchiver.setFileSelectors(
 				new FileSelector[] {includeExcludeFileSelector});
 
-			unArchiver.setOverwrite(false);
-			unArchiver.setSourceFile(artifact.getFile());
-
 			unArchiver.extract();
 
 			if (Validator.isNull(appServerLibPortalDir)) {
-				appServerLibPortalDir = new File(
-					appServerPortalDir, "WEB-INF/lib");
+				appServerLibPortalDir =
+					new File(appServerPortalDir, "WEB-INF/lib");
 			}
 		}
 
@@ -290,11 +287,18 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 	}
 
 	protected Artifact resolveArtifact(Dependency dependency) throws Exception {
-		Artifact artifact = artifactFactory.createArtifact(
-			dependency.getGroupId(), dependency.getArtifactId(),
-			dependency.getVersion(), dependency.getClassifier(),
-			dependency.getType());
-
+		Artifact artifact = null;
+		if (dependency.getClassifier() == null) {
+			artifact = artifactFactory.createArtifact(
+					dependency.getGroupId(), dependency.getArtifactId(),
+					dependency.getVersion(), dependency.getScope(),
+					dependency.getType());
+		}
+		else {
+			artifact = artifactFactory.createArtifactWithClassifier(dependency.getGroupId(), dependency.getArtifactId(),
+					dependency.getVersion(), dependency.getType(),
+					dependency.getClassifier());
+		}
 		artifactResolver.resolve(
 			artifact, remoteArtifactRepositories, localArtifactRepository);
 

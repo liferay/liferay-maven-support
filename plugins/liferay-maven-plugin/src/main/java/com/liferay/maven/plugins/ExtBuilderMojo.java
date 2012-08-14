@@ -14,16 +14,27 @@
 
 package com.liferay.maven.plugins;
 
-import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.tools.ExtInfoBuilder;
+import com.liferay.portal.util.FileImpl;
 import com.liferay.util.ant.CopyTask;
 
 import java.io.File;
 
+import java.util.List;
+
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.model.Dependency;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MavenProjectBuilder;
 
 import org.codehaus.plexus.archiver.UnArchiver;
+import org.codehaus.plexus.archiver.manager.ArchiverManager;
 import org.codehaus.plexus.components.io.fileselectors.FileSelector;
 import org.codehaus.plexus.components.io.fileselectors.IncludeExcludeFileSelector;
 
@@ -31,48 +42,18 @@ import org.codehaus.plexus.components.io.fileselectors.IncludeExcludeFileSelecto
  * @author Mika Koivisto
  * @goal   build-ext
  */
-public class ExtBuilderMojo extends AbstractLiferayMojo {
+public class ExtBuilderMojo extends AbstractMojo {
 
-	protected void copyJarAndClasses(
-			Artifact artifact, File jarDir, String jarName)
-		throws Exception {
-
-		File serviceJarFile = new File(jarDir, jarName);
-
-		FileUtil.copyFile(artifact.getFile(), serviceJarFile);
-
-		File classesDir = new File(jarDir, "classes");
-
-		classesDir.mkdirs();
-
-		String[] excludes = {
-			"META-INF/**", "portal-*.properties", "system-*.properties"
-		};
-
-		unpack(artifact.getFile(), classesDir, excludes, null);
-	}
-
-	protected void copyUtilLibrary(
-			Artifact artifact, File utilDir, File implClassesDir,
-			String utilJarName)
-		throws Exception {
-
-		File utilJarFile = new File(utilDir, "ext-" + utilJarName);
-
-		FileUtil.copyFile(artifact.getFile(), utilJarFile);
-
-		File dependencyUtilJarFile = new File(
-			implClassesDir, "ext-" + pluginName + "-" + utilJarName);
-
-		FileUtil.copyFile(artifact.getFile(), dependencyUtilJarFile);
+	public void execute() throws MojoExecutionException {
+		try {
+			doExecute();
+		}
+		catch (Exception e) {
+			throw new MojoExecutionException(e.getMessage(), e);
+		}
 	}
 
 	protected void doExecute() throws Exception {
-		if (dependencyAddVersionAndClassifier) {
-			dependencyAddVersion = true;
-			dependencyAddClassifier = true;
-		}
-
 		File implDir = new File(webappDir, "WEB-INF/ext-impl");
 
 		implDir.mkdirs();
@@ -135,61 +116,35 @@ public class ExtBuilderMojo extends AbstractLiferayMojo {
 				extImplFile = artifact.getFile();
 
 				copyJarAndClasses(artifact, implDir, "ext-impl.jar");
-
-				copyLibraryDependencies(
-					portalLibDir, artifact, dependencyAddVersion,
-					dependencyAddClassifier, dependencyCopyTransitive);
 			}
 			else if (artifactId.endsWith("ext-lib-global")) {
-				copyLibraryDependencies(
-					globalLibDir, artifact, dependencyAddVersion,
-					dependencyAddClassifier, dependencyCopyTransitive);
+				copyLibraryDependencies(globalLibDir, artifact);
 			}
 			else if (artifactId.endsWith("ext-lib-portal")) {
-				copyLibraryDependencies(
-					portalLibDir, artifact, dependencyAddVersion,
-					dependencyAddClassifier, dependencyCopyTransitive);
+				copyLibraryDependencies(portalLibDir, artifact);
 			}
 			else if (artifactId.endsWith("ext-service")) {
 				copyJarAndClasses(artifact, serviceDir, "ext-service.jar");
-
-				copyLibraryDependencies(
-					globalLibDir, artifact, dependencyAddVersion,
-					dependencyAddClassifier, dependencyCopyTransitive);
 			}
 			else if (artifactId.endsWith("ext-util-bridges")) {
 				copyUtilLibrary(
 					artifact, utilBridgesDir, implClassesDir,
 					"util-bridges.jar");
-
-				copyLibraryDependencies(
-					portalLibDir, artifact, dependencyAddVersion,
-					dependencyAddClassifier, dependencyCopyTransitive);
 			}
 			else if (artifactId.endsWith("ext-util-java")) {
 				copyUtilLibrary(
-					artifact, utilJavaDir, implClassesDir, "util-java.jar");
-
-				copyLibraryDependencies(
-					portalLibDir, artifact, dependencyAddVersion,
-					dependencyAddClassifier, dependencyCopyTransitive);
+					artifact, utilJavaDir, implClassesDir,
+					"util-java.jar");
 			}
 			else if (artifactId.endsWith("ext-util-taglib")) {
 				copyUtilLibrary(
-					artifact, utilTaglibDir, implClassesDir, "util-taglib.jar");
-
-				copyLibraryDependencies(
-					portalLibDir, artifact, dependencyAddVersion,
-					dependencyAddClassifier, dependencyCopyTransitive);
+					artifact, utilTaglibDir, implClassesDir,
+					"util-taglib.jar");
 			}
 			else if (artifactId.endsWith("ext-web")) {
 				String[] excludes = new String[] {"META-INF/**"};
 
 				unpack(artifact.getFile(), webDir, excludes, null);
-
-				copyLibraryDependencies(
-					portalLibDir, artifact, dependencyAddVersion,
-					dependencyAddClassifier, dependencyCopyTransitive);
 			}
 		}
 
@@ -201,12 +156,129 @@ public class ExtBuilderMojo extends AbstractLiferayMojo {
 			workDir, new File(webDir, "WEB-INF/classes"),
 			"portal-*.properties,system-*.properties", null);
 
-		FileUtil.copyDirectory(sqlSourceDir, sqlDir);
+		_fileUtil.copyDirectory(sqlSourceDir, sqlDir);
 
 		String dirName = webappDir.getAbsolutePath() + "/WEB-INF";
 
 		ExtInfoBuilder infoBuilder = new ExtInfoBuilder(
 			dirName, dirName, pluginName);
+	}
+
+	protected void copyJarAndClasses(
+			Artifact artifact, File jarDir, String jarName)
+		throws Exception {
+
+		File serviceJarFile = new File(jarDir, jarName);
+
+		_fileUtil.copyFile(artifact.getFile(), serviceJarFile);
+
+		File classesDir = new File(jarDir, "classes");
+
+		classesDir.mkdirs();
+
+		String[] excludes = {
+			"META-INF/**", "portal-*.properties", "system-*.properties"
+		};
+
+		unpack(artifact.getFile(), classesDir, excludes, null);
+	}
+
+	protected void copyLibraryDependencies(File libDir, Artifact artifact)
+		throws Exception {
+
+		MavenProject libProject = resolveProject(artifact);
+
+		List<Dependency> dependencies = libProject.getDependencies();
+
+		for (Dependency dependency : dependencies) {
+			String scope = dependency.getScope();
+
+			if (scope != null && (scope.equalsIgnoreCase("provided") ||
+				scope.equalsIgnoreCase("test"))) {
+
+				continue;
+			}
+
+			String type = dependency.getType();
+
+			if (type.equalsIgnoreCase("pom")) {
+				continue;
+			}
+
+			Artifact libArtifact = resolveArtifact(dependency);
+
+			File libJarFile = null;
+			
+			if (addVersionAndClassifier) {
+				libJarFile = new File(
+						libDir, libArtifact.getArtifactId() + 
+						(libArtifact.getVersion() == null ? "" : 
+							StringPool.DASH + libArtifact.getVersion()) + 
+							(libArtifact.getClassifier() == null ? "" : 
+								StringPool.DASH + libArtifact.getClassifier()) + 
+						".jar");
+			} else {
+				libJarFile = new File(
+						libDir, libArtifact.getArtifactId() + ".jar");
+			}
+
+			_fileUtil.copyFile(libArtifact.getFile(), libJarFile);
+		}
+	}
+
+	protected void copyUtilLibrary(
+			Artifact artifact, File utilDir, File implClassesDir,
+			String utilJarName)
+		throws Exception {
+
+		File utilJarFile = new File(utilDir, "ext-" + utilJarName);
+
+		_fileUtil.copyFile(artifact.getFile(), utilJarFile);
+
+		File dependencyUtilJarFile = new File(
+			implClassesDir, "ext-" + pluginName + "-" + utilJarName);
+
+		_fileUtil.copyFile(artifact.getFile(), dependencyUtilJarFile);
+	}
+
+	protected Dependency createDependency(
+		String groupId, String artifactId, String version, String type) {
+
+		Dependency dependency = new Dependency();
+
+		dependency.setArtifactId(artifactId);
+		dependency.setGroupId(groupId);
+		dependency.setType(type);
+		dependency.setVersion(version);
+
+		return dependency;
+	}
+
+	protected Artifact resolveArtifact(Dependency dependency) throws Exception {
+		Artifact artifact = artifactFactory.createArtifactWithClassifier(
+			dependency.getGroupId(), dependency.getArtifactId(),
+			dependency.getVersion(), dependency.getType(), dependency.getClassifier());
+		artifact.setScope(dependency.getScope());
+
+		artifactResolver.resolve(
+			artifact, remoteArtifactRepositories, localArtifactRepository);
+
+		return artifact;
+	}
+
+	protected MavenProject resolveProject(Artifact artifact) throws Exception {
+		Artifact pomArtifact = artifact;
+
+		String type = artifact.getType();
+
+		if (!type.equals("pom")) {
+			pomArtifact = artifactFactory.createArtifact(
+				artifact.getGroupId(), artifact.getArtifactId(),
+				artifact.getVersion(), "", "pom");
+		}
+
+		return projectBuilder.buildFromRepository(
+			pomArtifact, remoteArtifactRepositories, localArtifactRepository);
 	}
 
 	protected void unpack(
@@ -230,42 +302,78 @@ public class ExtBuilderMojo extends AbstractLiferayMojo {
 		unArchiver.extract();
 	}
 
-	/**
-	 * @parameter default-value="false"
-	 */
-	private boolean dependencyAddClassifier;
+	private static FileImpl _fileUtil = new FileImpl();
 
 	/**
-	 * @parameter default-value="false"
+	 * @component
 	 */
-	private boolean dependencyAddVersion;
+	private ArchiverManager archiverManager;
 
 	/**
-	 * @parameter default-value="false"
+	 * @component
 	 */
-	private boolean dependencyAddVersionAndClassifier;
+	private ArtifactFactory artifactFactory;
 
 	/**
-	 * @parameter default-value="false"
+	 * @component
 	 */
-	private boolean dependencyCopyTransitive;
+	private ArtifactResolver artifactResolver;
 
 	/**
-	 * @parameter default-value="${project.artifactId}" expression="${pluginName}"
+	 * @parameter expression="${localRepository}"
+	 * @readonly
+	 * @required
+	 */
+	private ArtifactRepository localArtifactRepository;
+
+	/**
+	 * @parameter expression="${project.artifactId}"
 	 * @required
 	 */
 	private String pluginName;
 
 	/**
-	 * @parameter default-value="${basedir}/src/main/webapp/WEB-INF/sql"
+	 * @parameter expression="${project}"
+	 * @required
+	 * @readonly
+	 */
+	private MavenProject project;
+
+	/**
+	 * @component role="org.apache.maven.project.MavenProjectBuilder"
+	 * @required
+	 * @readonly
+	 */
+	protected MavenProjectBuilder projectBuilder;
+
+	/**
+	 * @parameter expression="${project.remoteArtifactRepositories}"
+	 * @readonly
+	 * @required
+	 */
+	private List remoteArtifactRepositories;
+
+	/**
+	 * @parameter expression="${basedir}/src/main/webapp/WEB-INF/sql"
 	 * @required
 	 */
 	private File sqlSourceDir;
 
 	/**
-	 * @parameter default-value="${project.build.directory}/${project.build.finalName}"
+	 * @parameter default-value="false"
+	 */
+	private boolean addVersionAndClassifier;
+
+	/**
+	 * @parameter expression="${project.build.directory}/${project.build.finalName}"
 	 * @required
 	 */
 	private File webappDir;
+
+	/**
+	 * @parameter expression="${project.build.directory}/liferay-work"
+	 * @required
+	 */
+	private File workDir;
 
 }

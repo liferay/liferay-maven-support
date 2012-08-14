@@ -69,8 +69,8 @@ public class ThemeMergeMojo extends AbstractLiferayMojo {
 		}
 
 		Dependency dependency = createDependency(
-			parentThemeGroupId, parentThemeArtifactId, parentThemeVersion, "",
-			"war");
+			parentThemeGroupId, parentThemeArtifactId, parentThemeVersion,
+			"", "war");
 
 		Artifact artifact = resolveArtifact(dependency);
 
@@ -146,7 +146,8 @@ public class ThemeMergeMojo extends AbstractLiferayMojo {
 	}
 
 	/**
-	 * The parent theme can be _styled, _unstyled, classic, control_panel, or artifactGroupId:artifactId:artifactVersion.
+	 * Parent theme. Can be _styled | _unstyled | classic | control_panel |
+	 * artifactGroupId:artifactId:artifactVersion
 	 *
 	 * @parameter default-value="_styled"
 	 */
