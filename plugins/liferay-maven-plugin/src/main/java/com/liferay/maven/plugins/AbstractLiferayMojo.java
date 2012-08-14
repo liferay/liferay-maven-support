@@ -291,17 +291,20 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 
 	protected Artifact resolveArtifact(Dependency dependency) throws Exception {
 		Artifact artifact = null;
-		if (dependency.getClassifier() == null) {
+
+		if (Validator.isNull(dependency.getClassifier())) {
 			artifact = artifactFactory.createArtifact(
-					dependency.getGroupId(), dependency.getArtifactId(),
-					dependency.getVersion(), dependency.getScope(),
-					dependency.getType());
+				dependency.getGroupId(), dependency.getArtifactId(),
+				dependency.getVersion(), dependency.getScope(),
+				dependency.getType());
 		}
 		else {
-			artifact = artifactFactory.createArtifactWithClassifier(dependency.getGroupId(), dependency.getArtifactId(),
-					dependency.getVersion(), dependency.getType(),
-					dependency.getClassifier());
+			artifact = artifactFactory.createArtifactWithClassifier(
+				dependency.getGroupId(), dependency.getArtifactId(),
+				dependency.getVersion(), dependency.getType(),
+				dependency.getClassifier());
 		}
+
 		artifactResolver.resolve(
 			artifact, remoteArtifactRepositories, localArtifactRepository);
 
