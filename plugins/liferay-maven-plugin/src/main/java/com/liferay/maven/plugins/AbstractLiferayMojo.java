@@ -58,9 +58,9 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 
 	public void execute() throws MojoExecutionException {
 		try {
-			initPortal();
-
 			initClassLoader();
+
+			initPortal();
 
 			doExecute();
 		}
