@@ -127,7 +127,7 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 			springFileName, springBaseFileName, springClusterFileName,
 			springDynamicDataSourceFileName, springHibernateFileName,
 			springInfrastructureFileName, springShardDataSourceFileName, apiDir,
-			implDir, jsonFileName, remotingFileName, sqlDir, sqlFileName,
+			implDir, remotingFileName, sqlDir, sqlFileName,
 			sqlIndexesFileName, sqlIndexesPropertiesFileName,
 			sqlSequencesFileName, autoNamespaceTables, beanLocatorUtil,
 			propsUtil, pluginName, targetEntityName, null, true,
@@ -192,14 +192,12 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 				"/src/main/resources");
 
 			if (pluginType.equals("ext")) {
-				jsonFileName = webappDir.concat("/html/js/liferay/service.js");
 				remotingFileName = webappDir.concat(
 					"/WEB-INF/remoting-servlet-ext.xml");
 			}
 			else {
 				hbmFileName = webappResourcesDir.concat(
 					"/META-INF/portlet-hbm.xml");
-				jsonFileName = webappDir.concat("/js/service.js");
 				modelHintsFileName = webappResourcesDir.concat(
 					"/META-INF/portlet-model-hints.xml");
 				ormFileName = webappResourcesDir.concat(
@@ -270,10 +268,6 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 			if (Validator.isNull(implDir)) {
 				implDir = baseDir.concat("/src/main/java");
 				implResourcesDir = baseDir.concat("/src/main/resources");
-			}
-
-			if (Validator.isNull(jsonFileName)) {
-				jsonFileName = webappDir.concat("/js/service.js");
 			}
 
 			if (Validator.isNull(modelHintsFileName)) {
@@ -470,11 +464,6 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 	 * @component
 	 */
 	private Invoker invoker;
-
-	/**
-	 * @parameter
-	 */
-	private String jsonFileName;
 
 	/**
 	 * @parameter
