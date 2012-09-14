@@ -5,8 +5,17 @@
 		<fileSet encoding="UTF-8" filtered="true">
 			<directory>src/main/resources</directory>
 		</fileSet>
+		<fileSet encoding="UTF-8" filtered="false">
+			<file>src/main/webapp/__artifactId__.png</file>
+		</fileSet>
 		<fileSet encoding="UTF-8" filtered="true">
-			<directory>src/main/webapp</directory>
+			<file>src/main/webapp/__artifactId__.tpl</file>
+		</fileSet>
+		<fileSet encoding="UTF-8" filtered="true">
+			<file>src/main/webapp/__artifactId__.wap.tpl</file>
+		</fileSet>
+		<fileSet encoding="UTF-8" filtered="true">
+			<directory>src/main/webapp/WEB-INF</directory>
 		</fileSet>
 	</fileSets>
 </archetype-descriptor>

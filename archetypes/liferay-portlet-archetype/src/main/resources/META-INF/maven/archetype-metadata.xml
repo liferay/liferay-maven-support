@@ -8,8 +8,20 @@
 		<fileSet encoding="UTF-8" filtered="true">
 			<directory>src/main/resources</directory>
 		</fileSet>
+		<fileSet filtered="false">
+			<file>src/main/webapp/icon.png</file>
+		</fileSet>
 		<fileSet encoding="UTF-8" filtered="true">
-			<directory>src/main/webapp</directory>
+			<file>src/main/webapp/view.jsp</file>
+		</fileSet>
+		<fileSet encoding="UTF-8" filtered="true">
+			<directory>src/main/webapp/css</directory>
+		</fileSet>
+		<fileSet encoding="UTF-8" filtered="true">
+			<directory>src/main/webapp/js</directory>
+		</fileSet>
+		<fileSet encoding="UTF-8" filtered="true">
+			<directory>src/main/webapp/WEB-INF</directory>
 		</fileSet>
 	</fileSets>
 </archetype-descriptor>
