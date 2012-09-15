@@ -127,11 +127,11 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 			springFileName, springBaseFileName, springClusterFileName,
 			springDynamicDataSourceFileName, springHibernateFileName,
 			springInfrastructureFileName, springShardDataSourceFileName, apiDir,
-			implDir, remotingFileName, sqlDir, sqlFileName,
-			sqlIndexesFileName, sqlIndexesPropertiesFileName,
-			sqlSequencesFileName, autoNamespaceTables, beanLocatorUtil,
-			propsUtil, pluginName, targetEntityName, null, true,
-			serviceBuildNumber, serviceBuildNumberIncrement);
+			implDir, remotingFileName, sqlDir, sqlFileName, sqlIndexesFileName,
+			sqlIndexesPropertiesFileName, sqlSequencesFileName,
+			autoNamespaceTables, beanLocatorUtil, propsUtil, pluginName,
+			targetEntityName, null, true, serviceBuildNumber,
+			serviceBuildNumberIncrement);
 
 		if (tempServiceFile != null) {
 			FileUtil.delete(tempServiceFile);
