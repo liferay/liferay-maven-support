@@ -14,9 +14,21 @@
 
 package com.liferay.maven.plugins;
 
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.xml.Document;
+import com.liferay.portal.kernel.xml.Element;
+import com.liferay.portal.kernel.xml.SAXReaderUtil;
+import com.liferay.portal.model.Theme;
+import com.liferay.portal.model.impl.ThemeImpl;
+import com.liferay.portal.util.PortalUtil;
+import com.liferay.util.ContextReplace;
+
 import java.io.File;
 
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.Artifact;
@@ -33,44 +45,81 @@ import org.codehaus.plexus.components.io.fileselectors.IncludeExcludeFileSelecto
  */
 public class ThemeMergeMojo extends AbstractLiferayMojo {
 
+	protected void cleanupTemplates(File templatesDir) {
+		File initFile = new File(templatesDir, "init." + themeType);
+
+		FileUtils.deleteQuietly(initFile);
+
+		String[] extensions = null;
+
+		if (themeType.equals("ftl")) {
+			extensions = new String[] {"vm", "jsp"};
+		}
+		else if (themeType.equals("jsp")) {
+			extensions = new String[] {"vm", "ftl"};
+		}
+		else {
+			extensions = new String[] {"ftl", "jsp"};
+		}
+
+		Iterator<File> itr = FileUtils.iterateFiles(
+			templatesDir, extensions, false);
+
+		while (itr.hasNext()) {
+			File file = itr.next();
+
+			FileUtils.deleteQuietly(file);
+		}
+	}
+
 	protected void doExecute() throws Exception {
 		if (!workDir.exists()) {
 			workDir.mkdirs();
 		}
 
-		String parentThemeGroupId = "com.liferay.portal";
-		String parentThemeArtifactId = "portal-web";
-		String parentThemeVersion = liferayVersion;
+		if (Validator.isNotNull(parentTheme)) {
+			if (parentTheme.indexOf(":") > 0) {
+				String[] parentThemeArray = parentTheme.split(":");
 
-		String[] excludes = {
-			"html/themes/classic/_diffs/**",
-			"html/themes/control_panel/_diffs/**"
-		};
+				parentThemeArtifactGroupId = parentThemeArray[0];
+				parentThemeArtifactId = parentThemeArray[1];
+				parentThemeArtifactVersion = parentThemeArray[2];
+				parentThemeId = null;
+			}
+			else {
+				parentThemeId = parentTheme;
+			}
+		}
 
-		String[] includes = {
-			"html/themes/_unstyled/**", "html/themes/_styled/**",
-			"html/themes/classic/**", "html/themes/control_panel/**"
-		};
+		getLog().info("Parent theme groupId: " + parentThemeArtifactGroupId);
+		getLog().info("Parent theme artifactId: " + parentThemeArtifactId);
+		getLog().info("Parent theme version: " + parentThemeArtifactVersion);
+		getLog().info("Parent theme id: " + parentThemeId);
 
-		if (!parentTheme.equals("_styled") &&
-			!parentTheme.equals("_unstyled") &&
-			!parentTheme.equals("classic") &&
-			!parentTheme.equals("control_panel")) {
+		String[] excludes = null;
 
-			String[] parentThemeArray = parentTheme.split(":");
+		String[] includes = null;
 
-			parentThemeGroupId = parentThemeArray[0];
-			parentThemeArtifactId = parentThemeArray[1];
-			parentThemeVersion = parentThemeArray[2];
+		boolean portalTheme = false;
 
-			excludes = new String[] {"WEB-INF/**"};
+		if (parentThemeArtifactGroupId.equals("com.liferay.portal") &&
+			parentThemeArtifactId.equals("portal-web")) {
 
-			includes = null;
+			excludes = new String[] {
+				"html/themes/*/_diffs/**"
+			};
+
+			includes = new String[] {
+				"html/themes/**",
+				"WEB-INF/liferay-look-and-feel.xml"
+			};
+
+			portalTheme = true;
 		}
 
 		Dependency dependency = createDependency(
-			parentThemeGroupId, parentThemeArtifactId, parentThemeVersion, "",
-			"war");
+			parentThemeArtifactGroupId, parentThemeArtifactId,
+			parentThemeArtifactVersion, "", "war");
 
 		Artifact artifact = resolveArtifact(dependency);
 
@@ -91,66 +140,324 @@ public class ThemeMergeMojo extends AbstractLiferayMojo {
 
 		unArchiver.extract();
 
-		webappDir.mkdirs();
+		File liferayLookAndFeelXml = new File(
+			webappSourceDir, "WEB-INF/liferay-look-and-feel.xml");
 
-		if (parentThemeArtifactId.equals("portal-web")) {
-			FileUtils.copyDirectory(
-				new File(workDir, "html/themes/_unstyled"), webappDir);
+		if (liferayLookAndFeelXml.exists()) {
+			Document document = SAXReaderUtil.read(liferayLookAndFeelXml, true);
 
-			getLog().info("Copying html/themes/_unstyled to " + webappDir);
+			Element rootElement = document.getRootElement();
 
-			if (!"_unstyled".equals(parentTheme)) {
-				FileUtils.copyDirectory(
-					new File(workDir, "html/themes/_styled"), webappDir);
+			List<Element> themeElements = rootElement.elements("theme");
 
-				getLog().info("Copying html/themes/_styled to " + webappDir);
-			}
+			for (Element themeElement : themeElements) {
+				String id = themeElement.attributeValue("id");
 
-			if (!"_unstyled".equals(parentTheme) &&
-				!"_styled".equals(parentTheme)) {
+				if (Validator.isNotNull(themeId) && !themeId.equals(id)) {
+					continue;
+				}
 
-				FileUtils.copyDirectory(
-					new File(workDir, "html/themes/" + parentTheme), webappDir);
+				Theme targetTheme = readTheme(themeElement);
 
-				getLog().info(
-					"Copying html/themes/" + parentTheme + " to " + webappDir);
+				if (portalTheme) {
+					mergePortalTheme(targetTheme);
+				}
+				else {
+					File sourceLiferayLookAndFeelXml = new File(
+						workDir, "WEB-INF/liferay-look-and-feel.xml");
+
+					Theme sourceTheme = readTheme(
+						parentThemeId, sourceLiferayLookAndFeelXml);
+
+					mergeTheme(sourceTheme, targetTheme);
+				}
 			}
 		}
 		else {
-			FileUtils.copyDirectory(workDir, webappDir);
+			String id = PortalUtil.getJsSafePortletId(project.getArtifactId());
+
+			Theme targetTheme = readTheme(id, null);
+
+			if (portalTheme) {
+				mergePortalTheme(targetTheme);
+			}
+			else {
+				File sourceLiferayLookAndFeelXml = new File(
+					workDir, "WEB-INF/liferay-look-and-feel.xml");
+
+				Theme sourceTheme = readTheme(
+					parentThemeId, sourceLiferayLookAndFeelXml);
+
+				mergeTheme(sourceTheme, targetTheme);
+			}
+		}
+	}
+
+	protected void mergePortalTheme(Theme targetTheme)
+		throws Exception {
+
+		File templatesDir = new File(webappDir, targetTheme.getTemplatesPath());
+		File cssDir = new File(webappDir, targetTheme.getCssPath());
+		File imagesDir = new File(webappDir, targetTheme.getImagesPath());
+		File javaScriptDir = new File(webappDir, targetTheme.getJavaScriptPath());
+
+		templatesDir.mkdirs();
+		cssDir.mkdirs();
+		imagesDir.mkdirs();
+		javaScriptDir.mkdirs();
+
+		FileUtils.copyDirectory(
+			new File(workDir, "html/themes/_unstyled/templates"), templatesDir);
+
+		getLog().info("Copying html/themes/_unstyled/templates to " + templatesDir);
+
+		FileUtils.copyDirectory(
+			new File(workDir, "html/themes/_unstyled/css"), cssDir);
+
+		getLog().info("Copying html/themes/_unstyled/css to " + cssDir);
+
+		FileUtils.copyDirectory(
+			new File(workDir, "html/themes/_unstyled/images"), imagesDir);
+
+		getLog().info("Copying html/themes/_unstyled/images to " + imagesDir);
+
+		FileUtils.copyDirectory(
+			new File(workDir, "html/themes/_unstyled/js"), javaScriptDir);
+
+		getLog().info("Copying html/themes/_unstyled/js to " + javaScriptDir);
+
+		if (parentThemeId.equals("_unstyled")) {
+			mergeTheme(webappSourceDir, targetTheme, targetTheme);
+
+			return;
 		}
 
-		File initFile = new File(webappDir, "templates/init." + themeType);
+		FileUtils.copyDirectory(
+			new File(workDir, "html/themes/_styled/css"), cssDir);
 
-		FileUtils.deleteQuietly(initFile);
+		getLog().info("Copying html/themes/_styled/css to " + cssDir);
 
-		File templatesDirectory = new File(webappDir, "templates/");
+		FileUtils.copyDirectory(
+			new File(workDir, "html/themes/_styled/images"), imagesDir);
 
-		String[] extensions = null;
+		getLog().info("Copying html/themes/_styled/images to " + imagesDir);
 
-		if (themeType.equals("ftl")) {
-			extensions = new String[] {"vm"};
+		if (parentThemeId.equals("_styled")) {
+			mergeTheme(webappSourceDir, targetTheme, targetTheme);
+
+			return;
 		}
-		else {
-			extensions = new String[] {"ftl"};
+
+		File liferayLookAndFeelXml = new File(
+			workDir, "WEB-INF/liferay-look-and-feel.xml");
+
+		Theme sourceTheme = readTheme(parentThemeId, liferayLookAndFeelXml);
+
+		mergeTheme(sourceTheme, targetTheme);
+	}
+
+	protected void mergeTheme(
+			File sourceDir, Theme sourceTheme, Theme targetTheme)
+		throws Exception {
+
+		File sourceCssDir = new File(sourceDir, sourceTheme.getCssPath());
+
+		if (sourceCssDir.exists()) {
+			File targetCssDir = new File(webappDir, targetTheme.getCssPath());
+
+			targetCssDir.mkdirs();
+
+			FileUtils.copyDirectory(sourceCssDir, targetCssDir);
+
+			getLog().info("Copying " + sourceCssDir + " to " + targetCssDir);
 		}
 
-		Iterator<File> itr = FileUtils.iterateFiles(
-			templatesDirectory, extensions, false);
+		File sourceImagesDir = new File(sourceDir, sourceTheme.getImagesPath());
 
-		while (itr.hasNext()) {
-			File file = itr.next();
+		if (sourceImagesDir.exists()) {
+			File targetImagesDir = new File(
+				webappDir, targetTheme.getImagesPath());
 
-			FileUtils.deleteQuietly(file);
+			targetImagesDir.mkdirs();
+
+			FileUtils.copyDirectory(sourceImagesDir, targetImagesDir);
+
+			getLog().info(
+				"Copying " + sourceImagesDir + " to " + targetImagesDir);
 		}
+
+		File sourceJavaScriptDir = new File(
+			sourceDir, sourceTheme.getJavaScriptPath());
+
+		if (sourceJavaScriptDir.exists()) {
+			File targetJavaScriptDir = new File(
+				webappDir, targetTheme.getJavaScriptPath());
+
+			targetJavaScriptDir.mkdirs();
+
+			FileUtils.copyDirectory(sourceJavaScriptDir, targetJavaScriptDir);
+
+			getLog().info(
+				"Copying " + sourceJavaScriptDir + " to " +
+					targetJavaScriptDir);
+		}
+
+		File sourceTemplatesDir = new File(
+			sourceDir, sourceTheme.getTemplatesPath());
+
+		if (sourceTemplatesDir.exists()) {
+			File targetTemplatesDir = new File(
+				webappDir, targetTheme.getTemplatesPath());
+
+			targetTemplatesDir.mkdirs();
+
+			FileUtils.copyDirectory(sourceTemplatesDir, targetTemplatesDir);
+
+			getLog().info(
+				"Copying " + sourceTemplatesDir + " to " + targetTemplatesDir);
+
+			cleanupTemplates(targetTemplatesDir);
+		}
+	}
+
+	protected void mergeTheme(Theme sourceTheme, Theme targetTheme)
+		throws Exception {
+
+		mergeTheme(workDir, sourceTheme, targetTheme);
+		mergeTheme(webappSourceDir, targetTheme, targetTheme);
+	}
+
+	protected Theme readTheme(Element themeElement) {
+		String id = themeElement.attributeValue("id");
+
+		Theme theme = new ThemeImpl(id);
+
+		ContextReplace themeContextReplace = new ContextReplace();
+
+		themeContextReplace.addValue("themes-path", null);
+
+		String rootPath = GetterUtil.getString(
+			themeElement.elementText("root-path"), "/");
+
+		rootPath = themeContextReplace.replace(rootPath);
+
+		themeContextReplace.addValue("root-path", rootPath);
+		theme.setRootPath(rootPath);
+
+		String templatesPath = GetterUtil.getString(
+			themeElement.elementText("templates-path"),
+			rootPath.concat("/templates"));
+
+		templatesPath = themeContextReplace.replace(templatesPath);
+		templatesPath = StringUtil.safePath(templatesPath);
+
+		themeContextReplace.addValue("templates-path", templatesPath);
+		theme.setTemplatesPath(templatesPath);
+
+		String cssPath = GetterUtil.getString(
+			themeElement.elementText("css-path"),
+			rootPath.concat("/css"));
+
+		cssPath = themeContextReplace.replace(cssPath);
+		cssPath = StringUtil.safePath(cssPath);
+
+		themeContextReplace.addValue("css-path", cssPath);
+		theme.setCssPath(cssPath);
+
+		String imagesPath = GetterUtil.getString(
+			themeElement.elementText("images-path"),
+			rootPath.concat("/images"));
+
+		imagesPath = themeContextReplace.replace(imagesPath);
+		imagesPath = StringUtil.safePath(imagesPath);
+
+		themeContextReplace.addValue("images-path", imagesPath);
+		theme.setImagesPath(imagesPath);
+
+		String javaScriptPath = GetterUtil.getString(
+			themeElement.elementText("javascript-path"),
+			rootPath.concat("/js"));
+
+		javaScriptPath = themeContextReplace.replace(javaScriptPath);
+		javaScriptPath = StringUtil.safePath(javaScriptPath);
+
+		themeContextReplace.addValue("javascript-path", javaScriptPath);
+		theme.setJavaScriptPath(javaScriptPath);
+
+		String templateExtension = GetterUtil.getString(
+			themeElement.elementText("template-extension"),
+			themeType);
+
+		theme.setTemplateExtension(templateExtension);
+
+		return theme;
+	}
+
+	protected Theme readTheme(String themeId, File liferayLookAndFeelXml)
+		throws Exception {
+
+		if ((liferayLookAndFeelXml != null) && liferayLookAndFeelXml.exists()) {
+			Document document = SAXReaderUtil.read(liferayLookAndFeelXml, true);
+
+			Element rootElement = document.getRootElement();
+
+			List<Element> themeElements = rootElement.elements("theme");
+
+			for (Element themeElement : themeElements) {
+				String id = themeElement.attributeValue("id");
+
+				if (Validator.isNotNull(themeId) && !themeId.equals(id)) {
+					continue;
+				}
+
+				return readTheme(themeElement);
+			}
+		}
+
+		Theme theme = new ThemeImpl(themeId);
+
+		theme.setCssPath("/css");
+		theme.setImagesPath("/images");
+		theme.setJavaScriptPath("/js");
+		theme.setRootPath("/");
+		theme.setTemplatesPath("/templates");
+		theme.setTemplateExtension(themeType);
+
+		return theme;
 	}
 
 	/**
 	 * The parent theme can be _styled, _unstyled, classic, control_panel, or artifactGroupId:artifactId:artifactVersion.
 	 *
-	 * @parameter default-value="_styled"
+	 * @parameter
+	 * @deprecated
 	 */
 	private String parentTheme;
+
+	/**
+	 * @parameter default-value="com.liferay.portal"
+	 */
+	private String parentThemeArtifactGroupId;
+
+	/**
+	 * @parameter default-value="portal-web"
+	 */
+	private String parentThemeArtifactId;
+
+	/**
+	 * @parameter default-value="${liferay.version}"
+	 */
+	private String parentThemeArtifactVersion;
+
+	/**
+	 * @parameter default-value="_styled"
+	 */
+	private String parentThemeId;
+
+	/**
+	 * @parameter
+	 */
+	private String themeId;
 
 	/**
 	 * @parameter default-value="vm"
@@ -164,4 +471,9 @@ public class ThemeMergeMojo extends AbstractLiferayMojo {
 	 */
 	private File webappDir;
 
+	/**
+	 * @parameter default-value="${basedir}/src/main/webapp"
+	 * @required
+	 */
+	private File webappSourceDir;
 }
