@@ -45,7 +45,7 @@ import org.codehaus.plexus.components.io.fileselectors.IncludeExcludeFileSelecto
  */
 public class ThemeMergeMojo extends AbstractLiferayMojo {
 
-	protected void cleanupTemplates(File templatesDir) {
+	protected void cleanUpTemplates(File templatesDir) {
 		File initFile = new File(templatesDir, "init." + themeType);
 
 		FileUtils.deleteQuietly(initFile);
@@ -62,11 +62,11 @@ public class ThemeMergeMojo extends AbstractLiferayMojo {
 			extensions = new String[] {"ftl", "jsp"};
 		}
 
-		Iterator<File> itr = FileUtils.iterateFiles(
+		Iterator<File> iterator = FileUtils.iterateFiles(
 			templatesDir, extensions, false);
 
-		while (itr.hasNext()) {
-			File file = itr.next();
+		while (iterator.hasNext()) {
+			File file = iterator.next();
 
 			FileUtils.deleteQuietly(file);
 		}
@@ -91,13 +91,12 @@ public class ThemeMergeMojo extends AbstractLiferayMojo {
 			}
 		}
 
-		getLog().info("Parent theme groupId: " + parentThemeArtifactGroupId);
-		getLog().info("Parent theme artifactId: " + parentThemeArtifactId);
-		getLog().info("Parent theme version: " + parentThemeArtifactVersion);
-		getLog().info("Parent theme id: " + parentThemeId);
+		getLog().info("Parent theme group ID " + parentThemeArtifactGroupId);
+		getLog().info("Parent theme artifact ID " + parentThemeArtifactId);
+		getLog().info("Parent theme version " + parentThemeArtifactVersion);
+		getLog().info("Parent theme ID " + parentThemeId);
 
 		String[] excludes = null;
-
 		String[] includes = null;
 
 		boolean portalTheme = false;
@@ -110,8 +109,7 @@ public class ThemeMergeMojo extends AbstractLiferayMojo {
 			};
 
 			includes = new String[] {
-				"html/themes/**",
-				"WEB-INF/liferay-look-and-feel.xml"
+				"html/themes/**", "WEB-INF/liferay-look-and-feel.xml"
 			};
 
 			portalTheme = true;
@@ -193,33 +191,39 @@ public class ThemeMergeMojo extends AbstractLiferayMojo {
 		}
 	}
 
-	protected void mergePortalTheme(Theme targetTheme)
-		throws Exception {
-
+	protected void mergePortalTheme(Theme targetTheme) throws Exception {
 		File templatesDir = new File(webappDir, targetTheme.getTemplatesPath());
-		File cssDir = new File(webappDir, targetTheme.getCssPath());
-		File imagesDir = new File(webappDir, targetTheme.getImagesPath());
-		File javaScriptDir = new File(webappDir, targetTheme.getJavaScriptPath());
 
 		templatesDir.mkdirs();
-		cssDir.mkdirs();
-		imagesDir.mkdirs();
-		javaScriptDir.mkdirs();
 
 		FileUtils.copyDirectory(
 			new File(workDir, "html/themes/_unstyled/templates"), templatesDir);
 
-		getLog().info("Copying html/themes/_unstyled/templates to " + templatesDir);
+		getLog().info(
+			"Copying html/themes/_unstyled/templates to " + templatesDir);
+
+		File cssDir = new File(webappDir, targetTheme.getCssPath());
+
+		cssDir.mkdirs();
 
 		FileUtils.copyDirectory(
 			new File(workDir, "html/themes/_unstyled/css"), cssDir);
 
 		getLog().info("Copying html/themes/_unstyled/css to " + cssDir);
 
+		File imagesDir = new File(webappDir, targetTheme.getImagesPath());
+
+		imagesDir.mkdirs();
+
 		FileUtils.copyDirectory(
 			new File(workDir, "html/themes/_unstyled/images"), imagesDir);
 
 		getLog().info("Copying html/themes/_unstyled/images to " + imagesDir);
+
+		File javaScriptDir = new File(
+			webappDir, targetTheme.getJavaScriptPath());
+
+		javaScriptDir.mkdirs();
 
 		FileUtils.copyDirectory(
 			new File(workDir, "html/themes/_unstyled/js"), javaScriptDir);
@@ -316,7 +320,7 @@ public class ThemeMergeMojo extends AbstractLiferayMojo {
 			getLog().info(
 				"Copying " + sourceTemplatesDir + " to " + targetTemplatesDir);
 
-			cleanupTemplates(targetTemplatesDir);
+			cleanUpTemplates(targetTemplatesDir);
 		}
 	}
 
@@ -342,6 +346,7 @@ public class ThemeMergeMojo extends AbstractLiferayMojo {
 		rootPath = themeContextReplace.replace(rootPath);
 
 		themeContextReplace.addValue("root-path", rootPath);
+
 		theme.setRootPath(rootPath);
 
 		String templatesPath = GetterUtil.getString(
@@ -352,16 +357,17 @@ public class ThemeMergeMojo extends AbstractLiferayMojo {
 		templatesPath = StringUtil.safePath(templatesPath);
 
 		themeContextReplace.addValue("templates-path", templatesPath);
+
 		theme.setTemplatesPath(templatesPath);
 
 		String cssPath = GetterUtil.getString(
-			themeElement.elementText("css-path"),
-			rootPath.concat("/css"));
+			themeElement.elementText("css-path"), rootPath.concat("/css"));
 
 		cssPath = themeContextReplace.replace(cssPath);
 		cssPath = StringUtil.safePath(cssPath);
 
 		themeContextReplace.addValue("css-path", cssPath);
+
 		theme.setCssPath(cssPath);
 
 		String imagesPath = GetterUtil.getString(
@@ -372,6 +378,7 @@ public class ThemeMergeMojo extends AbstractLiferayMojo {
 		imagesPath = StringUtil.safePath(imagesPath);
 
 		themeContextReplace.addValue("images-path", imagesPath);
+
 		theme.setImagesPath(imagesPath);
 
 		String javaScriptPath = GetterUtil.getString(
@@ -382,11 +389,11 @@ public class ThemeMergeMojo extends AbstractLiferayMojo {
 		javaScriptPath = StringUtil.safePath(javaScriptPath);
 
 		themeContextReplace.addValue("javascript-path", javaScriptPath);
+
 		theme.setJavaScriptPath(javaScriptPath);
 
 		String templateExtension = GetterUtil.getString(
-			themeElement.elementText("template-extension"),
-			themeType);
+			themeElement.elementText("template-extension"), themeType);
 
 		theme.setTemplateExtension(templateExtension);
 
@@ -420,8 +427,8 @@ public class ThemeMergeMojo extends AbstractLiferayMojo {
 		theme.setImagesPath("/images");
 		theme.setJavaScriptPath("/js");
 		theme.setRootPath("/");
-		theme.setTemplatesPath("/templates");
 		theme.setTemplateExtension(themeType);
+		theme.setTemplatesPath("/templates");
 
 		return theme;
 	}
@@ -476,4 +483,5 @@ public class ThemeMergeMojo extends AbstractLiferayMojo {
 	 * @required
 	 */
 	private File webappSourceDir;
+
 }
