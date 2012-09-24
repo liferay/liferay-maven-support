@@ -11,7 +11,7 @@
 		<fileSet encoding="UTF-8" filtered="true">
 			<directory>src/main/webapp</directory>
 			<excludes>
-				<exclude>incon.png</exclude>
+				<exclude>icon.png</exclude>
 			</excludes>
 		</fileSet>
 		<fileSet filtered="false">
