@@ -109,7 +109,7 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 				build.getDirectory(), build.getFinalName());
 
 			CopyTask.copyDirectory(
-				sourceDir, appServerDeployDir, null, "WEB-INF/web.xml", true,
+				sourceDir, appServerPortalDir, null, "WEB-INF/web.xml", true,
 				true);
 
 			copyLibraryDependencies(
