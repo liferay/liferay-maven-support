@@ -19,6 +19,7 @@ import com.liferay.portal.tools.SassToCssBuilder;
 
 import java.io.File;
 import java.io.FileFilter;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +27,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.FileFileFilter;
 import org.apache.commons.io.filefilter.FileFilterUtils;
-import org.apache.commons.io.filefilter.IOFileFilter;
 
 /**
  * @author Mika Koivisto
@@ -36,14 +36,12 @@ import org.apache.commons.io.filefilter.IOFileFilter;
 public class SassToCssBuilderMojo extends AbstractLiferayMojo {
 
 	protected void doExecute() throws Exception {
-		IOFileFilter cssSuffixFilter = FileFilterUtils.suffixFileFilter(".css");
-		IOFileFilter cssFiles = FileFilterUtils.andFileFilter(
-			FileFileFilter.FILE, cssSuffixFilter);
-		FileFilter filter = FileFilterUtils.orFileFilter(
-			DirectoryFileFilter.DIRECTORY, cssFiles);
+		FileFilter fileFilter = FileFilterUtils.orFileFilter(
+			DirectoryFileFilter.DIRECTORY,
+			FileFilterUtils.andFileFilter(
+				FileFileFilter.FILE, FileFilterUtils.suffixFileFilter(".css")));
 
-		FileUtils.copyDirectory(
-			webappSourceDir, webappDir, filter, true);
+		FileUtils.copyDirectory(webappSourceDir, webappDir, fileFilter, true);
 
 		List<String> dirNames = new ArrayList<String>();
 
