@@ -17,8 +17,16 @@ package com.liferay.maven.plugins;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.tools.SassToCssBuilder;
 
+import java.io.File;
+import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.DirectoryFileFilter;
+import org.apache.commons.io.filefilter.FileFileFilter;
+import org.apache.commons.io.filefilter.FileFilterUtils;
+import org.apache.commons.io.filefilter.IOFileFilter;
 
 /**
  * @author Mika Koivisto
@@ -28,6 +36,15 @@ import java.util.List;
 public class SassToCssBuilderMojo extends AbstractLiferayMojo {
 
 	protected void doExecute() throws Exception {
+		IOFileFilter cssSuffixFilter = FileFilterUtils.suffixFileFilter(".css");
+		IOFileFilter cssFiles = FileFilterUtils.andFileFilter(
+			FileFileFilter.FILE, cssSuffixFilter);
+		FileFilter filter = FileFilterUtils.orFileFilter(
+			DirectoryFileFilter.DIRECTORY, cssFiles);
+
+		FileUtils.copyDirectory(
+			webappSourceDir, webappDir, filter, true);
+
 		List<String> dirNames = new ArrayList<String>();
 
 		for (String dirName : StringUtil.split(sassDirNames)) {
@@ -42,5 +59,17 @@ public class SassToCssBuilderMojo extends AbstractLiferayMojo {
 	 * @required
 	 */
 	private String sassDirNames;
+
+	/**
+	 * @parameter default-value="${project.build.directory}/${project.build.finalName}"
+	 * @required
+	 */
+	private File webappDir;
+
+	/**
+	 * @parameter default-value="${basedir}/src/main/webapp"
+	 * @required
+	 */
+	private File webappSourceDir;
 
 }
