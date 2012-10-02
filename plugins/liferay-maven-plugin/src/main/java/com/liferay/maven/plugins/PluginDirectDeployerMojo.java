@@ -43,15 +43,27 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 		String artifactId = project.getArtifactId();
 		Build build = project.getBuild();
 
+		if (artifactId.endsWith("ext-lib-global")) {
+			copyLibraryDependencies(
+				appServerLibGlobalDir, project.getArtifact(),
+				dependencyAddVersion, dependencyAddClassifier,
+				dependencyCopyTransitive);
+		}
+
+		if (artifactId.endsWith("ext-lib-portal")) {
+			copyLibraryDependencies(
+				appServerLibPortalDir, project.getArtifact(),
+				dependencyAddVersion, dependencyAddClassifier,
+				dependencyCopyTransitive);
+		}
+
 		if (artifactId.endsWith("ext-service")) {
 			File sourceFile = new File(
 				build.getDirectory(),
 				build.getFinalName() + StringPool.PERIOD +
 					project.getPackaging());
 
-			CopyTask.copyFile(
-				sourceFile, appServerLibGlobalDir,
-				"ext-" + pluginName + "-service.jar", null, true, true);
+			deployExtService(sourceFile);
 
 			copyLibraryDependencies(
 				appServerLibGlobalDir, project.getArtifact(),
@@ -65,15 +77,9 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 				build.getFinalName() + StringPool.PERIOD +
 					project.getPackaging());
 
-			CopyTask.copyFile(
-				sourceFile, appServerLibPortalDir,
-				"ext-" + pluginName + "-impl.jar", null, true, true);
-
 			File sourceDir = new File(build.getOutputDirectory());
 
-			CopyTask.copyDirectory(
-				sourceDir, appServerClassesPortalDir,
-				"portal-*.properties,system-*.properties", null);
+			deployExtImpl(sourceDir, sourceFile);
 
 			copyLibraryDependencies(
 				appServerLibPortalDir, project.getArtifact(),
@@ -90,13 +96,10 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 				build.getFinalName() + StringPool.PERIOD +
 					project.getPackaging());
 
-			String fileName = "ext-" + pluginName;
+			String utilName = "util-" + artifactId.substring(
+				artifactId.lastIndexOf('-'));
 
-			fileName += artifactId.substring(artifactId.lastIndexOf('-'));
-			fileName += ".jar";
-
-			CopyTask.copyFile(
-				sourceFile, appServerLibPortalDir, fileName, null, true, true);
+			deployExtUtil(sourceFile, utilName);
 
 			copyLibraryDependencies(
 				appServerLibPortalDir, project.getArtifact(),
@@ -108,25 +111,12 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 			File sourceDir = new File(
 				build.getDirectory(), build.getFinalName());
 
-			CopyTask.copyDirectory(
-				sourceDir, appServerPortalDir, null, "WEB-INF/web.xml", true,
-				true);
-
 			copyLibraryDependencies(
 				appServerLibPortalDir, project.getArtifact(),
 				dependencyAddVersion, dependencyAddClassifier,
 				dependencyCopyTransitive);
 
-			File originalWebXml = new File(
-				appServerPortalDir, "WEB-INF/web.xml");
-			File mergedWebXml = new File(
-				appServerPortalDir, "WEB-INF/web.xml.merged");
-
-			new WebXMLBuilder(
-				originalWebXml.getAbsolutePath(),
-				sourceDir + "/WEB-INF/web.xml", mergedWebXml.getAbsolutePath());
-
-			FileUtil.move(mergedWebXml, originalWebXml);
+			deployExtWeb(sourceDir);
 		}
 
 		String packaging = project.getPackaging();
@@ -135,11 +125,104 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 			File buildDir = new File(
 				build.getDirectory(), build.getFinalName());
 
+			if (fullDeploy) {
+				File extImplClassesDir = new File(
+					buildDir, "WEB-INF/ext-impl/classes");
+				File extImplJarFile = new File(
+					buildDir, "WEB-INF/ext-impl/ext-impl.jar");
+
+				deployExtImpl(extImplClassesDir, extImplJarFile);
+
+				File extLibDir = new File(buildDir, "WEB-INF/ext-lib");
+
+				deployExtLib(extLibDir);
+
+				File extServiceJarFile = new File(
+					buildDir, "WEB-INF/ext-service/ext-service.jar");
+
+				deployExtService(extServiceJarFile);
+
+				File extUtilBridgesJarFile = new File(
+					buildDir, "WEB-INF/ext-util-bridges/ext-util-bridges.jar");
+
+				deployExtUtil(extUtilBridgesJarFile, "util-bridges");
+
+				File extUtilJavaJarFile = new File(
+					buildDir, "WEB-INF/ext-util-java/ext-util-java.jar");
+
+				deployExtUtil(extUtilJavaJarFile, "util-java");
+
+				File extUtilTaglibJarFile = new File(
+					buildDir, "WEB-INF/ext-util-taglib/ext-util-taglib.jar");
+
+				deployExtUtil(extUtilTaglibJarFile, "util-taglib");
+
+				File extWebDocrootDir = new File(
+					buildDir, "WEB-INF/ext-web/docroot");
+
+				deployExtWeb(extWebDocrootDir);
+			}
+
 			File sourceFile = new File(
 				buildDir, "WEB-INF/ext-" + pluginName + ".xml");
 
-			CopyTask.copyFile(sourceFile, appServerPortalDir, true, true);
+			CopyTask.copyFile(
+				sourceFile, new File(appServerPortalDir, "WEB-INF"), true,
+				true);
 		}
+	}
+
+	protected void deployExtImpl(File extImplClassesDir, File extImplJarFile) {
+		CopyTask.copyFile(
+			extImplJarFile, appServerLibPortalDir,
+			"ext-" + pluginName + "-impl.jar", null, true, true);
+
+		CopyTask.copyDirectory(
+			extImplClassesDir, appServerClassesPortalDir,
+			null, null);
+	}
+
+	protected void deployExtLib(File extLibDir) {
+		File extLibGlobalDir = new File(extLibDir, "global");
+
+		CopyTask.copyDirectory(
+			extLibGlobalDir, appServerLibGlobalDir, "*.jar", null, true, true);
+
+		File extLibPortalDir = new File(extLibDir, "portal");
+
+		CopyTask.copyDirectory(
+			extLibPortalDir, appServerLibPortalDir, "*.jar", null, true, true);
+	}
+
+	protected void deployExtService(File extServiceJarFile) {
+		CopyTask.copyFile(
+			extServiceJarFile, appServerLibGlobalDir,
+			"ext-" + pluginName + "-service.jar", null, true, true);
+	}
+
+	protected void deployExtUtil(File extUtilFile, String utilName) {
+		String fileName = "ext-" + pluginName + "-" + utilName + ".jar";
+
+		CopyTask.copyFile(
+			extUtilFile, appServerLibPortalDir, fileName, null, true, true);
+	}
+
+	protected void deployExtWeb(File extWebDocrootDir) {
+		CopyTask.copyDirectory(
+			extWebDocrootDir, appServerPortalDir, null, "WEB-INF/web.xml", true,
+			true);
+
+		File originalWebXml = new File(
+			appServerPortalDir, "WEB-INF/web.xml");
+		File mergedWebXml = new File(
+			appServerPortalDir, "WEB-INF/web.xml.merged");
+
+		new WebXMLBuilder(
+			originalWebXml.getAbsolutePath(),
+			new File(extWebDocrootDir, "/WEB-INF/web.xml").getAbsolutePath(),
+			mergedWebXml.getAbsolutePath());
+
+		FileUtil.move(mergedWebXml, originalWebXml);
 	}
 
 	protected void deployHook() throws Exception {
@@ -225,7 +308,7 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 	}
 
 	protected void doExecute() throws Exception {
-		if (appServerLibGlobalDir == null) {
+		if (appServerLibGlobalDir == null && pluginType.equals("ext")) {
 			throw new MojoExecutionException(
 				"The parameter appServerLibGlobalDir is required");
 		}
@@ -274,6 +357,20 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 		else if (pluginType.equals("web")) {
 			deployWeb();
 		}
+	}
+
+	@Override
+	protected boolean isLiferayProject() {
+		String artifactId = project.getArtifactId();
+
+		if (pluginType.equals("ext") &&
+				(artifactId.endsWith("ext-lib-global") ||
+				artifactId.endsWith("ext-lib-portal"))) {
+
+			return true;
+		}
+
+		return super.isLiferayProject();
 	}
 
 	/**
@@ -326,6 +423,11 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 	 * @since 6.1.1
 	 */
 	private File deployDir;
+
+	/**
+	 * @parameter default-value="false"
+	 */
+	private boolean fullDeploy;
 
 	/**
 	 * @parameter expression="${jbossPrefix}"
