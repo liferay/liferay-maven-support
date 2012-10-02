@@ -20,6 +20,10 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.tools.servicebuilder.ServiceBuilder;
 
 import java.io.File;
+import java.lang.reflect.Method;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLClassLoader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -142,7 +146,33 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 		invokeDependencyBuild();
 	}
 
-	protected void initProperties() {
+	protected void initPortalClassLoader() throws Exception {
+		super.initPortalClassLoader();
+
+		Class<?> clazz = getClass();
+
+		URLClassLoader urlClassLoader =
+			(URLClassLoader)clazz.getClassLoader();
+
+		Method method = URLClassLoader.class.getDeclaredMethod(
+			"addURL", URL.class);
+
+		method.setAccessible(true);
+
+		File file = new File(implResourcesDir);
+
+		URI uri = file.toURI();
+
+		method.invoke(urlClassLoader, uri.toURL());
+	}
+
+	protected void initPortalProperties() throws Exception {
+		super.initPortalProperties();
+
+		initProperties();
+	}
+
+	protected void initProperties() throws Exception {
 		if (Validator.isNotNull(apiBaseDir) ||
 			Validator.isNotNull(implBaseDir) ||
 			Validator.isNotNull(webappBaseDir)) {
