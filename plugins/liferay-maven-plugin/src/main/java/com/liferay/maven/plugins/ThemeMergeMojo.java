@@ -73,6 +73,8 @@ public class ThemeMergeMojo extends AbstractLiferayMojo {
 	}
 
 	protected void doExecute() throws Exception {
+		workDir = new File(workDir, "liferay-theme");
+
 		if (!workDir.exists()) {
 			workDir.mkdirs();
 		}
@@ -104,39 +106,33 @@ public class ThemeMergeMojo extends AbstractLiferayMojo {
 		if (parentThemeArtifactGroupId.equals("com.liferay.portal") &&
 			parentThemeArtifactId.equals("portal-web")) {
 
-			excludes = new String[] {
-				"html/themes/*/_diffs/**"
-			};
-
-			includes = new String[] {
-				"html/themes/**", "WEB-INF/liferay-look-and-feel.xml"
-			};
-
 			portalTheme = true;
 		}
 
-		Dependency dependency = createDependency(
-			parentThemeArtifactGroupId, parentThemeArtifactId,
-			parentThemeArtifactVersion, "", "war");
+		if (!portalTheme) {
+			Dependency dependency = createDependency(
+				parentThemeArtifactGroupId, parentThemeArtifactId,
+				parentThemeArtifactVersion, "", "war");
 
-		Artifact artifact = resolveArtifact(dependency);
+			Artifact artifact = resolveArtifact(dependency);
 
-		UnArchiver unArchiver = archiverManager.getUnArchiver(
-			artifact.getFile());
+			UnArchiver unArchiver = archiverManager.getUnArchiver(
+				artifact.getFile());
 
-		unArchiver.setDestDirectory(workDir);
-		unArchiver.setSourceFile(artifact.getFile());
+			unArchiver.setDestDirectory(workDir);
+			unArchiver.setSourceFile(artifact.getFile());
 
-		IncludeExcludeFileSelector includeExcludeFileSelector =
-			new IncludeExcludeFileSelector();
+			IncludeExcludeFileSelector includeExcludeFileSelector =
+				new IncludeExcludeFileSelector();
 
-		includeExcludeFileSelector.setExcludes(excludes);
-		includeExcludeFileSelector.setIncludes(includes);
+			includeExcludeFileSelector.setExcludes(excludes);
+			includeExcludeFileSelector.setIncludes(includes);
 
-		unArchiver.setFileSelectors(
-			new FileSelector[] {includeExcludeFileSelector});
+			unArchiver.setFileSelectors(
+				new FileSelector[] {includeExcludeFileSelector});
 
-		unArchiver.extract();
+			unArchiver.extract();
+		}
 
 		File liferayLookAndFeelXml = new File(
 			webappSourceDir, "WEB-INF/liferay-look-and-feel.xml");
@@ -197,7 +193,8 @@ public class ThemeMergeMojo extends AbstractLiferayMojo {
 		templatesDir.mkdirs();
 
 		FileUtils.copyDirectory(
-			new File(workDir, "html/themes/_unstyled/templates"), templatesDir);
+			new File(appServerPortalDir, "html/themes/_unstyled/templates"),
+			templatesDir);
 
 		getLog().info(
 			"Copying html/themes/_unstyled/templates to " + templatesDir);
@@ -207,7 +204,7 @@ public class ThemeMergeMojo extends AbstractLiferayMojo {
 		cssDir.mkdirs();
 
 		FileUtils.copyDirectory(
-			new File(workDir, "html/themes/_unstyled/css"), cssDir);
+			new File(appServerPortalDir, "html/themes/_unstyled/css"), cssDir);
 
 		getLog().info("Copying html/themes/_unstyled/css to " + cssDir);
 
@@ -216,7 +213,8 @@ public class ThemeMergeMojo extends AbstractLiferayMojo {
 		imagesDir.mkdirs();
 
 		FileUtils.copyDirectory(
-			new File(workDir, "html/themes/_unstyled/images"), imagesDir);
+			new File(appServerPortalDir, "html/themes/_unstyled/images"),
+			imagesDir);
 
 		getLog().info("Copying html/themes/_unstyled/images to " + imagesDir);
 
@@ -226,7 +224,8 @@ public class ThemeMergeMojo extends AbstractLiferayMojo {
 		javaScriptDir.mkdirs();
 
 		FileUtils.copyDirectory(
-			new File(workDir, "html/themes/_unstyled/js"), javaScriptDir);
+			new File(appServerPortalDir, "html/themes/_unstyled/js"),
+			javaScriptDir);
 
 		getLog().info("Copying html/themes/_unstyled/js to " + javaScriptDir);
 
@@ -237,12 +236,13 @@ public class ThemeMergeMojo extends AbstractLiferayMojo {
 		}
 
 		FileUtils.copyDirectory(
-			new File(workDir, "html/themes/_styled/css"), cssDir);
+			new File(appServerPortalDir, "html/themes/_styled/css"), cssDir);
 
 		getLog().info("Copying html/themes/_styled/css to " + cssDir);
 
 		FileUtils.copyDirectory(
-			new File(workDir, "html/themes/_styled/images"), imagesDir);
+			new File(appServerPortalDir, "html/themes/_styled/images"),
+			imagesDir);
 
 		getLog().info("Copying html/themes/_styled/images to " + imagesDir);
 
@@ -253,7 +253,7 @@ public class ThemeMergeMojo extends AbstractLiferayMojo {
 		}
 
 		File liferayLookAndFeelXml = new File(
-			workDir, "WEB-INF/liferay-look-and-feel.xml");
+			appServerPortalDir, "WEB-INF/liferay-look-and-feel.xml");
 
 		Theme sourceTheme = readTheme(parentThemeId, liferayLookAndFeelXml);
 
