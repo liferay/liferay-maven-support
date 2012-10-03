@@ -235,44 +235,6 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 		}
 	}
 
-	protected boolean isLiferayProject() {
-		String packaging = project.getPackaging();
-
-		if (packaging.equals("pom")) {
-			getLog().info("Skipping " + project.getArtifactId());
-
-			return false;
-		}
-
-		return true;
-	}
-
-	protected boolean isPortalInitialized() {
-		return initialized;
-	}
-
-	protected Artifact resolveArtifact(Dependency dependency) throws Exception {
-		Artifact artifact = null;
-
-		if (Validator.isNull(dependency.getClassifier())) {
-			artifact = artifactFactory.createArtifact(
-				dependency.getGroupId(), dependency.getArtifactId(),
-				dependency.getVersion(), dependency.getScope(),
-				dependency.getType());
-		}
-		else {
-			artifact = artifactFactory.createArtifactWithClassifier(
-				dependency.getGroupId(), dependency.getArtifactId(),
-				dependency.getVersion(), dependency.getType(),
-				dependency.getClassifier());
-		}
-
-		artifactResolver.resolve(
-			artifact, remoteArtifactRepositories, localArtifactRepository);
-
-		return artifact;
-	}
-
 	protected void initPortalProperties() throws Exception {
 		if (((appServerPortalDir == null) || !appServerPortalDir.exists()) &&
 			 Validator.isNotNull(liferayVersion)) {
@@ -321,6 +283,44 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 				"liferay.lib.portal.dir",
 				appServerLibPortalDir.getAbsolutePath());
 		}
+	}
+
+	protected boolean isLiferayProject() {
+		String packaging = project.getPackaging();
+
+		if (packaging.equals("pom")) {
+			getLog().info("Skipping " + project.getArtifactId());
+
+			return false;
+		}
+
+		return true;
+	}
+
+	protected boolean isPortalInitialized() {
+		return initialized;
+	}
+
+	protected Artifact resolveArtifact(Dependency dependency) throws Exception {
+		Artifact artifact = null;
+
+		if (Validator.isNull(dependency.getClassifier())) {
+			artifact = artifactFactory.createArtifact(
+				dependency.getGroupId(), dependency.getArtifactId(),
+				dependency.getVersion(), dependency.getScope(),
+				dependency.getType());
+		}
+		else {
+			artifact = artifactFactory.createArtifactWithClassifier(
+				dependency.getGroupId(), dependency.getArtifactId(),
+				dependency.getVersion(), dependency.getType(),
+				dependency.getClassifier());
+		}
+
+		artifactResolver.resolve(
+			artifact, remoteArtifactRepositories, localArtifactRepository);
+
+		return artifact;
 	}
 
 	protected MavenProject resolveProject(Artifact artifact) throws Exception {
