@@ -96,8 +96,8 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 				build.getFinalName() + StringPool.PERIOD +
 					project.getPackaging());
 
-			String utilName = "util-" + artifactId.substring(
-				artifactId.lastIndexOf('-'));
+			String utilName =
+				"util-" + artifactId.substring(artifactId.lastIndexOf('-'));
 
 			deployExtUtil(sourceFile, utilName);
 
@@ -178,8 +178,7 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 			"ext-" + pluginName + "-impl.jar", null, true, true);
 
 		CopyTask.copyDirectory(
-			extImplClassesDir, appServerClassesPortalDir,
-			null, null);
+			extImplClassesDir, appServerClassesPortalDir, null, null);
 	}
 
 	protected void deployExtLib(File extLibDir) {
@@ -212,8 +211,7 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 			extWebDocrootDir, appServerPortalDir, null, "WEB-INF/web.xml", true,
 			true);
 
-		File originalWebXml = new File(
-			appServerPortalDir, "WEB-INF/web.xml");
+		File originalWebXml = new File(appServerPortalDir, "WEB-INF/web.xml");
 		File mergedWebXml = new File(
 			appServerPortalDir, "WEB-INF/web.xml.merged");
 
@@ -308,7 +306,7 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 	}
 
 	protected void doExecute() throws Exception {
-		if (appServerLibGlobalDir == null && pluginType.equals("ext")) {
+		if ((appServerLibGlobalDir == null) && pluginType.equals("ext")) {
 			throw new MojoExecutionException(
 				"The parameter appServerLibGlobalDir is required");
 		}
@@ -364,8 +362,8 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 		String artifactId = project.getArtifactId();
 
 		if (pluginType.equals("ext") &&
-				(artifactId.endsWith("ext-lib-global") ||
-				artifactId.endsWith("ext-lib-portal"))) {
+			(artifactId.endsWith("ext-lib-global") ||
+			 artifactId.endsWith("ext-lib-portal"))) {
 
 			return true;
 		}

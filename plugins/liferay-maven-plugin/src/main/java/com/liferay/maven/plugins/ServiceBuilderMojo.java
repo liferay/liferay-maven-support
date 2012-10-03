@@ -20,7 +20,9 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.tools.servicebuilder.ServiceBuilder;
 
 import java.io.File;
+
 import java.lang.reflect.Method;
+
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -151,8 +153,7 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 
 		Class<?> clazz = getClass();
 
-		URLClassLoader urlClassLoader =
-			(URLClassLoader)clazz.getClassLoader();
+		URLClassLoader urlClassLoader = (URLClassLoader)clazz.getClassLoader();
 
 		Method method = URLClassLoader.class.getDeclaredMethod(
 			"addURL", URL.class);
