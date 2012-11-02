@@ -7,14 +7,11 @@
 		</fileSet>
 		<fileSet encoding="UTF-8" filtered="true">
 			<directory>src/main/webapp/WEB-INF</directory>
-			<excludes>
-				<exclude>__artifactId__.png</exclude>
-			</excludes>
 		</fileSet>
 		<fileSet filtered="false">
-			<directory>src/main/webapp/WEB-INF</directory>
+			<directory>src/main/webapp</directory>
 			<includes>
-				<include>__artifactId__.png</include>
+				<include>__artifactId__.*</include>
 			</includes>
 		</fileSet>
 	</fileSets>
