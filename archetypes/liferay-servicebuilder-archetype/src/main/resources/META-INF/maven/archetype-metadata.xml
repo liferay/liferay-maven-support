@@ -17,5 +17,8 @@
 				<include>icon.png</include>
 			</includes>
 		</fileSet>
+		<fileSet encoding="UTF-8" filtered="true">
+			<directory>__artifactId__-portlet/src/main/java</directory>
+		</fileSet>
 	</fileSets>
 </archetype-descriptor>
