@@ -2,10 +2,10 @@
 
 <archetype-descriptor name="liferay-theme-archetype">
 	<fileSets>
-		<fileSet encoding="UTF-8" filtered="true">
+		<fileSet filtered="true">
 			<directory>src/main/resources</directory>
 		</fileSet>
-		<fileSet encoding="UTF-8" filtered="true">
+		<fileSet filtered="true">
 			<directory>src/main/webapp</directory>
 		</fileSet>
 	</fileSets>
