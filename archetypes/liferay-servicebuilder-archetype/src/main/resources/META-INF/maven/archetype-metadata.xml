@@ -3,7 +3,7 @@
 <archetype-descriptor name="liferay-servicebuilder-archetype">
 	<fileSets>
 		<fileSet encoding="UTF-8" filtered="true">
-			<directory>__artifactId__-portlet-service</directory>
+			<directory>__artifactId__-portlet/src/main/java</directory>
 		</fileSet>
 		<fileSet encoding="UTF-8" filtered="true">
 			<directory>__artifactId__-portlet</directory>
@@ -18,7 +18,7 @@
 			</includes>
 		</fileSet>
 		<fileSet encoding="UTF-8" filtered="true">
-			<directory>__artifactId__-portlet/src/main/java</directory>
+			<directory>__artifactId__-portlet-service</directory>
 		</fileSet>
 	</fileSets>
 </archetype-descriptor>
