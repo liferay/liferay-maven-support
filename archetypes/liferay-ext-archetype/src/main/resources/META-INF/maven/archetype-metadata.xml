@@ -2,49 +2,49 @@
 
 <archetype-descriptor name="liferay-ext-archetype">
 	<fileSets>
-		<fileSet encoding="UTF-8" filtered="true">
+		<fileSet filtered="true">
 			<directory>__artifactId__-ext</directory>
 		</fileSet>
-		<fileSet encoding="UTF-8" filtered="true">
+		<fileSet filtered="true">
 			<directory>__artifactId__-ext-impl</directory>
 		</fileSet>
-		<fileSet encoding="UTF-8" filtered="true">
+		<fileSet filtered="true">
 			<directory>__artifactId__-ext-impl/src/main/resources</directory>
 		</fileSet>
-		<fileSet encoding="UTF-8" filtered="true">
+		<fileSet filtered="true">
 			<directory>__artifactId__-ext-impl/src/main/java</directory>
 		</fileSet>
-		<fileSet encoding="UTF-8" filtered="true">
+		<fileSet filtered="true">
 			<directory>__artifactId__-ext-lib-global</directory>
 		</fileSet>
-		<fileSet encoding="UTF-8" filtered="true">
+		<fileSet filtered="true">
 			<directory>__artifactId__-ext-lib-portal</directory>
 		</fileSet>
-		<fileSet encoding="UTF-8" filtered="true">
+		<fileSet filtered="true">
 			<directory>__artifactId__-ext-service</directory>
 		</fileSet>
-		<fileSet encoding="UTF-8" filtered="true">
+		<fileSet filtered="true">
 			<directory>__artifactId__-ext-service/src/main/java</directory>
 		</fileSet>
-		<fileSet encoding="UTF-8" filtered="true">
+		<fileSet filtered="true">
 			<directory>__artifactId__-ext-util-bridges</directory>
 		</fileSet>
-		<fileSet encoding="UTF-8" filtered="true">
+		<fileSet filtered="true">
 			<directory>__artifactId__-ext-util-bridges/src/main/java</directory>
 		</fileSet>
-		<fileSet encoding="UTF-8" filtered="true">
+		<fileSet filtered="true">
 			<directory>__artifactId__-ext-util-java</directory>
 		</fileSet>
-		<fileSet encoding="UTF-8" filtered="true">
+		<fileSet filtered="true">
 			<directory>__artifactId__-ext-util-java/src/main/java</directory>
 		</fileSet>
-		<fileSet encoding="UTF-8" filtered="true">
+		<fileSet filtered="true">
 			<directory>__artifactId__-ext-util-taglib</directory>
 		</fileSet>
-		<fileSet encoding="UTF-8" filtered="true">
+		<fileSet filtered="true">
 			<directory>__artifactId__-ext-util-taglib/src/main/java</directory>
 		</fileSet>
-		<fileSet encoding="UTF-8" filtered="true">
+		<fileSet filtered="true">
 			<directory>__artifactId__-ext-web</directory>
 		</fileSet>
 	</fileSets>
