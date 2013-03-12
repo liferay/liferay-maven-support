@@ -131,9 +131,9 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 		new ServiceBuilder(
 			serviceFileName, hbmFileName, ormFileName, modelHintsFileName,
 			springFileName, springBaseFileName, springClusterFileName,
-			springDynamicDataSourceFileName, springHibernateFileName,
-			springInfrastructureFileName, springShardDataSourceFileName, apiDir,
-			implDir, remotingFileName, sqlDir, sqlFileName, sqlIndexesFileName,
+			springHibernateFileName, springInfrastructureFileName,
+			springShardDataSourceFileName, apiDir, implDir, remotingFileName,
+			sqlDir, sqlFileName, sqlIndexesFileName,
 			sqlIndexesPropertiesFileName, sqlSequencesFileName,
 			autoNamespaceTables, beanLocatorUtil, propsUtil, pluginName,
 			targetEntityName, null, true, serviceBuildNumber,
@@ -569,6 +569,8 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 
 	/**
 	 * @parameter
+	 * @deprecated
+	 * @since 6.2.0
 	 */
 	private String springDynamicDataSourceFileName;
 
