@@ -568,8 +568,8 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 	private String springClusterFileName;
 
 	/**
-	 * @parameter
 	 * @deprecated
+	 * @parameter
 	 * @since 6.2.0
 	 */
 	private String springDynamicDataSourceFileName;
