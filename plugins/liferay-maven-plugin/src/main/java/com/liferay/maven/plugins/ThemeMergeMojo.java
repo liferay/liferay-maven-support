@@ -106,10 +106,17 @@ public class ThemeMergeMojo extends AbstractLiferayMojo {
 		if (parentThemeArtifactGroupId.equals("com.liferay.portal") &&
 			parentThemeArtifactId.equals("portal-web")) {
 
-			portalTheme = true;
+            if(usePortalWebDependency){
+                portalTheme = false;
+            }else {
+			    portalTheme = true;
+            }
 		}
 
 		if (!portalTheme) {
+
+            getLog().info("Use dependency : " + parentThemeArtifactGroupId+":"+parentThemeArtifactId+":"+parentThemeArtifactVersion);
+
 			Dependency dependency = createDependency(
 				parentThemeArtifactGroupId, parentThemeArtifactId,
 				parentThemeArtifactVersion, "", "war");
@@ -460,6 +467,11 @@ public class ThemeMergeMojo extends AbstractLiferayMojo {
 	 * @parameter default-value="_styled"
 	 */
 	private String parentThemeId;
+    /**
+     * @parameter default-value="false" expression="${usePortalWebDependency}"
+     *
+     */
+    private Boolean usePortalWebDependency;
 
 	/**
 	 * @parameter
