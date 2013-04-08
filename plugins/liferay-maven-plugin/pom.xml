@@ -48,6 +48,11 @@
 			<artifactId>util-java</artifactId>
 			<version>${liferay.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.liferay.portal</groupId>
+			<artifactId>util-taglib</artifactId>
+			<version>${liferay.version}</version>
+		</dependency>
 
 		<!-- Maven -->
 
