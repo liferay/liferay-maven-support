@@ -204,6 +204,17 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 
 		CopyTask.copyFile(
 			extUtilFile, appServerLibPortalDir, fileName, null, true, true);
+
+		File deployDependenciesDir = new File(
+			appServerClassesPortalDir,
+			"com/liferay/portal/deploy/dependencies");
+
+		if (!deployDependenciesDir.exists()) {
+			deployDependenciesDir.mkdirs();
+		}
+
+		CopyTask.copyFile(
+			extUtilFile, deployDependenciesDir, fileName, null, true, true);
 	}
 
 	protected void deployExtWeb(File extWebDocrootDir) {
