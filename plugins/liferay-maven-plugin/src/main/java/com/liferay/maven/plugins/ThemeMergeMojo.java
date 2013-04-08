@@ -257,7 +257,8 @@ public class ThemeMergeMojo extends AbstractLiferayMojo {
 
 		Theme sourceTheme = readTheme(parentThemeId, liferayLookAndFeelXml);
 
-		mergeTheme(sourceTheme, targetTheme);
+		mergeTheme(appServerPortalDir, sourceTheme, targetTheme);
+		mergeTheme(webappSourceDir, targetTheme, targetTheme);
 	}
 
 	protected void mergeTheme(
