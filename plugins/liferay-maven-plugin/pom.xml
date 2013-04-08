@@ -155,6 +155,10 @@
 			<groupId>javax.mail</groupId>
 			<artifactId>mail</artifactId>
 			<version>1.4</version>
+		<dependency>
+			<groupId>javax.ccpp</groupId>
+			<artifactId>ccpp</artifactId>
+			<version>1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>javax.portlet</groupId>
