@@ -130,8 +130,12 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 
 		String[] args = new String[28];
 
-		args[0] = "-Dexternal-properties=com/liferay/portal/tools/dependencies/portal-tools.properties";
-		args[1] = "-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger";
+		args[0] =
+			"-Dexternal-properties=com/liferay/portal/tools/dependencies" +
+				"/portal-tools.properties";
+		args[1] =
+			"-Dorg.apache.commons.logging.Log=org.apache.commons.logging." +
+				"impl.Log4JLogger";
 		args[2] = "service.input.file=" + serviceFileName;
 		args[3] = "service.hbm.file=" + hbmFileName;
 		args[4] = "service.orm.file=" + ormFileName;
@@ -139,17 +143,25 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 		args[6] = "service.spring.file=" + springFileName;
 		args[7] = "service.spring.base.file=" + springBaseFileName;
 		args[8] = "service.spring.cluster.file=" + springClusterFileName;
-		args[9] = "service.spring.dynamic.data.source.file=" + springDynamicDataSourceFileName;
+		args[9] =
+			"service.spring.dynamic.data.source.file=" +
+				springDynamicDataSourceFileName;
 		args[10] = "service.spring.hibernate.file=" + springHibernateFileName;
-		args[11] = "service.spring.infrastructure.file=" + springInfrastructureFileName;
-		args[12] = "service.spring.shard.data.source.file=" + springShardDataSourceFileName;
+		args[11] =
+			"service.spring.infrastructure.file=" +
+				springInfrastructureFileName;
+		args[12] =
+			"service.spring.shard.data.source.file=" +
+				springShardDataSourceFileName;
 		args[13] = "service.api.dir=" + apiDir;
 		args[14] = "service.impl.dir=" + implDir;
 		args[15] = "service.remoting.file=" + remotingFileName;
 		args[16] = "service.sql.dir=" + sqlDir;
 		args[17] = "service.sql.file=" + sqlFileName;
 		args[18] = "service.sql.indexes.file=" + sqlIndexesFileName;
-		args[19] = "service.sql.indexes.properties.file=" + sqlIndexesPropertiesFileName;
+		args[19] =
+			"service.sql.indexes.properties.file=" +
+				sqlIndexesPropertiesFileName;
 		args[20] = "service.sql.sequences.file=" + sqlSequencesFileName;
 		args[21] = "service.auto.namespace.tables=" + autoNamespaceTables;
 		args[22] = "service.bean.locator.util=" + beanLocatorUtil;
@@ -157,7 +169,8 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 		args[24] = "service.plugin.name=" + pluginName;
 		args[25] = "service.target.entity.name=" + targetEntityName;
 		args[26] = "service.build.number=" + serviceBuildNumber;
-		args[27] = "service.build.number.increment=" + serviceBuildNumberIncrement;
+		args[27] =
+			"service.build.number.increment=" + serviceBuildNumberIncrement;
 
 		ServiceBuilder.main(args);
 
