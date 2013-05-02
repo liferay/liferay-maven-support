@@ -3,7 +3,19 @@
 <archetype-descriptor name="liferay-theme-archetype">
 	<fileSets>
 		<fileSet filtered="true">
-			<directory>src/main/resources</directory>
+			<directory>src/main/resources/resources-importer</directory>
+		</fileSet>
+		<fileSet filtered="true">
+			<directory>src/main/resources/resources-importer/document_library/documents</directory>
+		</fileSet>
+		<fileSet filtered="true">
+			<directory>src/main/resources/resources-importer/journal/articles</directory>
+		</fileSet>
+		<fileSet filtered="true">
+			<directory>src/main/resources/resources-importer/journal/structures</directory>
+		</fileSet>
+		<fileSet filtered="true">
+			<directory>src/main/resources/resources-importer/journal/templates</directory>
 		</fileSet>
 		<fileSet filtered="true">
 			<directory>src/main/webapp</directory>
