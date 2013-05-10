@@ -14,22 +14,19 @@
 
 package com.liferay.maven.plugins;
 
-import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.tools.servicebuilder.ServiceBuilder;
-
 import java.io.File;
-
-import java.lang.reflect.Method;
+import java.io.IOException;
 
 import java.net.URI;
 import java.net.URL;
-import java.net.URLClassLoader;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
@@ -53,7 +50,7 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 			implResourcesDir, "service.properties");
 
 		if (servicePropertiesFile.exists()) {
-			FileUtil.copyFile(
+			FileUtils.copyFile(
 				servicePropertiesFile, new File(implDir, "service.properties"));
 		}
 	}
@@ -95,7 +92,7 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 
 		initProperties();
 
-		if (Validator.isNull(serviceFileName)) {
+		if (StringUtils.isEmpty(serviceFileName)) {
 			throw new MojoExecutionException(
 				"Unable to find service.xml with path " + serviceFileName);
 		}
@@ -112,7 +109,9 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 
 		copyServicePropertiesFile();
 
-		FileUtil.mkdirs(sqlDir);
+		File sqlDirFile = new File(sqlDir);
+
+		sqlDirFile.mkdirs();
 
 		File tempServiceFile = null;
 
@@ -121,10 +120,10 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 				File serviceFile = new File(serviceFileName);
 
 				tempServiceFile = new File(
-					StringUtil.replace(
+					StringUtils.replace(
 						serviceFileName, "/main/resources/", "/main/java/"));
 
-				FileUtil.copyFile(serviceFile, tempServiceFile);
+				FileUtils.copyFile(serviceFile, tempServiceFile);
 			}
 		}
 
@@ -172,10 +171,11 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 		args[27] =
 			"service.build.number.increment=" + serviceBuildNumberIncrement;
 
-		ServiceBuilder.main(args);
+		//ServiceBuilder.main(args);
+		executeTool(_SERVICE_BUILDER, getProjectClassLoader(), args);
 
 		if (tempServiceFile != null) {
-			FileUtil.delete(tempServiceFile);
+			FileUtils.forceDelete(tempServiceFile);
 		}
 
 		moveServicePropertiesFile();
@@ -183,24 +183,37 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 		invokeDependencyBuild();
 	}
 
-	protected void initPortalClassLoader() throws Exception {
-		super.initPortalClassLoader();
-
-		Class<?> clazz = getClass();
-
-		URLClassLoader urlClassLoader = (URLClassLoader)clazz.getClassLoader();
-
-		Method method = URLClassLoader.class.getDeclaredMethod(
-			"addURL", URL.class);
-
-		method.setAccessible(true);
+	@Override
+	protected Set<URL> getProjectClassPath() throws Exception {
+		Set<URL> projectClassPath = new LinkedHashSet<URL>();
 
 		File file = new File(implResourcesDir);
 
 		URI uri = file.toURI();
 
-		method.invoke(urlClassLoader, uri.toURL());
+		projectClassPath.add(uri.toURL());
+
+		return projectClassPath;
 	}
+
+//	protected void initPortalClassLoader() throws Exception {
+//		super.initPortalClassLoader();
+//
+//		Class<?> clazz = getClass();
+//
+//		URLClassLoader urlClassLoader = (URLClassLoader)clazz.getClassLoader();
+//
+//		Method method = URLClassLoader.class.getDeclaredMethod(
+//			"addURL", URL.class);
+//
+//		method.setAccessible(true);
+//
+//		File file = new File(implResourcesDir);
+//
+//		URI uri = file.toURI();
+//
+//		method.invoke(urlClassLoader, uri.toURL());
+//	}
 
 	protected void initPortalProperties() throws Exception {
 		super.initPortalProperties();
@@ -209,36 +222,35 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 	}
 
 	protected void initProperties() throws Exception {
-		if (Validator.isNotNull(apiBaseDir) ||
-			Validator.isNotNull(implBaseDir) ||
-			Validator.isNotNull(webappBaseDir)) {
+		if (StringUtils.isNotEmpty(apiBaseDir) ||
+			StringUtils.isNotEmpty(implBaseDir) ||
+			StringUtils.isNotEmpty(webappBaseDir)) {
 
-			if (Validator.isNull(apiBaseDir)) {
+			if (StringUtils.isEmpty(apiBaseDir)) {
 				apiBaseDir = baseDir;
 			}
 
-			if (Validator.isNull(implBaseDir) &&
-				Validator.isNotNull(webappBaseDir)) {
+			if (StringUtils.isEmpty(implBaseDir) &&
+				StringUtils.isNotEmpty(webappBaseDir)) {
 
 				implBaseDir = webappBaseDir;
 			}
-			else if (Validator.isNull(implBaseDir) &&
-					 Validator.isNotNull(apiBaseDir)) {
+			else if (StringUtils.isEmpty(implBaseDir) &&
+					 StringUtils.isNotEmpty(apiBaseDir)) {
 
 				implBaseDir = baseDir;
 			}
 
-			if (Validator.isNull(webappBaseDir)) {
-
+			if (StringUtils.isEmpty(webappBaseDir)) {
 				webappBaseDir = baseDir;
 			}
 		}
 
-		if (Validator.isNotNull(apiBaseDir)) {
+		if (StringUtils.isNotEmpty(apiBaseDir)) {
 			apiDir = apiBaseDir.concat("/src/main/java");
 		}
 
-		if (Validator.isNotNull(implBaseDir)) {
+		if (StringUtils.isNotEmpty(implBaseDir)) {
 			implDir = implBaseDir.concat("/src/main/java");
 			implResourcesDir = implBaseDir.concat("/src/main/resources");
 
@@ -252,7 +264,7 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 			}
 		}
 
-		if (Validator.isNotNull(webappBaseDir)) {
+		if (StringUtils.isNotEmpty(webappBaseDir)) {
 			String webappDir = webappBaseDir.concat("/src/main/webapp");
 			String webappResourcesDir = webappBaseDir.concat(
 				"/src/main/resources");
@@ -285,27 +297,27 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 					"/META-INF/shard-data-source-spring.xml");
 				sqlDir = webappDir.concat("/WEB-INF/sql");
 
-				if (Validator.isNull(serviceFileName)) {
+				if (StringUtils.isEmpty(serviceFileName)) {
 					serviceFileName = webappDir.concat("/WEB-INF/service.xml");
 				}
 			}
 		}
 
-		if (Validator.isNull(sqlDir)) {
+		if (StringUtils.isEmpty(sqlDir)) {
 			sqlDir = baseDir.concat("/src/main/webapp/WEB-INF/sql");
 		}
 
 		if (pluginType.equals("ext")) {
-			if (Validator.isNull(beanLocatorUtil)) {
+			if (StringUtils.isEmpty(beanLocatorUtil)) {
 				beanLocatorUtil =
 					"com.liferay.portal.kernel.bean.PortalBeanLocatorUtil";
 			}
 
-			if (Validator.isNull(propsUtil)) {
+			if (StringUtils.isEmpty(propsUtil)) {
 				propsUtil = "com.liferay.portal.util.PropsUtil";
 			}
 
-			if (Validator.isNull(sqlFileName)) {
+			if (StringUtils.isEmpty(sqlFileName)) {
 				sqlFileName = "portal-tables.sql";
 			}
 
@@ -321,75 +333,75 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 			String webappDir = baseDir.concat("/src/main/webapp");
 			String webappResourcesDir = baseDir.concat("/src/main/resources");
 
-			if (Validator.isNull(beanLocatorUtil)) {
+			if (StringUtils.isEmpty(beanLocatorUtil)) {
 				beanLocatorUtil =
 					"com.liferay.util.bean.PortletBeanLocatorUtil";
 			}
 
-			if (Validator.isNull(hbmFileName)) {
+			if (StringUtils.isEmpty(hbmFileName)) {
 				hbmFileName = webappResourcesDir.concat(
 					"/META-INF/portlet-hbm.xml");
 			}
 
-			if (Validator.isNull(implDir)) {
+			if (StringUtils.isEmpty(implDir)) {
 				implDir = baseDir.concat("/src/main/java");
 				implResourcesDir = baseDir.concat("/src/main/resources");
 			}
 
-			if (Validator.isNull(modelHintsFileName)) {
+			if (StringUtils.isEmpty(modelHintsFileName)) {
 				modelHintsFileName = webappResourcesDir.concat(
 					"/META-INF/portlet-model-hints.xml");
 			}
 
-			if (Validator.isNull(ormFileName)) {
+			if (StringUtils.isEmpty(ormFileName)) {
 				ormFileName = webappResourcesDir.concat(
 					"/META-INF/portlet-orm.xml");
 			}
 
-			if (Validator.isNull(propsUtil)) {
+			if (StringUtils.isEmpty(propsUtil)) {
 				propsUtil = "com.liferay.util.service.ServiceProps";
 			}
 
-			if (Validator.isNull(serviceFileName)) {
+			if (StringUtils.isEmpty(serviceFileName)) {
 				serviceFileName = webappDir.concat("/WEB-INF/service.xml");
 			}
 
-			if (Validator.isNull(springBaseFileName)) {
+			if (StringUtils.isEmpty(springBaseFileName)) {
 				springBaseFileName = webappResourcesDir.concat(
 					"/META-INF/base-spring.xml");
 			}
 
-			if (Validator.isNull(springClusterFileName)) {
+			if (StringUtils.isEmpty(springClusterFileName)) {
 				springClusterFileName = webappResourcesDir.concat(
 					"/META-INF/cluster-spring.xml");
 			}
 
-			if (Validator.isNull(springDynamicDataSourceFileName)) {
+			if (StringUtils.isEmpty(springDynamicDataSourceFileName)) {
 				springDynamicDataSourceFileName = webappResourcesDir.concat(
 					"/META-INF/dynamic-data-source-spring.xml");
 			}
 
-			if (Validator.isNull(springFileName)) {
+			if (StringUtils.isEmpty(springFileName)) {
 				springFileName = webappResourcesDir.concat(
 					"/META-INF/portlet-spring.xml");
 			}
 
-			if (Validator.isNull(springHibernateFileName)) {
+			if (StringUtils.isEmpty(springHibernateFileName)) {
 				springHibernateFileName = webappResourcesDir.concat(
 					"/META-INF/hibernate-spring.xml");
 			}
 
-			if (Validator.isNull(springInfrastructureFileName)) {
+			if (StringUtils.isEmpty(springInfrastructureFileName)) {
 				springInfrastructureFileName = webappResourcesDir.concat(
 					"/META-INF/infrastructure-spring.xml");
 			}
 
-			if (Validator.isNull(springShardDataSourceFileName)) {
+			if (StringUtils.isEmpty(springShardDataSourceFileName)) {
 				springShardDataSourceFileName = webappResourcesDir.concat(
 					"/META-INF/shard-data-source-spring.xml");
 			}
 
-			if (Validator.isNull(sqlFileName)) {
+			if (StringUtils.isEmpty(sqlFileName)) {
 				sqlFileName = "tables.sql";
 			}
 		}
@@ -473,11 +485,27 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 		File servicePropertiesFile = new File(implDir, "service.properties");
 
 		if (servicePropertiesFile.exists()) {
-			FileUtil.move(
-				servicePropertiesFile,
-				new File(implResourcesDir, "service.properties"));
+			File targetFile = new File(
+				implResourcesDir, "service.properties");
+
+			try {
+				if (targetFile.exists()) {
+					FileUtils.forceDelete(targetFile);
+				}
+
+				FileUtils.moveFile(
+					servicePropertiesFile, targetFile);
+			}
+			catch (IOException ioe) {
+				getLog().error(
+					"Unable to move file " + servicePropertiesFile + " to " +
+						targetFile, ioe);
+			}
 		}
 	}
+
+	private static final String _SERVICE_BUILDER =
+		"com.liferay.portal.tools.servicebuilder.ServiceBuilder";
 
 	/**
 	 * @parameter
