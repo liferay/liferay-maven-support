@@ -129,44 +129,40 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 
 		String[] args = new String[28];
 
-		args[0] =
-			"-Dexternal-properties=com/liferay/portal/tools/dependencies" +
-				"/portal-tools.properties";
-		args[1] =
-			"-Dorg.apache.commons.logging.Log=org.apache.commons.logging." +
-				"impl.Log4JLogger";
-		args[2] = "service.input.file=" + serviceFileName;
-		args[3] = "service.hbm.file=" + hbmFileName;
-		args[4] = "service.orm.file=" + ormFileName;
-		args[5] = "service.model.hints.file=" + modelHintsFileName;
-		args[6] = "service.spring.file=" + springFileName;
-		args[7] = "service.spring.base.file=" + springBaseFileName;
-		args[8] = "service.spring.cluster.file=" + springClusterFileName;
-		args[9] =
+		args[0] = "service.input.file=" + serviceFileName;
+		args[1] = "service.hbm.file=" + hbmFileName;
+		args[2] = "service.orm.file=" + ormFileName;
+		args[3] = "service.model.hints.file=" + modelHintsFileName;
+		args[4] = "service.spring.file=" + springFileName;
+		args[5] = "service.spring.base.file=" + springBaseFileName;
+		args[6] = "service.spring.cluster.file=" + springClusterFileName;
+		args[7] =
 			"service.spring.dynamic.data.source.file=" +
 				springDynamicDataSourceFileName;
-		args[10] = "service.spring.hibernate.file=" + springHibernateFileName;
-		args[11] =
+		args[8] = "service.spring.hibernate.file=" + springHibernateFileName;
+		args[9] =
 			"service.spring.infrastructure.file=" +
 				springInfrastructureFileName;
-		args[12] =
+		args[10] =
 			"service.spring.shard.data.source.file=" +
 				springShardDataSourceFileName;
-		args[13] = "service.api.dir=" + apiDir;
-		args[14] = "service.impl.dir=" + implDir;
-		args[15] = "service.remoting.file=" + remotingFileName;
-		args[16] = "service.sql.dir=" + sqlDir;
-		args[17] = "service.sql.file=" + sqlFileName;
-		args[18] = "service.sql.indexes.file=" + sqlIndexesFileName;
-		args[19] =
+		args[11] = "service.api.dir=" + apiDir;
+		args[12] = "service.impl.dir=" + implDir;
+		args[13] = "service.json.file=" + jsonFileName;
+		args[14] = "service.remoting.file=" + remotingFileName;
+		args[15] = "service.sql.dir=" + sqlDir;
+		args[16] = "service.sql.file=" + sqlFileName;
+		args[17] = "service.sql.indexes.file=" + sqlIndexesFileName;
+		args[18] =
 			"service.sql.indexes.properties.file=" +
 				sqlIndexesPropertiesFileName;
-		args[20] = "service.sql.sequences.file=" + sqlSequencesFileName;
-		args[21] = "service.auto.namespace.tables=" + autoNamespaceTables;
-		args[22] = "service.bean.locator.util=" + beanLocatorUtil;
-		args[23] = "service.props.util=" + propsUtil;
-		args[24] = "service.plugin.name=" + pluginName;
-		args[25] = "service.target.entity.name=" + targetEntityName;
+		args[19] = "service.sql.sequences.file=" + sqlSequencesFileName;
+		args[20] = "service.auto.namespace.tables=" + autoNamespaceTables;
+		args[21] = "service.bean.locator.util=" + beanLocatorUtil;
+		args[22] = "service.props.util=" + propsUtil;
+		args[23] = "service.plugin.name=" + pluginName;
+		args[24] = "service.target.entity.name=" + targetEntityName;
+		args[25] = "service.test.dir=";
 		args[26] = "service.build.number=" + serviceBuildNumber;
 		args[27] =
 			"service.build.number.increment=" + serviceBuildNumberIncrement;
@@ -251,12 +247,14 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 				"/src/main/resources");
 
 			if (pluginType.equals("ext")) {
+				jsonFileName = webappDir.concat("/html/js/liferay/service.js");
 				remotingFileName = webappDir.concat(
 					"/WEB-INF/remoting-servlet-ext.xml");
 			}
 			else {
 				hbmFileName = webappResourcesDir.concat(
 					"/META-INF/portlet-hbm.xml");
+				jsonFileName = webappDir.concat("/js/service.js");
 				modelHintsFileName = webappResourcesDir.concat(
 					"/META-INF/portlet-model-hints.xml");
 				ormFileName = webappResourcesDir.concat(
@@ -327,6 +325,10 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 			if (StringUtils.isEmpty(implDir)) {
 				implDir = baseDir.concat("/src/main/java");
 				implResourcesDir = baseDir.concat("/src/main/resources");
+			}
+
+			if (StringUtils.isEmpty(jsonFileName)) {
+				jsonFileName = webappDir.concat("/js/service.js");
 			}
 
 			if (StringUtils.isEmpty(modelHintsFileName)) {
@@ -539,6 +541,11 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 	 * @component
 	 */
 	private Invoker invoker;
+
+	/**
+	 * @parameter
+	 */
+	private String jsonFileName;
 
 	/**
 	 * @parameter
