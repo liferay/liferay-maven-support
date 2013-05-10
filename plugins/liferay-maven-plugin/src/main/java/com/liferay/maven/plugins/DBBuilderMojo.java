@@ -14,11 +14,7 @@
 
 package com.liferay.maven.plugins;
 
-import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.tools.DBBuilder;
-
-import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * @author Mika Koivisto
@@ -26,7 +22,7 @@ import org.apache.maven.plugin.MojoExecutionException;
  */
 public class DBBuilderMojo extends AbstractLiferayMojo {
 
-	protected void doExecute() throws MojoExecutionException {
+	protected void doExecute() throws Exception {
 		if (pluginType.equals("ext")) {
 			StringBuilder sb = new StringBuilder();
 
@@ -41,15 +37,17 @@ public class DBBuilderMojo extends AbstractLiferayMojo {
 			getLog().warn(sb.toString());
 		}
 
-		if ((Validator.isNotNull(apiBaseDir) ||
-			 Validator.isNotNull(implBaseDir)) &&
-			Validator.isNull(webappBaseDir)) {
+		if ((StringUtils.isNotEmpty(apiBaseDir) ||
+			 StringUtils.isNotEmpty(implBaseDir)) &&
+			StringUtils.isEmpty(webappBaseDir)) {
 
 			webappBaseDir = baseDir;
 		}
 
-		if (Validator.isNull(sqlDir)) {
-			if (pluginType.equals("ext") || Validator.isNull(webappBaseDir)) {
+		if (StringUtils.isEmpty(sqlDir)) {
+			if (pluginType.equals("ext") ||
+				StringUtils.isEmpty(webappBaseDir)) {
+
 				sqlDir = baseDir.concat("/src/main/webapp/WEB-INF/sql");
 			}
 			else {
@@ -61,8 +59,17 @@ public class DBBuilderMojo extends AbstractLiferayMojo {
 		getLog().debug("Database types " + databaseTypes);
 		getLog().debug("SQL directory " + sqlDir);
 
-		new DBBuilder(databaseName, StringUtil.split(databaseTypes), sqlDir);
+		String[] args = new String[3];
+
+		args[0] = "db.database.name=" + databaseName;
+		args[1] = "db.database.types=" + databaseTypes;
+		args[2] = "db.sql.dir=" + sqlDir;
+
+		executeTool(_DB_BUILDER, getProjectClassLoader(), args);
 	}
+
+	private static final String _DB_BUILDER =
+		"com.liferay.portal.tools.DBBuilder";
 
 	/**
 	 * @parameter
