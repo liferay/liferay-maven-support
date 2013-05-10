@@ -14,12 +14,11 @@
 
 package com.liferay.maven.plugins;
 
-import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.tools.ExtInfoBuilder;
-import com.liferay.util.ant.CopyTask;
+import com.liferay.maven.plugins.util.CopyTask;
 
 import java.io.File;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Dependency;
 
@@ -39,7 +38,7 @@ public class ExtBuilderMojo extends AbstractLiferayMojo {
 
 		File serviceJarFile = new File(jarDir, jarName);
 
-		FileUtil.copyFile(artifact.getFile(), serviceJarFile);
+		FileUtils.copyFile(artifact.getFile(), serviceJarFile);
 
 		File classesDir = new File(jarDir, "classes");
 
@@ -59,12 +58,12 @@ public class ExtBuilderMojo extends AbstractLiferayMojo {
 
 		File utilJarFile = new File(utilDir, "ext-" + utilJarName);
 
-		FileUtil.copyFile(artifact.getFile(), utilJarFile);
+		FileUtils.copyFile(artifact.getFile(), utilJarFile);
 
 		File dependencyUtilJarFile = new File(
 			implClassesDir, "ext-" + pluginName + "-" + utilJarName);
 
-		FileUtil.copyFile(artifact.getFile(), dependencyUtilJarFile);
+		FileUtils.copyFile(artifact.getFile(), dependencyUtilJarFile);
 	}
 
 	protected void doExecute() throws Exception {
@@ -199,14 +198,17 @@ public class ExtBuilderMojo extends AbstractLiferayMojo {
 
 		CopyTask.copyDirectory(
 			workDir, new File(webDir, "WEB-INF/classes"),
-			"portal-*.properties,system-*.properties", null);
+			"portal-*.properties,system-*.properties", null, true, true);
 
-		FileUtil.copyDirectory(sqlSourceDir, sqlDir);
+		if (sqlSourceDir.exists()) {
+			FileUtils.copyDirectory(sqlSourceDir, sqlDir);
+		}
 
 		String dirName = webappDir.getAbsolutePath() + "/WEB-INF";
 
-		ExtInfoBuilder infoBuilder = new ExtInfoBuilder(
-			dirName, dirName, pluginName);
+		String[] args = new String[] { dirName, dirName, pluginName };
+
+		executeTool(_EXT_BUILDER, getToolsClassLoader(), args);
 	}
 
 	protected void unpack(
@@ -229,6 +231,9 @@ public class ExtBuilderMojo extends AbstractLiferayMojo {
 
 		unArchiver.extract();
 	}
+
+	private static final String _EXT_BUILDER =
+		"com.liferay.portal.tools.ExtInfoBuilder";
 
 	/**
 	 * @parameter default-value="false"
