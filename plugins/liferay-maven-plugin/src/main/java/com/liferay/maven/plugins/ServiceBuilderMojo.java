@@ -196,25 +196,6 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 		return projectClassPath;
 	}
 
-//	protected void initPortalClassLoader() throws Exception {
-//		super.initPortalClassLoader();
-//
-//		Class<?> clazz = getClass();
-//
-//		URLClassLoader urlClassLoader = (URLClassLoader)clazz.getClassLoader();
-//
-//		Method method = URLClassLoader.class.getDeclaredMethod(
-//			"addURL", URL.class);
-//
-//		method.setAccessible(true);
-//
-//		File file = new File(implResourcesDir);
-//
-//		URI uri = file.toURI();
-//
-//		method.invoke(urlClassLoader, uri.toURL());
-//	}
-
 	protected void initPortalProperties() throws Exception {
 		super.initPortalProperties();
 
