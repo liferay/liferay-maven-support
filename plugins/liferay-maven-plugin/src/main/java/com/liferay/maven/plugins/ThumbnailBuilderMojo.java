@@ -14,8 +14,6 @@
 
 package com.liferay.maven.plugins;
 
-import com.liferay.portal.tools.ThumbnailBuilder;
-
 import java.io.File;
 
 /**
@@ -26,9 +24,19 @@ import java.io.File;
 public class ThumbnailBuilderMojo extends AbstractLiferayMojo {
 
 	protected void doExecute() throws Exception {
-		new ThumbnailBuilder(
-			originalFile, thumbnailFile, height, width, overwrite);
+		String[] args = new String[5];
+
+		args[0] = "thumbnail.original.file=" + originalFile.getAbsolutePath();
+		args[1] = "thumbnail.thumbnail.file=" + thumbnailFile.getAbsolutePath();
+		args[2] = "thumbnail.height=" + height;
+		args[3] = "thumbnail.width=" + width;
+		args[4] = "thumbnail.overwrite=" + overwrite;
+
+		executeTool(_THUMBNAIL_BUILDER,  getToolsClassLoader(), args);
 	}
+
+	private static final String _THUMBNAIL_BUILDER =
+		"com.liferay.portal.tools.ThumbnailBuilder";
 
 	/**
 	 * @parameter default-value="120"
