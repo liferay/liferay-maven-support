@@ -181,7 +181,7 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 
 	@Override
 	protected Set<URL> getProjectClassPath() throws Exception {
-		Set<URL> projectClassPath = new LinkedHashSet<URL>();
+		Set<URL> projectClassPath = super.getProjectClassPath();
 
 		File file = new File(implResourcesDir);
 

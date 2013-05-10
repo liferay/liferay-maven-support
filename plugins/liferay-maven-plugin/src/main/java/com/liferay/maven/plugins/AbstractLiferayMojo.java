@@ -208,6 +208,14 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 	protected abstract void doExecute() throws Exception;
 
 	protected ClassLoader getToolsClassLoader() throws Exception {
+		Set<URL> toolsClassPathURLs = getToolsClassPath();
+
+		return new URLClassLoader(
+			toolsClassPathURLs.toArray(new URL[toolsClassPathURLs.size()]),
+			null);
+	}
+
+	protected Set<URL> getToolsClassPath() throws Exception {
 		Set<URL> toolsClassPathURLs = new LinkedHashSet<URL>();
 
 		Dependency jalopyDependency = createDependency(
@@ -290,13 +298,19 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 
 		toolsClassPathURLs.add(uri.toURL());
 
-		return new URLClassLoader(
-			toolsClassPathURLs.toArray(new URL[toolsClassPathURLs.size()]),
-			null);
+		return toolsClassPathURLs;
 	}
 
 	protected ClassLoader getProjectClassLoader() throws Exception {
 		Set<URL> projectClassPathURLs = getProjectClassPath();
+
+		return new URLClassLoader(
+			projectClassPathURLs.toArray(new URL[projectClassPathURLs.size()]),
+			null);
+	}
+
+	protected Set<URL> getProjectClassPath() throws Exception {
+		Set<URL> projectClassPathURLs = new LinkedHashSet<URL>();
 
 		for (Object object : project.getCompileClasspathElements()) {
 			String path = (String)object;
@@ -308,13 +322,9 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 			projectClassPathURLs.add(uri.toURL());
 		}
 
-		return new URLClassLoader(
-			projectClassPathURLs.toArray(new URL[projectClassPathURLs.size()]),
-			getToolsClassLoader());
-	}
+		projectClassPathURLs.addAll(getToolsClassPath());
 
-	protected Set<URL> getProjectClassPath() throws Exception {
-		return new LinkedHashSet<URL>();
+		return projectClassPathURLs;
 	}
 
 	protected void initPortalProperties() throws Exception {
