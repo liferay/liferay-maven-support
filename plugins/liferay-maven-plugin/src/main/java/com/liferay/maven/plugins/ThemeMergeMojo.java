@@ -14,16 +14,9 @@
 
 package com.liferay.maven.plugins;
 
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.xml.Document;
-import com.liferay.portal.kernel.xml.Element;
-import com.liferay.portal.kernel.xml.SAXReaderUtil;
-import com.liferay.portal.model.Theme;
-import com.liferay.portal.model.impl.ThemeImpl;
-import com.liferay.portal.util.PortalUtil;
-import com.liferay.util.ContextReplace;
+import com.liferay.maven.plugins.theme.Theme;
+import com.liferay.maven.plugins.util.ContextReplace;
+import com.liferay.maven.plugins.util.JS;
 
 import java.io.File;
 
@@ -31,12 +24,17 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Dependency;
 
 import org.codehaus.plexus.archiver.UnArchiver;
 import org.codehaus.plexus.components.io.fileselectors.FileSelector;
 import org.codehaus.plexus.components.io.fileselectors.IncludeExcludeFileSelector;
+
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
 
 /**
  * @author Mika Koivisto
@@ -79,7 +77,7 @@ public class ThemeMergeMojo extends AbstractLiferayMojo {
 			workDir.mkdirs();
 		}
 
-		if (Validator.isNotNull(parentTheme)) {
+		if (StringUtils.isNotEmpty(parentTheme)) {
 			if (parentTheme.indexOf(":") > 0) {
 				String[] parentThemeArray = parentTheme.split(":");
 
@@ -138,7 +136,10 @@ public class ThemeMergeMojo extends AbstractLiferayMojo {
 			webappSourceDir, "WEB-INF/liferay-look-and-feel.xml");
 
 		if (liferayLookAndFeelXml.exists()) {
-			Document document = SAXReaderUtil.read(liferayLookAndFeelXml, true);
+			SAXReader reader = new SAXReader();
+
+			Document document = reader.read(liferayLookAndFeelXml);
+			//Document document = SAXReaderUtil.read(liferayLookAndFeelXml, true);
 
 			Element rootElement = document.getRootElement();
 
@@ -147,7 +148,7 @@ public class ThemeMergeMojo extends AbstractLiferayMojo {
 			for (Element themeElement : themeElements) {
 				String id = themeElement.attributeValue("id");
 
-				if (Validator.isNotNull(themeId) && !themeId.equals(id)) {
+				if (StringUtils.isNotEmpty(themeId) && !themeId.equals(id)) {
 					continue;
 				}
 
@@ -168,7 +169,7 @@ public class ThemeMergeMojo extends AbstractLiferayMojo {
 			}
 		}
 		else {
-			String id = PortalUtil.getJsSafePortletId(project.getArtifactId());
+			String id = JS.getSafeName(project.getArtifactId());
 
 			Theme targetTheme = readTheme(id, null);
 
@@ -335,14 +336,13 @@ public class ThemeMergeMojo extends AbstractLiferayMojo {
 	protected Theme readTheme(Element themeElement) {
 		String id = themeElement.attributeValue("id");
 
-		Theme theme = new ThemeImpl(id);
+		Theme theme = new Theme(id);
 
 		ContextReplace themeContextReplace = new ContextReplace();
 
 		themeContextReplace.addValue("themes-path", null);
 
-		String rootPath = GetterUtil.getString(
-			themeElement.elementText("root-path"), "/");
+		String rootPath = getString(themeElement.elementText("root-path"), "/");
 
 		rootPath = themeContextReplace.replace(rootPath);
 
@@ -350,50 +350,50 @@ public class ThemeMergeMojo extends AbstractLiferayMojo {
 
 		theme.setRootPath(rootPath);
 
-		String templatesPath = GetterUtil.getString(
+		String templatesPath = getString(
 			themeElement.elementText("templates-path"),
 			rootPath.concat("/templates"));
 
 		templatesPath = themeContextReplace.replace(templatesPath);
-		templatesPath = StringUtil.safePath(templatesPath);
+		templatesPath = StringUtils.replace(templatesPath, "//", "/");
 
 		themeContextReplace.addValue("templates-path", templatesPath);
 
 		theme.setTemplatesPath(templatesPath);
 
-		String cssPath = GetterUtil.getString(
+		String cssPath = getString(
 			themeElement.elementText("css-path"), rootPath.concat("/css"));
 
 		cssPath = themeContextReplace.replace(cssPath);
-		cssPath = StringUtil.safePath(cssPath);
+		cssPath = StringUtils.replace(cssPath, "//", "/");
 
 		themeContextReplace.addValue("css-path", cssPath);
 
 		theme.setCssPath(cssPath);
 
-		String imagesPath = GetterUtil.getString(
+		String imagesPath = getString(
 			themeElement.elementText("images-path"),
 			rootPath.concat("/images"));
 
 		imagesPath = themeContextReplace.replace(imagesPath);
-		imagesPath = StringUtil.safePath(imagesPath);
+		imagesPath = StringUtils.replace(imagesPath, "//", "/");
 
 		themeContextReplace.addValue("images-path", imagesPath);
 
 		theme.setImagesPath(imagesPath);
 
-		String javaScriptPath = GetterUtil.getString(
+		String javaScriptPath = getString(
 			themeElement.elementText("javascript-path"),
 			rootPath.concat("/js"));
 
 		javaScriptPath = themeContextReplace.replace(javaScriptPath);
-		javaScriptPath = StringUtil.safePath(javaScriptPath);
+		javaScriptPath = StringUtils.replace(javaScriptPath, "//", "/");
 
 		themeContextReplace.addValue("javascript-path", javaScriptPath);
 
 		theme.setJavaScriptPath(javaScriptPath);
 
-		String templateExtension = GetterUtil.getString(
+		String templateExtension = getString(
 			themeElement.elementText("template-extension"), themeType);
 
 		theme.setTemplateExtension(templateExtension);
@@ -405,7 +405,9 @@ public class ThemeMergeMojo extends AbstractLiferayMojo {
 		throws Exception {
 
 		if ((liferayLookAndFeelXml != null) && liferayLookAndFeelXml.exists()) {
-			Document document = SAXReaderUtil.read(liferayLookAndFeelXml, true);
+			SAXReader reader = new SAXReader();
+
+			Document document = reader.read(liferayLookAndFeelXml);
 
 			Element rootElement = document.getRootElement();
 
@@ -414,7 +416,7 @@ public class ThemeMergeMojo extends AbstractLiferayMojo {
 			for (Element themeElement : themeElements) {
 				String id = themeElement.attributeValue("id");
 
-				if (Validator.isNotNull(themeId) && !themeId.equals(id)) {
+				if (StringUtils.isNotEmpty(themeId) && !themeId.equals(id)) {
 					continue;
 				}
 
@@ -422,7 +424,7 @@ public class ThemeMergeMojo extends AbstractLiferayMojo {
 			}
 		}
 
-		Theme theme = new ThemeImpl(themeId);
+		Theme theme = new Theme(themeId);
 
 		theme.setCssPath("/css");
 		theme.setImagesPath("/images");
@@ -432,6 +434,20 @@ public class ThemeMergeMojo extends AbstractLiferayMojo {
 		theme.setTemplatesPath("/templates");
 
 		return theme;
+	}
+
+	private String getString(String value, String defaultValue) {
+		if (value == null) {
+			return defaultValue;
+		}
+
+		value = value.trim();
+
+		if (value.indexOf('\r') != -1) {
+			value = StringUtils.replace(value, "\r\n", "\n");
+		}
+
+		return value;
 	}
 
 	/**
