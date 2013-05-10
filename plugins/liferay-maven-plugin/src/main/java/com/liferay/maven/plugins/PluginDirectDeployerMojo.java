@@ -14,21 +14,11 @@
 
 package com.liferay.maven.plugins;
 
-import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.tools.WebXMLBuilder;
-import com.liferay.portal.tools.deploy.HookDeployer;
-import com.liferay.portal.tools.deploy.LayoutTemplateDeployer;
-import com.liferay.portal.tools.deploy.PortletDeployer;
-import com.liferay.portal.tools.deploy.ThemeDeployer;
-import com.liferay.portal.tools.deploy.WebDeployer;
-import com.liferay.util.ant.CopyTask;
+import com.liferay.maven.plugins.util.CopyTask;
 
 import java.io.File;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.model.Build;
 import org.apache.maven.plugin.MojoExecutionException;
 
@@ -60,8 +50,7 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 		if (artifactId.endsWith("ext-service")) {
 			File sourceFile = new File(
 				build.getDirectory(),
-				build.getFinalName() + StringPool.PERIOD +
-					project.getPackaging());
+				build.getFinalName() + "." + project.getPackaging());
 
 			deployExtService(sourceFile);
 
@@ -74,8 +63,7 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 		if (artifactId.endsWith("ext-impl")) {
 			File sourceFile = new File(
 				build.getDirectory(),
-				build.getFinalName() + StringPool.PERIOD +
-					project.getPackaging());
+				build.getFinalName() + "." + project.getPackaging());
 
 			File sourceDir = new File(build.getOutputDirectory());
 
@@ -93,8 +81,7 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 
 			File sourceFile = new File(
 				build.getDirectory(),
-				build.getFinalName() + StringPool.PERIOD +
-					project.getPackaging());
+				build.getFinalName() + "." + project.getPackaging());
 
 			String utilName =
 				"util-" + artifactId.substring(artifactId.lastIndexOf('-'));
@@ -217,7 +204,7 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 			extUtilFile, deployDependenciesDir, fileName, null, true, true);
 	}
 
-	protected void deployExtWeb(File extWebDocrootDir) {
+	protected void deployExtWeb(File extWebDocrootDir) throws Exception {
 		CopyTask.copyDirectory(
 			extWebDocrootDir, appServerPortalDir, null, "WEB-INF/web.xml", true,
 			true);
@@ -226,29 +213,32 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 		File mergedWebXml = new File(
 			appServerPortalDir, "WEB-INF/web.xml.merged");
 
-		new WebXMLBuilder(
+		String[] args = new String[] { 
 			originalWebXml.getAbsolutePath(),
 			new File(extWebDocrootDir, "/WEB-INF/web.xml").getAbsolutePath(),
-			mergedWebXml.getAbsolutePath());
+			mergedWebXml.getAbsolutePath()
+		};
 
-		FileUtil.move(mergedWebXml, originalWebXml);
+		executeTool(_WEB_XML_BUILDER, getProjectClassLoader(), args);
+
+		if (originalWebXml.exists()) {
+			FileUtils.forceDelete(originalWebXml);
+		}
+
+		FileUtils.moveFile(mergedWebXml, originalWebXml);
 	}
 
 	protected void deployHook() throws Exception {
-		List<String> wars = new ArrayList<String>();
+		String[] args = new String[] { 
+			appServerLibPortalDir.getAbsolutePath() + "/util-java.jar"
+		};
 
-		List<String> jars = new ArrayList<String>();
-
-		jars.add(appServerLibPortalDir.getAbsolutePath() + "/util-java.jar");
-
-		new HookDeployer(wars, jars);
+		executeTool(_HOOK_DEPLOYER, getProjectClassLoader(), args);
 	}
 
 	protected void deployLayoutTemplate() throws Exception {
-		List<String> wars = new ArrayList<String>();
-		List<String> jars = new ArrayList<String>();
-
-		new LayoutTemplateDeployer(wars, jars);
+		executeTool(
+			_LAYOUT_TEMPLATE_DEPLOYER, getProjectClassLoader(), new String[]{});
 	}
 
 	protected void deployPortlet() throws Exception {
@@ -271,17 +261,15 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 		System.setProperty(
 			"deployer.util.taglib.dtd", tldPath + "/liferay-util.tld");
 
-		List<String> wars = new ArrayList<String>();
-
-		List<String> jars = new ArrayList<String>();
-
 		String libPath = appServerLibPortalDir.getAbsolutePath() ;
 
-		jars.add(libPath + "/util-bridges.jar");
-		jars.add(libPath + "/util-java.jar");
-		jars.add(libPath + "/util-taglib.jar");
+		String[] args = new String[] {
+			libPath + "/util-bridges.jar",
+			libPath + "/util-java.jar",
+			libPath + "/util-taglib.jar"
+		};
 
-		new PortletDeployer(wars, jars);
+		executeTool(_PORTLET_DEPLOYER, getProjectClassLoader(), args);
 	}
 
 	protected void deployTheme() throws Exception {
@@ -292,28 +280,24 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 		System.setProperty(
 			"deployer.util.taglib.dtd", tldPath + "/liferay-util.tld");
 
-		List<String> wars = new ArrayList<String>();
-
-		List<String> jars = new ArrayList<String>();
-
 		String libPath = appServerLibPortalDir.getAbsolutePath();
 
-		jars.add(libPath + "/util-java.jar");
-		jars.add(libPath + "/util-taglib.jar");
+		String[] args = new String[] {
+			libPath + "/util-java.jar",
+			libPath + "/util-taglib.jar"
+		};
 
-		new ThemeDeployer(wars, jars);
+		executeTool(_THEME_DEPLOYER, getProjectClassLoader(), args);
 	}
 
 	protected void deployWeb() throws Exception {
-		List<String> wars = new ArrayList<String>();
-
-		List<String> jars = new ArrayList<String>();
-
 		String libPath = appServerLibPortalDir.getAbsolutePath();
 
-		jars.add(libPath + "/util-java.jar");
+		String[] args = new String[] {
+			libPath + "/util-java.jar"
+		};
 
-		new WebDeployer(wars, jars);
+		executeTool(_WEB_DEPLOYER, getProjectClassLoader(), args);
 	}
 
 	protected void doExecute() throws Exception {
@@ -381,6 +365,19 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 
 		return super.isLiferayProject();
 	}
+
+	private static final String _HOOK_DEPLOYER =
+		"com.liferay.portal.tools.deploy.HookDeployer";
+	private static final String _LAYOUT_TEMPLATE_DEPLOYER =
+		"com.liferay.portal.tools.deploy.LayoutTemplateDeployer";
+	private static final String _PORTLET_DEPLOYER =
+		"com.liferay.portal.tools.deploy.PortletDeployer";
+	private static final String _THEME_DEPLOYER =
+		"com.liferay.portal.tools.deploy.ThemeDeployer";
+	private static final String _WEB_DEPLOYER =
+		"com.liferay.portal.tools.deploy.WebDeployer";
+	private static final String _WEB_XML_BUILDER =
+		"com.liferay.portal.tools.WebXMLBuilder";
 
 	/**
 	 * @parameter default-value="${deployDir}" expression="${appServerDeployDir}"
