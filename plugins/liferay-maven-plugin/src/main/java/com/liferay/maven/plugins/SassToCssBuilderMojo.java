@@ -21,7 +21,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.FileFileFilter;
 import org.apache.commons.io.filefilter.FileFilterUtils;
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * @author Mika Koivisto
@@ -38,7 +38,7 @@ public class SassToCssBuilderMojo extends AbstractLiferayMojo {
 
 		FileUtils.copyDirectory(webappSourceDir, webappDir, fileFilter, true);
 
-		String[] dirNames = StringUtils.split(sassDirNames);
+		String[] dirNames = StringUtils.split(sassDirNames, ",");
 
 		String[] args = null;
 
