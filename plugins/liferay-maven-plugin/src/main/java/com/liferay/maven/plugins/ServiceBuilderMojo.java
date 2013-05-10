@@ -312,6 +312,10 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 			String webappDir = baseDir.concat("/src/main/webapp");
 			String webappResourcesDir = baseDir.concat("/src/main/resources");
 
+			if (StringUtils.isEmpty(apiDir)) {
+				apiDir = baseDir.concat("/src/main/java");
+			}
+
 			if (StringUtils.isEmpty(beanLocatorUtil)) {
 				beanLocatorUtil =
 					"com.liferay.util.bean.PortletBeanLocatorUtil";
