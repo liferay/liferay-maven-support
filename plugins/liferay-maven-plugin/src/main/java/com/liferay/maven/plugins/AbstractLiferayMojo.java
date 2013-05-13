@@ -27,6 +27,7 @@ import java.net.URLClassLoader;
 
 import java.security.Permission;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -208,68 +209,88 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 	protected abstract void doExecute() throws Exception;
 
 	protected ClassLoader getToolsClassLoader() throws Exception {
-		Set<URL> toolsClassPathURLs = getToolsClassPath();
+		List<String> toolsClassPath = getToolsClassPath();
 
-		return new URLClassLoader(
-			toolsClassPathURLs.toArray(new URL[toolsClassPathURLs.size()]),
-			null);
+		List<URL> urls = new ArrayList<URL>();
+
+		for (String path : toolsClassPath) {
+			urls.add(new URL(path));
+		}
+
+		return new URLClassLoader(urls.toArray(new URL[urls.size()]), null);
 	}
 
-	protected Set<URL> getToolsClassPath() throws Exception {
-		Set<URL> toolsClassPathURLs = new LinkedHashSet<URL>();
+	protected List<String> getToolsClassPath() throws Exception {
+		List<String> toolsClassPath = new ArrayList<String>();
 
 		Dependency jalopyDependency = createDependency(
 			"jalopy", "jalopy", "1.5rc3", "", "jar");
 
 		URI uri = resolveArtifactFileURI(jalopyDependency);
 
-		toolsClassPathURLs.add(uri.toURL());
+		URL url = uri.toURL();
+
+		toolsClassPath.add(url.toString());
 
 		Dependency activationDependency = createDependency(
 			"javax.activation", "activation", "1.1", "", "jar");
 
 		uri = resolveArtifactFileURI(activationDependency);
 
-		toolsClassPathURLs.add(uri.toURL());
+		url = uri.toURL();
+
+		toolsClassPath.add(url.toString());
 
 		Dependency mailDependency = createDependency(
 			"javax.mail", "mail", "1.4", "", "jar");
 
 		uri = resolveArtifactFileURI(mailDependency);
 
-		toolsClassPathURLs.add(uri.toURL());
+		url = uri.toURL();
+
+		toolsClassPath.add(url.toString());
 
 		Dependency servletApiDependency = createDependency(
 			"javax.servlet", "servlet-api", "2.5", "", "jar");
 
 		uri = resolveArtifactFileURI(servletApiDependency);
 
-		toolsClassPathURLs.add(uri.toURL());
+		url = uri.toURL();
+
+		toolsClassPath.add(url.toString());
 
 		Dependency jspApiDependency = createDependency(
 			"javax.servlet.jsp", "jsp-api", "2.1", "", "jar");
 
 		uri = resolveArtifactFileURI(jspApiDependency);
 
-		toolsClassPathURLs.add(uri.toURL());
+		url = uri.toURL();
+
+		toolsClassPath.add(url.toString());
 
 		Dependency portletApiDependency = createDependency(
 			"javax.portlet", "portlet-api", "2.0", "", "jar");
 
 		uri = resolveArtifactFileURI(portletApiDependency);
 
-		toolsClassPathURLs.add(uri.toURL());
+		url = uri.toURL();
+
+		toolsClassPath.add(url.toString());
 
 		Dependency qdoxDependency = createDependency(
 			"com.thoughtworks.qdox", "qdox", "1.12", "", "jar");
 
 		uri = resolveArtifactFileURI(qdoxDependency);
 
-		toolsClassPathURLs.add(uri.toURL());
+		url = uri.toURL();
 
-		URI classesURI = appServerClassesPortalDir.toURI();
+		toolsClassPath.add(url.toString());
 
-		toolsClassPathURLs.add(classesURI.toURL());
+		uri = appServerClassesPortalDir.toURI();
+
+		url = uri.toURL();
+
+		toolsClassPath.add(url.toString());
 
 		Collection<File> portalJarFiles = FileUtils.listFiles(
 			appServerLibPortalDir, new String[] {"jar"}, false);
@@ -277,7 +298,9 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 		for (File file : portalJarFiles) {
 			uri = file.toURI();
 
-			toolsClassPathURLs.add(uri.toURL());
+			url = uri.toURL();
+
+			toolsClassPath.add(url.toString());
 		}
 
 		if ((appServerLibGlobalDir != null) && appServerLibGlobalDir.exists()) {
@@ -287,7 +310,9 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 			for (File file : globalJarFiles) {
 				uri = file.toURI();
 
-				toolsClassPathURLs.add(uri.toURL());
+				url = uri.toURL();
+
+				toolsClassPath.add(url.toString());
 			}
 		}
 
@@ -296,21 +321,27 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 
 		uri = resolveArtifactFileURI(dependency);
 
-		toolsClassPathURLs.add(uri.toURL());
+		url = uri.toURL();
 
-		return toolsClassPathURLs;
+		toolsClassPath.add(url.toString());
+
+		return toolsClassPath;
 	}
 
 	protected ClassLoader getProjectClassLoader() throws Exception {
-		Set<URL> projectClassPathURLs = getProjectClassPath();
+		List<String> projectClassPath = getProjectClassPath();
 
-		return new URLClassLoader(
-			projectClassPathURLs.toArray(new URL[projectClassPathURLs.size()]),
-			null);
+		List<URL> urls = new ArrayList<URL>();
+
+		for (String path : projectClassPath) {
+			urls.add(new URL(path));
+		}
+
+		return new URLClassLoader(urls.toArray(new URL[urls.size()]), null);
 	}
 
-	protected Set<URL> getProjectClassPath() throws Exception {
-		Set<URL> projectClassPathURLs = new LinkedHashSet<URL>();
+	protected List<String> getProjectClassPath() throws Exception {
+		List<String> projectClassPath = new ArrayList<String>();
 
 		for (Object object : project.getCompileClasspathElements()) {
 			String path = (String)object;
@@ -319,12 +350,14 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 
 			URI uri = file.toURI();
 
-			projectClassPathURLs.add(uri.toURL());
+			URL url = uri.toURL();
+
+			projectClassPath.add(url.toString());
 		}
 
-		projectClassPathURLs.addAll(getToolsClassPath());
+		projectClassPath.addAll(getToolsClassPath());
 
-		return projectClassPathURLs;
+		return projectClassPath;
 	}
 
 	protected void initPortalProperties() throws Exception {

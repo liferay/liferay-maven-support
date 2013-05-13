@@ -180,14 +180,16 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 	}
 
 	@Override
-	protected Set<URL> getProjectClassPath() throws Exception {
-		Set<URL> projectClassPath = super.getProjectClassPath();
+	protected List<String> getProjectClassPath() throws Exception {
+		List<String> projectClassPath = super.getProjectClassPath();
 
 		File file = new File(implResourcesDir);
 
 		URI uri = file.toURI();
 
-		projectClassPath.add(uri.toURL());
+		URL url = uri.toURL();
+
+		projectClassPath.add(0, url.toString());
 
 		return projectClassPath;
 	}
