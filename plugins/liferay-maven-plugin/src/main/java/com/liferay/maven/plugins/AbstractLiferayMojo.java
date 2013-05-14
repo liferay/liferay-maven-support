@@ -321,16 +321,15 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 
 		toolsClassPath.add(url.toString());
 
-		Collection<File> portalJarFiles = FileUtils.listFiles(
-			appServerLibPortalDir, new String[] {"jar"}, false);
 
-		for (File file : portalJarFiles) {
-			uri = file.toURI();
+		Dependency dependency = createDependency(
+			"com.liferay.portal", "portal-service", liferayVersion, "", "jar");
 
-			url = uri.toURL();
+		uri = resolveArtifactFileURI(dependency);
 
-			toolsClassPath.add(url.toString());
-		}
+		url = uri.toURL();
+
+		toolsClassPath.add(url.toString());
 
 		if ((appServerLibGlobalDir != null) && appServerLibGlobalDir.exists()) {
 			Collection<File> globalJarFiles = FileUtils.listFiles(
@@ -345,14 +344,16 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 			}
 		}
 
-		Dependency dependency = createDependency(
-			"com.liferay.portal", "portal-service", liferayVersion, "", "jar");
+		Collection<File> portalJarFiles = FileUtils.listFiles(
+			appServerLibPortalDir, new String[] {"jar"}, false);
 
-		uri = resolveArtifactFileURI(dependency);
+		for (File file : portalJarFiles) {
+			uri = file.toURI();
 
-		url = uri.toURL();
+			url = uri.toURL();
 
-		toolsClassPath.add(url.toString());
+			toolsClassPath.add(url.toString());
+		}
 
 		return toolsClassPath;
 	}
