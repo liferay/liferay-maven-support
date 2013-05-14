@@ -64,12 +64,32 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 
 			doExecute();
 		}
-		catch (Exception e) {
-			if (e instanceof MojoExecutionException) {
-				throw (MojoExecutionException)e;
+		catch (Throwable t) {
+			try {
+				List<String> toolsClassPath = getToolsClassPath();
+
+				getLog().debug("Tools classpath: ");
+
+				for (String path : toolsClassPath) {
+					getLog().debug("\t" + path);
+				}
+
+				List<String> projectClassPath = getProjectClassPath();
+
+				getLog().debug("Project classpath: ");
+
+				for (String path : projectClassPath) {
+					getLog().debug("\t" + path);
+				}
+			}
+			catch (Exception e) {
+			}
+
+			if (t instanceof MojoExecutionException) {
+				throw (MojoExecutionException)t;
 			}
 			else {
-				throw new MojoExecutionException(e.getMessage(), e);
+				throw new MojoExecutionException(t.getMessage(), t);
 			}
 		}
 	}
