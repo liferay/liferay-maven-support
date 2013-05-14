@@ -18,7 +18,7 @@
 			<plugin>
 				<groupId>com.liferay.maven.plugins</groupId>
 				<artifactId>liferay-maven-plugin</artifactId>
-				<version>${liferay.version}</version>
+				<version>${liferay.maven.plugin.version}</version>
 				<configuration>
 					<implBaseDir>${basedir}/../${artifactId}-ext-impl</implBaseDir>
 					<sqlDir>${basedir}/../${artifactId}-ext/src/main/webapp/WEB-INF/sql</sqlDir>
