@@ -60,6 +60,17 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 				return;
 			}
 
+			String[] versionParts = StringUtils.split(liferayVersion, '.');
+
+			int major = Integer.parseInt(versionParts[0]);
+			int minor = Integer.parseInt(versionParts[1]);
+
+			if ((major < 6) || ((major == 6) && (minor < 1))) {
+				throw new MojoExecutionException(
+					"Liferay versions below 6.1.0 are not supported by this " +
+						"plugin version");
+			}
+
 			initPortalProperties();
 
 			doExecute();
