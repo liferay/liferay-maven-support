@@ -14,50 +14,20 @@
 
 package com.liferay.maven.plugins.util;
 
+import java.io.File;
+
+import org.dom4j.Document;
+import org.dom4j.io.SAXReader;
+
 /**
- * @author Mika Koivisto
+ * @author Brian Wing Shun Chan
  */
-public class JS {
+public class SAXReaderUtil {
 
-	public static String getSafeName(String name) {
-		if (name == null) {
-			return null;
-		}
+	public static Document read(File file, boolean validate) throws Exception {
+		SAXReader saxReader = new SAXReader();
 
-		StringBuilder sb = null;
-
-		int index = 0;
-
-		for (int i = 0; i < name.length(); i++) {
-			char c = name.charAt(i);
-
-			switch (c) {
-				case ' ':
-
-				case '-':
-
-				case '.':
-					if (sb == null) {
-						sb = new StringBuilder(name.length() - 1);
-
-						sb.append(name, index, i);
-					}
-
-					break;
-
-				default:
-					if (sb != null) {
-						sb.append(c);
-					}
-			}
-		}
-
-		if (sb == null) {
-			return name;
-		}
-		else {
-			return sb.toString();
-		}
+		return saxReader.read(file);
 	}
 
 }

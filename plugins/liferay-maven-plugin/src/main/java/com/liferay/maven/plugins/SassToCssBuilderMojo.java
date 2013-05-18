@@ -14,6 +14,8 @@
 
 package com.liferay.maven.plugins;
 
+import com.liferay.maven.plugins.util.StringUtil;
+
 import java.io.File;
 import java.io.FileFilter;
 
@@ -21,7 +23,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.FileFileFilter;
 import org.apache.commons.io.filefilter.FileFilterUtils;
-import org.apache.commons.lang.StringUtils;
 
 /**
  * @author Mika Koivisto
@@ -38,9 +39,9 @@ public class SassToCssBuilderMojo extends AbstractLiferayMojo {
 
 		FileUtils.copyDirectory(webappSourceDir, webappDir, fileFilter, true);
 
-		String[] dirNames = StringUtils.split(sassDirNames, ",");
-
 		String[] args = null;
+
+		String[] dirNames = StringUtil.split(sassDirNames);
 
 		if (dirNames.length > 1) {
 			args = new String[dirNames.length];
@@ -50,14 +51,13 @@ public class SassToCssBuilderMojo extends AbstractLiferayMojo {
 			}
 		}
 		else {
-			args = new String[] { "sass.dir=" + sassDirNames };
+			args = new String[] {"sass.dir=" + sassDirNames};
 		}
 
-		executeTool(_SASS_TO_CSS_BUILDER, getProjectClassLoader(), args);
+		executeTool(
+			"com.liferay.portal.tools.SassToCssBuilder",
+			getProjectClassLoader(), args);
 	}
-
-	private static final String _SASS_TO_CSS_BUILDER =
-		"com.liferay.portal.tools.SassToCssBuilder";
 
 	/**
 	 * @parameter default-value="${project.build.directory}/${project.build.finalName}"

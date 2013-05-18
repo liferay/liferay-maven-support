@@ -14,10 +14,8 @@
 
 package com.liferay.maven.plugins.util;
 
-//import com.liferay.portal.kernel.util.Validator;
-//import com.liferay.util.ant.AntUtil;
-
 import java.io.File;
+
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;

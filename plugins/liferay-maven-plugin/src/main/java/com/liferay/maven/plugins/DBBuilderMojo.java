@@ -14,7 +14,7 @@
 
 package com.liferay.maven.plugins;
 
-import org.apache.commons.lang.StringUtils;
+import com.liferay.maven.plugins.util.Validator;
 
 /**
  * @author Mika Koivisto
@@ -37,17 +37,15 @@ public class DBBuilderMojo extends AbstractLiferayMojo {
 			getLog().warn(sb.toString());
 		}
 
-		if ((StringUtils.isNotEmpty(apiBaseDir) ||
-			 StringUtils.isNotEmpty(implBaseDir)) &&
-			StringUtils.isEmpty(webappBaseDir)) {
+		if ((Validator.isNotNull(apiBaseDir) ||
+			 Validator.isNotNull(implBaseDir)) &&
+			Validator.isNull(webappBaseDir)) {
 
 			webappBaseDir = baseDir;
 		}
 
-		if (StringUtils.isEmpty(sqlDir)) {
-			if (pluginType.equals("ext") ||
-				StringUtils.isEmpty(webappBaseDir)) {
-
+		if (Validator.isNull(sqlDir)) {
+			if (pluginType.equals("ext") || Validator.isNull(webappBaseDir)) {
 				sqlDir = baseDir.concat("/src/main/webapp/WEB-INF/sql");
 			}
 			else {
@@ -65,11 +63,10 @@ public class DBBuilderMojo extends AbstractLiferayMojo {
 		args[1] = "db.database.types=" + databaseTypes;
 		args[2] = "db.sql.dir=" + sqlDir;
 
-		executeTool(_DB_BUILDER, getProjectClassLoader(), args);
+		executeTool(
+			"com.liferay.portal.tools.DBBuilder", getProjectClassLoader(),
+			args);
 	}
-
-	private static final String _DB_BUILDER =
-		"com.liferay.portal.tools.DBBuilder";
 
 	/**
 	 * @parameter

@@ -14,50 +14,27 @@
 
 package com.liferay.maven.plugins.util;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
- * @author Mika Koivisto
+ * @author Brian Wing Shun Chan
  */
-public class JS {
+public class StringUtil {
 
-	public static String getSafeName(String name) {
-		if (name == null) {
-			return null;
-		}
+	public static String replace(String s, String oldSub, String newSub) {
+		return StringUtils.replace(s, oldSub, newSub);
+	}
 
-		StringBuilder sb = null;
+	public static String safePath(String path) {
+		return StringUtils.replace(path, "//", "/");
+	}
 
-		int index = 0;
+	public static String[] split(String s) {
+		return split(s, ",");
+	}
 
-		for (int i = 0; i < name.length(); i++) {
-			char c = name.charAt(i);
-
-			switch (c) {
-				case ' ':
-
-				case '-':
-
-				case '.':
-					if (sb == null) {
-						sb = new StringBuilder(name.length() - 1);
-
-						sb.append(name, index, i);
-					}
-
-					break;
-
-				default:
-					if (sb != null) {
-						sb.append(c);
-					}
-			}
-		}
-
-		if (sb == null) {
-			return name;
-		}
-		else {
-			return sb.toString();
-		}
+	public static String[] split(String s, String delimiter) {
+		return StringUtils.split(s, delimiter);
 	}
 
 }

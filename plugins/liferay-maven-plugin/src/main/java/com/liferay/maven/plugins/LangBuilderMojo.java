@@ -36,11 +36,10 @@ public class LangBuilderMojo extends AbstractLiferayMojo {
 		args[2] = "lang.plugin=" + langPlugin;
 		args[3] = "lang.translate=" + langTranslate;
 
-		executeTool(_LANG_BUILDER, getToolsClassLoader(), args);
+		executeTool(
+			"com.liferay.portal.tools.LangBuilder", getToolsClassLoader(),
+			args);
 	}
-
-	private static final String _LANG_BUILDER =
-		"com.liferay.portal.tools.LangBuilder";
 
 	/**
 	 * @parameter default-value="${basedir}/src/main/resources/content" expression="${langDir}"

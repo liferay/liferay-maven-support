@@ -36,10 +36,10 @@ public class WSDDBuilderMojo extends AbstractLiferayMojo {
 		args[2] = "wsdd.server.config.file=" + serverConfigFileName;
 		args[3] = "wsdd.service.namespace=" + serviceNamespace;
 
-		executeTool(_WSDD_BUILDER, getProjectClassLoader(), args);
+		executeTool(
+			"com.liferay.portal.tools.WSDDBuilder", getProjectClassLoader(),
+			args);
 	}
-
-	private static String _WSDD_BUILDER = "com.liferay.portal.tools.WSDDBuilder";
 
 	/**
 	 * @parameter default-value="${basedir}/src/main/resources"

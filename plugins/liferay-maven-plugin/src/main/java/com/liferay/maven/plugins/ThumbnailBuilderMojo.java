@@ -32,11 +32,10 @@ public class ThumbnailBuilderMojo extends AbstractLiferayMojo {
 		args[3] = "thumbnail.width=" + width;
 		args[4] = "thumbnail.overwrite=" + overwrite;
 
-		executeTool(_THUMBNAIL_BUILDER,  getToolsClassLoader(), args);
+		executeTool(
+			"com.liferay.portal.tools.ThumbnailBuilder", getToolsClassLoader(),
+			args);
 	}
-
-	private static final String _THUMBNAIL_BUILDER =
-		"com.liferay.portal.tools.ThumbnailBuilder";
 
 	/**
 	 * @parameter default-value="120"
