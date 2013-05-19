@@ -18,7 +18,7 @@
 			<plugin>
 				<groupId>com.liferay.maven.plugins</groupId>
 				<artifactId>liferay-maven-plugin</artifactId>
-				<version>${liferay.version}</version>
+				<version>${liferay.maven.plugin.version}</version>
 				<configuration>
 					<apiBaseDir>${basedir}/../${artifactId}-ext-service</apiBaseDir>
 					<implBaseDir>${basedir}</implBaseDir>

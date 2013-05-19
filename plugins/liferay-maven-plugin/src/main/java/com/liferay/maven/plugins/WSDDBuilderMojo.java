@@ -14,7 +14,7 @@
 
 package com.liferay.maven.plugins;
 
-import com.liferay.portal.tools.WSDDBuilder;
+import java.io.File;
 
 /**
  * @author Mika Koivisto
@@ -23,14 +23,22 @@ import com.liferay.portal.tools.WSDDBuilder;
 public class WSDDBuilderMojo extends AbstractLiferayMojo {
 
 	protected void doExecute() throws Exception {
-		WSDDBuilder wsddBuilder = new WSDDBuilder();
+		File serviceFile = new File(serviceFileName);
 
-		wsddBuilder.setFileName(serviceFileName);
-		wsddBuilder.setOutputPath(resourcesDir + "/");
-		wsddBuilder.setServerConfigFileName(serverConfigFileName);
-		wsddBuilder.setServiceNamespace(serviceNamespace);
+		if (!serviceFile.exists()) {
+			return;
+		}
 
-		wsddBuilder.build();
+		String[] args = new String[4];
+
+		args[0] = "wsdd.input.file=" + serviceFileName;
+		args[1] = "wsdd.output.path=" + resourcesDir + "/";
+		args[2] = "wsdd.server.config.file=" + serverConfigFileName;
+		args[3] = "wsdd.service.namespace=" + serviceNamespace;
+
+		executeTool(
+			"com.liferay.portal.tools.WSDDBuilder", getProjectClassLoader(),
+			args);
 	}
 
 	/**

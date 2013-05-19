@@ -14,11 +14,7 @@
 
 package com.liferay.maven.plugins;
 
-import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.tools.DBBuilder;
-
-import org.apache.maven.plugin.MojoExecutionException;
+import com.liferay.maven.plugins.util.Validator;
 
 /**
  * @author Mika Koivisto
@@ -26,7 +22,7 @@ import org.apache.maven.plugin.MojoExecutionException;
  */
 public class DBBuilderMojo extends AbstractLiferayMojo {
 
-	protected void doExecute() throws MojoExecutionException {
+	protected void doExecute() throws Exception {
 		if (pluginType.equals("ext")) {
 			StringBuilder sb = new StringBuilder();
 
@@ -61,7 +57,15 @@ public class DBBuilderMojo extends AbstractLiferayMojo {
 		getLog().debug("Database types " + databaseTypes);
 		getLog().debug("SQL directory " + sqlDir);
 
-		new DBBuilder(databaseName, StringUtil.split(databaseTypes), sqlDir);
+		String[] args = new String[3];
+
+		args[0] = "db.database.name=" + databaseName;
+		args[1] = "db.database.types=" + databaseTypes;
+		args[2] = "db.sql.dir=" + sqlDir;
+
+		executeTool(
+			"com.liferay.portal.tools.DBBuilder", getProjectClassLoader(),
+			args);
 	}
 
 	/**

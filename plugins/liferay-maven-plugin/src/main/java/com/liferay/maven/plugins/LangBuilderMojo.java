@@ -14,7 +14,7 @@
 
 package com.liferay.maven.plugins;
 
-import com.liferay.portal.tools.LangBuilder;
+import java.io.File;
 
 /**
  * @author Mika Koivisto
@@ -23,9 +23,22 @@ import com.liferay.portal.tools.LangBuilder;
 public class LangBuilderMojo extends AbstractLiferayMojo {
 
 	protected void doExecute() throws Exception {
-		initPortal();
+		File file = new File(langDir, langFile + ".properties");
 
-		new LangBuilder(langDir, langFile, langPlugin, langTranslate);
+		if (!file.exists()) {
+			return;
+		}
+
+		String[] args = new String[4];
+
+		args[0] = "lang.dir=" + langDir;
+		args[1] = "lang.file=" + langFile;
+		args[2] = "lang.plugin=" + langPlugin;
+		args[3] = "lang.translate=" + langTranslate;
+
+		executeTool(
+			"com.liferay.portal.tools.LangBuilder", getToolsClassLoader(),
+			args);
 	}
 
 	/**

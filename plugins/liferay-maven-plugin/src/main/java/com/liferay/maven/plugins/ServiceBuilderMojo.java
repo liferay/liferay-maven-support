@@ -14,18 +14,14 @@
 
 package com.liferay.maven.plugins;
 
-import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.tools.servicebuilder.ServiceBuilder;
+import com.liferay.maven.plugins.util.FileUtil;
+import com.liferay.maven.plugins.util.StringUtil;
+import com.liferay.maven.plugins.util.Validator;
 
 import java.io.File;
 
-import java.lang.reflect.Method;
-
 import java.net.URI;
 import java.net.URL;
-import java.net.URLClassLoader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -128,16 +124,49 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 			}
 		}
 
-		new ServiceBuilder(
-			serviceFileName, hbmFileName, ormFileName, modelHintsFileName,
-			springFileName, springBaseFileName, springClusterFileName,
-			springDynamicDataSourceFileName, springHibernateFileName,
-			springInfrastructureFileName, springShardDataSourceFileName, apiDir,
-			implDir, jsonFileName, remotingFileName, sqlDir, sqlFileName,
-			sqlIndexesFileName, sqlIndexesPropertiesFileName,
-			sqlSequencesFileName, autoNamespaceTables, beanLocatorUtil,
-			propsUtil, pluginName, targetEntityName, null, true,
-			serviceBuildNumber, serviceBuildNumberIncrement);
+		String[] args = new String[28];
+
+		args[0] = "service.input.file=" + serviceFileName;
+		args[1] = "service.hbm.file=" + hbmFileName;
+		args[2] = "service.orm.file=" + ormFileName;
+		args[3] = "service.model.hints.file=" + modelHintsFileName;
+		args[4] = "service.spring.file=" + springFileName;
+		args[5] = "service.spring.base.file=" + springBaseFileName;
+		args[6] = "service.spring.cluster.file=" + springClusterFileName;
+		args[7] =
+			"service.spring.dynamic.data.source.file=" +
+				springDynamicDataSourceFileName;
+		args[8] = "service.spring.hibernate.file=" + springHibernateFileName;
+		args[9] =
+			"service.spring.infrastructure.file=" +
+				springInfrastructureFileName;
+		args[10] =
+			"service.spring.shard.data.source.file=" +
+				springShardDataSourceFileName;
+		args[11] = "service.api.dir=" + apiDir;
+		args[12] = "service.impl.dir=" + implDir;
+		args[13] = "service.json.file=" + jsonFileName;
+		args[14] = "service.remoting.file=" + remotingFileName;
+		args[15] = "service.sql.dir=" + sqlDir;
+		args[16] = "service.sql.file=" + sqlFileName;
+		args[17] = "service.sql.indexes.file=" + sqlIndexesFileName;
+		args[18] =
+			"service.sql.indexes.properties.file=" +
+				sqlIndexesPropertiesFileName;
+		args[19] = "service.sql.sequences.file=" + sqlSequencesFileName;
+		args[20] = "service.auto.namespace.tables=" + autoNamespaceTables;
+		args[21] = "service.bean.locator.util=" + beanLocatorUtil;
+		args[22] = "service.props.util=" + propsUtil;
+		args[23] = "service.plugin.name=" + pluginName;
+		args[24] = "service.target.entity.name=" + targetEntityName;
+		args[25] = "service.test.dir=";
+		args[26] = "service.build.number=" + serviceBuildNumber;
+		args[27] =
+			"service.build.number.increment=" + serviceBuildNumberIncrement;
+
+		executeTool(
+			"com.liferay.portal.tools.servicebuilder.ServiceBuilder",
+			getProjectClassLoader(), args);
 
 		if (tempServiceFile != null) {
 			FileUtil.delete(tempServiceFile);
@@ -148,23 +177,19 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 		invokeDependencyBuild();
 	}
 
-	protected void initPortalClassLoader() throws Exception {
-		super.initPortalClassLoader();
-
-		Class<?> clazz = getClass();
-
-		URLClassLoader urlClassLoader = (URLClassLoader)clazz.getClassLoader();
-
-		Method method = URLClassLoader.class.getDeclaredMethod(
-			"addURL", URL.class);
-
-		method.setAccessible(true);
+	@Override
+	protected List<String> getProjectClassPath() throws Exception {
+		List<String> projectClassPath = super.getProjectClassPath();
 
 		File file = new File(implResourcesDir);
 
 		URI uri = file.toURI();
 
-		method.invoke(urlClassLoader, uri.toURL());
+		URL url = uri.toURL();
+
+		projectClassPath.add(0, url.toString());
+
+		return projectClassPath;
 	}
 
 	protected void initPortalProperties() throws Exception {
@@ -288,6 +313,10 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 			String webappDir = baseDir.concat("/src/main/webapp");
 			String webappResourcesDir = baseDir.concat("/src/main/resources");
 
+			if (Validator.isNull(apiDir)) {
+				apiDir = baseDir.concat("/src/main/java");
+			}
+
 			if (Validator.isNull(beanLocatorUtil)) {
 				beanLocatorUtil =
 					"com.liferay.util.bean.PortletBeanLocatorUtil";
@@ -367,8 +396,7 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 	}
 
 	/**
-	 * @deprecated
-	 * @since 6.1.0
+	 * @deprecated As of 6.1.0
 	 */
 	protected void invokeDependencyBuild() throws Exception {
 		if (!postBuildDependencyModules) {
@@ -440,7 +468,7 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 		}
 	}
 
-	protected void moveServicePropertiesFile() {
+	protected void moveServicePropertiesFile() throws Exception {
 		File servicePropertiesFile = new File(implDir, "service.properties");
 
 		if (servicePropertiesFile.exists()) {
@@ -503,6 +531,7 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 	private Invoker invoker;
 
 	/**
+	 * @deprecated As of 6.2.0
 	 * @parameter
 	 */
 	private String jsonFileName;
@@ -530,16 +559,14 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 	private String pluginType;
 
 	/**
-	 * @deprecated
+	 * @deprecated As of 6.1.0
 	 * @parameter default-value="false" expression="${postBuildDependencyModules}"
-	 * @since 6.1.0
 	 */
 	private boolean postBuildDependencyModules;
 
 	/**
-	 * @deprecated
+	 * @deprecated As of 6.1.0
 	 * @parameter
-	 * @since 6.1.0
 	 */
 	private List<String> postBuildGoals;
 
@@ -579,6 +606,7 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 	private String springClusterFileName;
 
 	/**
+	 * @deprecated As of 6.1.0
 	 * @parameter
 	 */
 	private String springDynamicDataSourceFileName;

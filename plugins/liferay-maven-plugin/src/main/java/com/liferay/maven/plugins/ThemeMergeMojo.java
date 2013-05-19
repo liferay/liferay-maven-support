@@ -14,16 +14,13 @@
 
 package com.liferay.maven.plugins;
 
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.xml.Document;
-import com.liferay.portal.kernel.xml.Element;
-import com.liferay.portal.kernel.xml.SAXReaderUtil;
-import com.liferay.portal.model.Theme;
-import com.liferay.portal.model.impl.ThemeImpl;
-import com.liferay.portal.util.PortalUtil;
-import com.liferay.util.ContextReplace;
+import com.liferay.maven.plugins.theme.Theme;
+import com.liferay.maven.plugins.util.ContextReplace;
+import com.liferay.maven.plugins.util.GetterUtil;
+import com.liferay.maven.plugins.util.PortalUtil;
+import com.liferay.maven.plugins.util.SAXReaderUtil;
+import com.liferay.maven.plugins.util.StringUtil;
+import com.liferay.maven.plugins.util.Validator;
 
 import java.io.File;
 
@@ -37,6 +34,9 @@ import org.apache.maven.model.Dependency;
 import org.codehaus.plexus.archiver.UnArchiver;
 import org.codehaus.plexus.components.io.fileselectors.FileSelector;
 import org.codehaus.plexus.components.io.fileselectors.IncludeExcludeFileSelector;
+
+import org.dom4j.Document;
+import org.dom4j.Element;
 
 /**
  * @author Mika Koivisto
@@ -335,7 +335,7 @@ public class ThemeMergeMojo extends AbstractLiferayMojo {
 	protected Theme readTheme(Element themeElement) {
 		String id = themeElement.attributeValue("id");
 
-		Theme theme = new ThemeImpl(id);
+		Theme theme = new Theme(id);
 
 		ContextReplace themeContextReplace = new ContextReplace();
 
@@ -422,7 +422,7 @@ public class ThemeMergeMojo extends AbstractLiferayMojo {
 			}
 		}
 
-		Theme theme = new ThemeImpl(themeId);
+		Theme theme = new Theme(themeId);
 
 		theme.setCssPath("/css");
 		theme.setImagesPath("/images");
@@ -438,7 +438,7 @@ public class ThemeMergeMojo extends AbstractLiferayMojo {
 	 * The parent theme can be _styled, _unstyled, classic, control_panel, or artifactGroupId:artifactId:artifactVersion.
 	 *
 	 * @parameter
-	 * @deprecated
+	 * @deprecated As of 6.2.0
 	 */
 	private String parentTheme;
 

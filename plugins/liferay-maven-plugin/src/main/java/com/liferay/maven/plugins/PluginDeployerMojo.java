@@ -14,7 +14,7 @@
 
 package com.liferay.maven.plugins;
 
-import com.liferay.util.ant.CopyTask;
+import com.liferay.maven.plugins.util.CopyTask;
 
 import java.io.File;
 
@@ -37,15 +37,6 @@ public class PluginDeployerMojo extends AbstractLiferayMojo {
 		else {
 			getLog().warn(warFileName + " does not exist");
 		}
-	}
-
-	@Override
-	protected void initPortalProperties() {
-	}
-
-	@Override
-	protected boolean isPortalInitialized() {
-		return true;
 	}
 
 	/**

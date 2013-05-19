@@ -14,14 +14,10 @@
 
 package com.liferay.maven.plugins;
 
-import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.tools.SassToCssBuilder;
+import com.liferay.maven.plugins.util.StringUtil;
 
 import java.io.File;
 import java.io.FileFilter;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
@@ -43,13 +39,24 @@ public class SassToCssBuilderMojo extends AbstractLiferayMojo {
 
 		FileUtils.copyDirectory(webappSourceDir, webappDir, fileFilter, true);
 
-		List<String> dirNames = new ArrayList<String>();
+		String[] args = null;
 
-		for (String dirName : StringUtil.split(sassDirNames)) {
-			dirNames.add(dirName);
+		String[] dirNames = StringUtil.split(sassDirNames);
+
+		if (dirNames.length > 1) {
+			args = new String[dirNames.length];
+
+			for (int i = 0; i < dirNames.length; i++) {
+				args[i] = "sass.dir." + i + "=" + dirNames[i];
+			}
+		}
+		else {
+			args = new String[] {"sass.dir=" + sassDirNames};
 		}
 
-		new SassToCssBuilder(dirNames);
+		executeTool(
+			"com.liferay.portal.tools.SassToCssBuilder",
+			getProjectClassLoader(), args);
 	}
 
 	/**
