@@ -25,7 +25,7 @@ import org.dom4j.io.SAXReader;
 public class SAXReaderUtil {
 
 	public static Document read(File file, boolean validate) throws Exception {
-		SAXReader saxReader = new SAXReader();
+		SAXReader saxReader = new SAXReader(validate);
 
 		return saxReader.read(file);
 	}
