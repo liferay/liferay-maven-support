@@ -138,7 +138,8 @@ public class ThemeMergeMojo extends AbstractLiferayMojo {
 			webappSourceDir, "WEB-INF/liferay-look-and-feel.xml");
 
 		if (liferayLookAndFeelXml.exists()) {
-			Document document = SAXReaderUtil.read(liferayLookAndFeelXml, true);
+			Document document = SAXReaderUtil.read(
+				liferayLookAndFeelXml, false);
 
 			Element rootElement = document.getRootElement();
 
@@ -405,7 +406,8 @@ public class ThemeMergeMojo extends AbstractLiferayMojo {
 		throws Exception {
 
 		if ((liferayLookAndFeelXml != null) && liferayLookAndFeelXml.exists()) {
-			Document document = SAXReaderUtil.read(liferayLookAndFeelXml, true);
+			Document document = SAXReaderUtil.read(
+				liferayLookAndFeelXml, false);
 
 			Element rootElement = document.getRootElement();
 
