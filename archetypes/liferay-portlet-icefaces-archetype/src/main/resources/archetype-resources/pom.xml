@@ -100,6 +100,12 @@
 			<groupId>org.icefaces</groupId>
 			<artifactId>icefaces</artifactId>
 			<version>3.3.0</version>
+			<exclusions>
+				<exclusion>
+					<groupId>javax.servlet.jsp</groupId>
+					<artifactId>jsp-api</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.icefaces</groupId>
