@@ -223,6 +223,10 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 			"com.liferay.portal.tools.WebXMLBuilder", getProjectClassLoader(),
 			args);
 
+		if (originalWebXml.exists()) {
+			FileUtil.delete(originalWebXml);
+		}
+
 		FileUtil.move(mergedWebXml, originalWebXml);
 	}
 
