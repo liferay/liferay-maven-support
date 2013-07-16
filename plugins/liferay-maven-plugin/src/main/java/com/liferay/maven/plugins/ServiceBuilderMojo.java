@@ -219,7 +219,6 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 			}
 
 			if (Validator.isNull(webappBaseDir)) {
-
 				webappBaseDir = baseDir;
 			}
 		}
