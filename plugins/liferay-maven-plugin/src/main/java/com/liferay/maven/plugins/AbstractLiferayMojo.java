@@ -415,7 +415,9 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 		return artifact;
 	}
 
-	protected URI resolveArtifactFileURI(Dependency dependency) throws Exception {
+	protected URI resolveArtifactFileURI(Dependency dependency)
+		throws Exception {
+
 		Artifact artifact = resolveArtifact(dependency);
 
 		File file = artifact.getFile();
