@@ -51,8 +51,26 @@ public class FileUtil {
 		file.mkdirs();
 	}
 
-	public static void move(File source, File destination) throws IOException {
-		FileUtils.moveFile(source, destination);
+	public static boolean move(File source, File destination) {
+		if (!source.exists()) {
+			return false;
+		}
+
+		destination.delete();
+
+		try {
+			if (source.isDirectory()) {
+				FileUtils.moveDirectory(source, destination);
+			}
+			else {
+				FileUtils.moveFile(source, destination);
+			}
+		}
+		catch (IOException ioe) {
+			return false;
+		}
+
+		return true;
 	}
 
 }

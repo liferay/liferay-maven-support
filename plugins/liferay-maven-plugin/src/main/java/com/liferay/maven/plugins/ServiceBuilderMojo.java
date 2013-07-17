@@ -468,13 +468,9 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 	}
 
 	protected void moveServicePropertiesFile() throws Exception {
-		File servicePropertiesFile = new File(implDir, "service.properties");
-
-		if (servicePropertiesFile.exists()) {
-			FileUtil.move(
-				servicePropertiesFile,
-				new File(implResourcesDir, "service.properties"));
-		}
+		FileUtil.move(
+			new File(implDir, "service.properties"),
+			new File(implResourcesDir, "service.properties"));
 	}
 
 	/**
