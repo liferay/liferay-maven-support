@@ -251,7 +251,7 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 
 		projectClassPath.addAll(getToolsClassPath());
 
-		getLog().debug("Project classpath:");
+		getLog().debug("Project class path:");
 
 		for (String path : projectClassPath) {
 			getLog().debug("\t" + path);
@@ -281,31 +281,33 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 
 			Dependency jalopyDependency = createDependency(
 				"jalopy", "jalopy", "1.5rc3", "", "jar");
+
 			addDependencyToClassPath(toolsClassPath, jalopyDependency);
 
 			Dependency qdoxDependency = createDependency(
 				"com.thoughtworks.qdox", "qdox", "1.12", "", "jar");
+
 			addDependencyToClassPath(toolsClassPath, qdoxDependency);
 
 			ClassLoader globalClassLoader = toClassLoader(toolsClassPath);
 
 			try {
-				globalClassLoader.loadClass(
-					"javax.activation.MimeType");
+				globalClassLoader.loadClass("javax.activation.MimeType");
 			}
 			catch (ClassNotFoundException cnfe) {
 				Dependency activationDependency = createDependency(
 					"javax.activation", "activation", "1.1", "", "jar");
+
 				addDependencyToClassPath(toolsClassPath, activationDependency);
 			}
 
 			try {
-				globalClassLoader.loadClass(
-					"javax.mail.Message");
+				globalClassLoader.loadClass("javax.mail.Message");
 			}
 			catch (ClassNotFoundException cnfe) {
 				Dependency mailDependency = createDependency(
 					"javax.mail", "mail", "1.4", "", "jar");
+
 				addDependencyToClassPath(toolsClassPath, mailDependency);
 			}
 
@@ -317,72 +319,81 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 				Dependency portalServiceDependency = createDependency(
 					"com.liferay.portal", "portal-service", liferayVersion, "",
 					"jar");
+
 				addDependencyToClassPath(
 					toolsClassPath, portalServiceDependency);
 			}
 
 			try {
-				globalClassLoader.loadClass(
-					"javax.portlet.Portlet");
+				globalClassLoader.loadClass("javax.portlet.Portlet");
 			}
 			catch (ClassNotFoundException cnfe) {
 				Dependency portletApiDependency = createDependency(
 					"javax.portlet", "portlet-api", "2.0", "", "jar");
+
 				addDependencyToClassPath(toolsClassPath, portletApiDependency);
 			}
 
 			try {
-				globalClassLoader.loadClass(
-					"javax.servlet.ServletRequest");
+				globalClassLoader.loadClass("javax.servlet.ServletRequest");
 			}
 			catch (ClassNotFoundException cnfe) {
 				Dependency servletApiDependency = createDependency(
 					"javax.servlet", "servlet-api", "2.5", "", "jar");
+
 				addDependencyToClassPath(toolsClassPath, servletApiDependency);
 			}
 
 			try {
-				globalClassLoader.loadClass(
-					"javax.servlet.jsp.JspPage");
+				globalClassLoader.loadClass("javax.servlet.jsp.JspPage");
 			}
 			catch (ClassNotFoundException cnfe) {
 				Dependency jspApiDependency = createDependency(
 					"javax.servlet.jsp", "jsp-api", "2.1", "", "jar");
+
 				addDependencyToClassPath(toolsClassPath, jspApiDependency);
 			}
 		}
 		else {
 			Dependency jalopyDependency = createDependency(
 				"jalopy", "jalopy", "1.5rc3", "", "jar");
+
 			addDependencyToClassPath(toolsClassPath, jalopyDependency);
 
 			Dependency qdoxDependency = createDependency(
 				"com.thoughtworks.qdox", "qdox", "1.12", "", "jar");
+
 			addDependencyToClassPath(toolsClassPath, qdoxDependency);
 
 			Dependency activationDependency = createDependency(
 				"javax.activation", "activation", "1.1", "", "jar");
+
 			addDependencyToClassPath(toolsClassPath, activationDependency);
 
 			Dependency mailDependency = createDependency(
 				"javax.mail", "mail", "1.4", "", "jar");
+
 			addDependencyToClassPath(toolsClassPath, mailDependency);
 
 			Dependency portalServiceDependency = createDependency(
 				"com.liferay.portal", "portal-service", liferayVersion, "",
 				"jar");
+
 			addDependencyToClassPath(toolsClassPath, portalServiceDependency);
 
 			Dependency portletApiDependency = createDependency(
 				"javax.portlet", "portlet-api", "2.0", "", "jar");
+
 			addDependencyToClassPath(toolsClassPath, portletApiDependency);
 
 			Dependency servletApiDependency = createDependency(
 				"javax.servlet", "servlet-api", "2.5", "", "jar");
+
 			addDependencyToClassPath(toolsClassPath, servletApiDependency);
 
 			Dependency jspApiDependency = createDependency(
 				"javax.servlet.jsp", "jsp-api", "2.1", "", "jar");
+
 			addDependencyToClassPath(toolsClassPath, jspApiDependency);
 		}
 
@@ -397,7 +408,7 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 			toolsClassPath.add(url.toString());
 		}
 
-		getLog().debug("Tools classpath:");
+		getLog().debug("Tools class path:");
 
 		for (String path : toolsClassPath) {
 			getLog().debug("\t" + path);
