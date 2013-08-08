@@ -237,6 +237,8 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 	protected List<String> getProjectClassPath() throws Exception {
 		List<String> projectClassPath = new ArrayList<String>();
 
+		projectClassPath.addAll(getToolsClassPath());
+
 		for (Object object : project.getCompileClasspathElements()) {
 			String path = (String)object;
 
@@ -248,8 +250,6 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 
 			projectClassPath.add(url.toString());
 		}
-
-		projectClassPath.addAll(getToolsClassPath());
 
 		getLog().debug("Project class path:");
 
