@@ -57,7 +57,6 @@ public class PluginDeployerMojo extends AbstractLiferayMojo {
 	protected void initPortalProperties() {
 	}
 
-	@Override
 	protected boolean isPortalInitialized() {
 		return true;
 	}
