@@ -14,9 +14,8 @@
 
 package com.liferay.maven.plugins;
 
-import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.tools.ExtInfoBuilder;
-import com.liferay.util.ant.CopyTask;
+import com.liferay.maven.plugins.util.CopyTask;
+import com.liferay.maven.plugins.util.FileUtil;
 
 import java.io.File;
 
@@ -199,14 +198,17 @@ public class ExtBuilderMojo extends AbstractLiferayMojo {
 
 		CopyTask.copyDirectory(
 			workDir, new File(webDir, "WEB-INF/classes"),
-			"portal-*.properties,system-*.properties", null);
+			"portal-*.properties,system-*.properties", null, true, true);
 
 		FileUtil.copyDirectory(sqlSourceDir, sqlDir);
 
 		String dirName = webappDir.getAbsolutePath() + "/WEB-INF";
 
-		ExtInfoBuilder infoBuilder = new ExtInfoBuilder(
-			dirName, dirName, pluginName);
+		String[] args = {dirName, dirName, pluginName};
+
+		executeTool(
+			"com.liferay.portal.tools.ExtInfoBuilder", getToolsClassLoader(),
+			args);
 	}
 
 	protected void unpack(

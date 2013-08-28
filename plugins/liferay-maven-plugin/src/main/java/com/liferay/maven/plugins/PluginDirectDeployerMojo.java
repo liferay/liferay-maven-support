@@ -14,20 +14,10 @@
 
 package com.liferay.maven.plugins;
 
-import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.tools.WebXMLBuilder;
-import com.liferay.portal.tools.deploy.HookDeployer;
-import com.liferay.portal.tools.deploy.LayoutTemplateDeployer;
-import com.liferay.portal.tools.deploy.PortletDeployer;
-import com.liferay.portal.tools.deploy.ThemeDeployer;
-import com.liferay.portal.tools.deploy.WebDeployer;
-import com.liferay.util.ant.CopyTask;
+import com.liferay.maven.plugins.util.CopyTask;
+import com.liferay.maven.plugins.util.FileUtil;
 
 import java.io.File;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.maven.model.Build;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -60,8 +50,7 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 		if (artifactId.endsWith("ext-service")) {
 			File sourceFile = new File(
 				build.getDirectory(),
-				build.getFinalName() + StringPool.PERIOD +
-					project.getPackaging());
+				build.getFinalName() + "." + project.getPackaging());
 
 			deployExtService(sourceFile);
 
@@ -74,8 +63,7 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 		if (artifactId.endsWith("ext-impl")) {
 			File sourceFile = new File(
 				build.getDirectory(),
-				build.getFinalName() + StringPool.PERIOD +
-					project.getPackaging());
+				build.getFinalName() + "." + project.getPackaging());
 
 			File sourceDir = new File(build.getOutputDirectory());
 
@@ -93,8 +81,7 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 
 			File sourceFile = new File(
 				build.getDirectory(),
-				build.getFinalName() + StringPool.PERIOD +
-					project.getPackaging());
+				build.getFinalName() + "." + project.getPackaging());
 
 			String utilName =
 				"util-" + artifactId.substring(artifactId.lastIndexOf('-'));
@@ -204,9 +191,20 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 
 		CopyTask.copyFile(
 			extUtilFile, appServerLibPortalDir, fileName, null, true, true);
+
+		File deployDependenciesDir = new File(
+			appServerClassesPortalDir,
+			"com/liferay/portal/deploy/dependencies");
+
+		if (!deployDependenciesDir.exists()) {
+			deployDependenciesDir.mkdirs();
+		}
+
+		CopyTask.copyFile(
+			extUtilFile, deployDependenciesDir, fileName, null, true, true);
 	}
 
-	protected void deployExtWeb(File extWebDocrootDir) {
+	protected void deployExtWeb(File extWebDocrootDir) throws Exception {
 		CopyTask.copyDirectory(
 			extWebDocrootDir, appServerPortalDir, null, "WEB-INF/web.xml", true,
 			true);
@@ -215,29 +213,32 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 		File mergedWebXml = new File(
 			appServerPortalDir, "WEB-INF/web.xml.merged");
 
-		new WebXMLBuilder(
+		String[] args = {
 			originalWebXml.getAbsolutePath(),
 			new File(extWebDocrootDir, "/WEB-INF/web.xml").getAbsolutePath(),
-			mergedWebXml.getAbsolutePath());
+			mergedWebXml.getAbsolutePath()
+		};
+
+		executeTool(
+			"com.liferay.portal.tools.WebXMLBuilder", getProjectClassLoader(),
+			args);
 
 		FileUtil.move(mergedWebXml, originalWebXml);
 	}
 
 	protected void deployHook() throws Exception {
-		List<String> wars = new ArrayList<String>();
+		String[] args =
+			{appServerLibPortalDir.getAbsolutePath() + "/util-java.jar"};
 
-		List<String> jars = new ArrayList<String>();
-
-		jars.add(appServerLibPortalDir.getAbsolutePath() + "/util-java.jar");
-
-		new HookDeployer(wars, jars);
+		executeTool(
+			"com.liferay.portal.tools.deploy.HookDeployer",
+			getProjectClassLoader(), args);
 	}
 
 	protected void deployLayoutTemplate() throws Exception {
-		List<String> wars = new ArrayList<String>();
-		List<String> jars = new ArrayList<String>();
-
-		new LayoutTemplateDeployer(wars, jars);
+		executeTool(
+			"com.liferay.portal.tools.deploy.LayoutTemplateDeployer",
+			getProjectClassLoader(), new String[0]);
 	}
 
 	protected void deployPortlet() throws Exception {
@@ -260,17 +261,16 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 		System.setProperty(
 			"deployer.util.taglib.dtd", tldPath + "/liferay-util.tld");
 
-		List<String> wars = new ArrayList<String>();
+		String libPath = appServerLibPortalDir.getAbsolutePath();
 
-		List<String> jars = new ArrayList<String>();
+		String[] args = {
+			libPath + "/util-bridges.jar", libPath + "/util-java.jar",
+			libPath + "/util-taglib.jar"
+		};
 
-		String libPath = appServerLibPortalDir.getAbsolutePath() ;
-
-		jars.add(libPath + "/util-bridges.jar");
-		jars.add(libPath + "/util-java.jar");
-		jars.add(libPath + "/util-taglib.jar");
-
-		new PortletDeployer(wars, jars);
+		executeTool(
+			"com.liferay.portal.tools.deploy.PortletDeployer",
+			getProjectClassLoader(), args);
 	}
 
 	protected void deployTheme() throws Exception {
@@ -281,28 +281,24 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 		System.setProperty(
 			"deployer.util.taglib.dtd", tldPath + "/liferay-util.tld");
 
-		List<String> wars = new ArrayList<String>();
-
-		List<String> jars = new ArrayList<String>();
-
 		String libPath = appServerLibPortalDir.getAbsolutePath();
 
-		jars.add(libPath + "/util-java.jar");
-		jars.add(libPath + "/util-taglib.jar");
+		String[] args =
+			{libPath + "/util-java.jar", libPath + "/util-taglib.jar"};
 
-		new ThemeDeployer(wars, jars);
+		executeTool(
+			"com.liferay.portal.tools.deploy.ThemeDeployer",
+			getProjectClassLoader(), args);
 	}
 
 	protected void deployWeb() throws Exception {
-		List<String> wars = new ArrayList<String>();
-
-		List<String> jars = new ArrayList<String>();
-
 		String libPath = appServerLibPortalDir.getAbsolutePath();
 
-		jars.add(libPath + "/util-java.jar");
+		String[] args = {libPath + "/util-java.jar"};
 
-		new WebDeployer(wars, jars);
+		executeTool(
+			"com.liferay.portal.tools.deploy.WebDeployer",
+			getProjectClassLoader(), args);
 	}
 
 	protected void doExecute() throws Exception {
@@ -416,9 +412,8 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 	private boolean dependencyCopyTransitive;
 
 	/**
-	 * @deprecated
+	 * @deprecated As of 6.1.1
 	 * @parameter expression="${deployDir}"
-	 * @since 6.1.1
 	 */
 	private File deployDir;
 
