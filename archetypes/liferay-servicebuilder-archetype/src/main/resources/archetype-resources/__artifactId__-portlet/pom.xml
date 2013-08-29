@@ -19,6 +19,14 @@
 				<groupId>com.liferay.maven.plugins</groupId>
 				<artifactId>liferay-maven-plugin</artifactId>
 				<version>${liferay.maven.plugin.version}</version>
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>build-css</goal>
+						</goals>
+					</execution>
+				</executions>
 				<configuration>
 					<apiBaseDir>${basedir}/../${artifactId}-portlet-service</apiBaseDir>
 				</configuration>
