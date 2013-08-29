@@ -13,6 +13,14 @@
 				<groupId>com.liferay.maven.plugins</groupId>
 				<artifactId>liferay-maven-plugin</artifactId>
 				<version>${liferay.maven.plugin.version}</version>
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>build-css</goal>
+						</goals>
+					</execution>
+				</executions>
 				<configuration>
 					<autoDeployDir>${liferay.auto.deploy.dir}</autoDeployDir>
 					<appServerDeployDir>${liferay.app.server.deploy.dir}</appServerDeployDir>
