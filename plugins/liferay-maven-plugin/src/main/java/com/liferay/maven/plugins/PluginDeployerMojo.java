@@ -39,6 +39,28 @@ public class PluginDeployerMojo extends AbstractLiferayMojo {
 		}
 	}
 
+
+    protected boolean isLiferayProject() {
+        String artifactId = project.getArtifactId();
+
+        if ((pluginType.equals("ext")) &&
+                artifactId.endsWith("ext-web")){
+            getLog().info("Skipping " + project.getArtifactId());
+
+            return false;
+        }
+
+        return super.isLiferayProject();
+    }
+
+	@Override
+	protected void initPortalProperties() {
+	}
+
+	protected boolean isPortalInitialized() {
+		return true;
+	}
+
 	/**
 	 * @parameter expression="${autoDeployDir}"
 	 * @required
