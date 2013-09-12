@@ -15,6 +15,7 @@
 package com.liferay.maven.plugins;
 
 import com.liferay.maven.plugins.util.StringUtil;
+import com.liferay.maven.plugins.util.Validator;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -39,19 +40,49 @@ public class SassToCssBuilderMojo extends AbstractLiferayMojo {
 
 		FileUtils.copyDirectory(webappSourceDir, webappDir, fileFilter, true);
 
+		if (Validator.isNull(sassPortalCommonDir)) {
+			sassPortalCommonDir = new File(
+				appServerPortalDir, "html/css/common").getAbsolutePath();
+		}
+
 		String[] args = null;
 
 		String[] dirNames = StringUtil.split(sassDirNames);
 
 		if (dirNames.length > 1) {
-			args = new String[dirNames.length];
+			if (getPortalMajorVersion() < PORTAL_VERSION_6_2) {
+				args = new String[dirNames.length];
+			}
+			else {
+				args = new String[dirNames.length + 2];
+				args[dirNames.length] = "sass.docroot.dir=" + sassDocrootDir;
+				args[dirNames.length + 1] = "sass.portal.common.dir=" +
+					sassPortalCommonDir;
+			}
 
 			for (int i = 0; i < dirNames.length; i++) {
-				args[i] = "sass.dir." + i + "=" + dirNames[i];
+				if (getPortalMajorVersion() < PORTAL_VERSION_6_2) {
+					args[i] = "sass.dir." + i + "=" + dirNames[i];
+				}
 			}
 		}
 		else {
-			args = new String[] {"sass.dir=" + sassDirNames};
+			if (getPortalMajorVersion() < PORTAL_VERSION_6_2) {
+				if (sassDirNames.equals("/")) {
+					sassDirNames = "";
+				}
+
+				args = new String[] {
+					"sass.dir=" + sassDocrootDir + sassDirNames
+				};
+			}
+			else {
+				args = new String[] {
+					"sass.dir=" + sassDirNames,
+					"sass.docroot.dir=" + sassDocrootDir,
+					"sass.portal.common.dir=" + sassPortalCommonDir
+				};
+			}
 		}
 
 		executeTool(
@@ -60,10 +91,21 @@ public class SassToCssBuilderMojo extends AbstractLiferayMojo {
 	}
 
 	/**
-	 * @parameter default-value="${project.build.directory}/${project.build.finalName}"
+	 * @parameter default-value="/"
 	 * @required
 	 */
 	private String sassDirNames;
+
+	/**
+	 * @parameter default-value="${project.build.directory}/${project.build.finalName}"
+	 * @required
+	 */
+	private String sassDocrootDir;
+
+	/**
+	 * @parameter
+	 */
+	private String sassPortalCommonDir;
 
 	/**
 	 * @parameter default-value="${project.build.directory}/${project.build.finalName}"
