@@ -35,4 +35,22 @@ public class GetterUtil {
 		return value;
 	}
 
+	public static float getFloat(String value) {
+		return getFloat(value, 0f);
+	}
+
+	public static float getFloat(String value, float defaultValue) {
+		if (value == null) {
+			return defaultValue;
+		}
+
+		try {
+			return Float.parseFloat(value.trim());
+		}
+		catch (Exception e) {
+		}
+
+		return defaultValue;
+	}
+
 }
