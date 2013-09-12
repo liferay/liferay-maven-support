@@ -16,7 +16,7 @@ package com.liferay.maven.plugins;
 
 import com.liferay.maven.plugins.util.CopyTask;
 import com.liferay.maven.plugins.util.FileUtil;
-import com.liferay.maven.plugins.util.StringUtil;
+import com.liferay.maven.plugins.util.GetterUtil;
 import com.liferay.maven.plugins.util.Validator;
 
 import java.io.File;
@@ -33,6 +33,8 @@ import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.Artifact;
@@ -53,18 +55,16 @@ import org.codehaus.plexus.archiver.manager.ArchiverManager;
  */
 public abstract class AbstractLiferayMojo extends AbstractMojo {
 
+	public static final float PORTAL_VERSION_6_1 = 6.1f;
+	public static final float PORTAL_VERSION_6_2 = 6.2f;
+
 	public void execute() throws MojoExecutionException {
 		try {
 			if (!isLiferayProject()) {
 				return;
 			}
 
-			String[] versionParts = StringUtil.split(liferayVersion, ".");
-
-			int major = Integer.parseInt(versionParts[0]);
-			int minor = Integer.parseInt(versionParts[1]);
-
-			if ((major < 6) || ((major == 6) && (minor < 1))) {
+			if (getPortalMajorVersion() < PORTAL_VERSION_6_1) {
 				throw new MojoExecutionException(
 					"Liferay versions below 6.1.0 are not supported");
 			}
@@ -228,6 +228,18 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 
 			System.setSecurityManager(currentSecurityManager);
 		}
+	}
+
+	protected float getPortalMajorVersion() {
+		float majorVersion = 0;
+
+		Matcher matcher = _majorVersionPattern.matcher(liferayVersion);
+
+		if (matcher.find()) {
+			majorVersion = GetterUtil.getFloat(matcher.group(1));
+		}
+
+		return majorVersion;
 	}
 
 	protected ClassLoader getProjectClassLoader() throws Exception {
@@ -618,5 +630,8 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 	 * @required
 	 */
 	protected File workDir;
+
+	private static Pattern _majorVersionPattern = Pattern.compile(
+		"(\\d+[.]\\d+)");
 
 }
