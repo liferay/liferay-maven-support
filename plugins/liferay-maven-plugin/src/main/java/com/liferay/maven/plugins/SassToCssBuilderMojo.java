@@ -41,8 +41,9 @@ public class SassToCssBuilderMojo extends AbstractLiferayMojo {
 		FileUtils.copyDirectory(webappSourceDir, webappDir, fileFilter, true);
 
 		if (Validator.isNull(sassPortalCommonDir)) {
-			sassPortalCommonDir = new File(
-				appServerPortalDir, "html/css/common").getAbsolutePath();
+			File file = new File(appServerPortalDir, "html/css/common");
+
+			sassPortalCommonDir = file.getAbsolutePath();
 		}
 
 		String[] args = null;
@@ -55,9 +56,10 @@ public class SassToCssBuilderMojo extends AbstractLiferayMojo {
 			}
 			else {
 				args = new String[dirNames.length + 2];
+
 				args[dirNames.length] = "sass.docroot.dir=" + sassDocrootDir;
-				args[dirNames.length + 1] = "sass.portal.common.dir=" +
-					sassPortalCommonDir;
+				args[dirNames.length + 1] =
+					"sass.portal.common.dir=" + sassPortalCommonDir;
 			}
 
 			for (int i = 0; i < dirNames.length; i++) {
