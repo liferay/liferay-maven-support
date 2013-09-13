@@ -56,6 +56,7 @@ import org.codehaus.plexus.archiver.manager.ArchiverManager;
 public abstract class AbstractLiferayMojo extends AbstractMojo {
 
 	public static final float PORTAL_VERSION_6_1 = 6.1f;
+
 	public static final float PORTAL_VERSION_6_2 = 6.2f;
 
 	public void execute() throws MojoExecutionException {

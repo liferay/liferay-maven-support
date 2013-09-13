@@ -21,20 +21,6 @@ import org.apache.commons.lang.StringUtils;
  */
 public class GetterUtil {
 
-	public static String getString(String value, String defaultValue) {
-		if (value == null) {
-			return defaultValue;
-		}
-
-		value = value.trim();
-
-		if (value.indexOf('\r') != -1) {
-			value = StringUtils.replace(value, "\r\n", "\n");
-		}
-
-		return value;
-	}
-
 	public static float getFloat(String value) {
 		return getFloat(value, 0f);
 	}
@@ -51,6 +37,20 @@ public class GetterUtil {
 		}
 
 		return defaultValue;
+	}
+
+	public static String getString(String value, String defaultValue) {
+		if (value == null) {
+			return defaultValue;
+		}
+
+		value = value.trim();
+
+		if (value.indexOf('\r') != -1) {
+			value = StringUtils.replace(value, "\r\n", "\n");
+		}
+
+		return value;
 	}
 
 }
