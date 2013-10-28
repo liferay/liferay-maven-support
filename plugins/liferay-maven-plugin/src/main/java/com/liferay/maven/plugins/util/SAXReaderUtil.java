@@ -14,10 +14,10 @@
 
 package com.liferay.maven.plugins.util;
 
-import java.io.File;
-
 import org.dom4j.Document;
 import org.dom4j.io.SAXReader;
+
+import java.io.File;
 
 /**
  * @author Brian Wing Shun Chan
@@ -26,6 +26,7 @@ public class SAXReaderUtil {
 
 	public static Document read(File file, boolean validate) throws Exception {
 		SAXReader saxReader = new SAXReader(validate);
+		saxReader.setEntityResolver(new EntityResolver());
 
 		return saxReader.read(file);
 	}
