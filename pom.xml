@@ -163,7 +163,7 @@
 		</profile>
 	</profiles>
 	<properties>
-		<liferay.version>6.2.0-RC5</liferay.version>
+		<liferay.version>6.2.0-RC6</liferay.version>
 		<maven.version>2.0.10</maven.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<liferay.repository.release.id>sonatype-staging</liferay.repository.release.id>
