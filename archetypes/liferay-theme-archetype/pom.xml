@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.liferay.maven</groupId>
 		<artifactId>liferay-archetypes</artifactId>
-		<version>6.2.0-SNAPSHOT</version>
+		<version>6.2.0-RC6</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
