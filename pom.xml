@@ -161,14 +161,14 @@
 		</profile>
 	</profiles>
 	<properties>
-		<liferay.version>6.2.0-RC6</liferay.version>
+		<liferay.version>6.2.0-GA1</liferay.version>
 		<maven.version>2.0.10</maven.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<liferay.repository.release.id>liferay-releases-ce</liferay.repository.release.id>
 		<liferay.repository.release.name>Liferay Releases CE</liferay.repository.release.name>
-		<liferay.repository.release.url>https://repository.liferay.com/nexus/content/repositories/liferay-releases-ce/</liferay.repository.release.url>
+		<liferay.repository.release.url>https://repository.liferay.com/nexus/content/repositories/liferay-releases-ee/</liferay.repository.release.url>
 		<liferay.repository.snapshots.id>liferay-snapshots-ce</liferay.repository.snapshots.id>
 		<liferay.repository.snapshots.name>Liferay Snapshots CE</liferay.repository.snapshots.name>
-		<liferay.repository.snapshots.url>https://repository.liferay.com/nexus/content/repositories/liferay-snapshots-ce/</liferay.repository.snapshots.url>
+		<liferay.repository.snapshots.url>https://repository.liferay.com/nexus/content/repositories/liferay-snapshots-ee/</liferay.repository.snapshots.url>
 	</properties>
 </project>
