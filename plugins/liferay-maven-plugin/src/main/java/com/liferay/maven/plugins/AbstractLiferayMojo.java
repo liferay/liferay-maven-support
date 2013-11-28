@@ -420,6 +420,10 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 
 			toolsClassPath.add(url.toString());
 		}
+		
+		URI uri = appServerClassesPortalDir.toURI();
+		URL url = uri.toURL();
+		toolsClassPath.add(url.toString());
 
 		getLog().debug("Tools class path:");
 
