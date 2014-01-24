@@ -171,3 +171,4 @@
 		<liferay.repository.snapshots.name>Liferay Snapshots CE</liferay.repository.snapshots.name>
 		<liferay.repository.snapshots.url>https://repository.liferay.com/nexus/content/repositories/liferay-snapshots-ce/</liferay.repository.snapshots.url>
 	</properties>
+</project>
