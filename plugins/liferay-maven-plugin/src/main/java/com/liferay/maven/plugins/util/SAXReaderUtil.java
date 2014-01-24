@@ -29,7 +29,6 @@ public class SAXReaderUtil {
 	public static Document read(File file, boolean validate) throws Exception {
 		SAXReader saxReader = new SAXReader(validate);
 
-		
 		saxReader.setEntityResolver(_entityResolver);
 
 		return saxReader.read(file);
@@ -40,4 +39,5 @@ public class SAXReaderUtil {
 	}
 
 	private static EntityResolver _entityResolver;
+
 }
