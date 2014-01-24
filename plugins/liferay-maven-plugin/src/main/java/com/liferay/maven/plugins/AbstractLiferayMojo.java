@@ -17,6 +17,7 @@ package com.liferay.maven.plugins;
 import com.liferay.maven.plugins.util.CopyTask;
 import com.liferay.maven.plugins.util.FileUtil;
 import com.liferay.maven.plugins.util.GetterUtil;
+import com.liferay.maven.plugins.util.SAXReaderUtil;
 import com.liferay.maven.plugins.util.Validator;
 
 import java.io.File;
@@ -50,6 +51,8 @@ import org.apache.maven.project.MavenProjectBuilder;
 import org.codehaus.plexus.archiver.UnArchiver;
 import org.codehaus.plexus.archiver.manager.ArchiverManager;
 
+import org.xml.sax.EntityResolver;
+
 /**
  * @author Mika Koivisto
  */
@@ -71,6 +74,8 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 			}
 
 			initPortalProperties();
+
+			initUtils();
 
 			doExecute();
 		}
@@ -472,6 +477,17 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 					appServerPortalDir, "WEB-INF/tld");
 			}
 		}
+	}
+
+	protected void initUtils() throws Exception {
+		ClassLoader classLoader = getToolsClassLoader();
+
+		Class<?> clazz = classLoader.loadClass(
+			"com.liferay.portal.util.EntityResolver");
+
+		EntityResolver entityResolver = (EntityResolver)clazz.newInstance();
+
+		SAXReaderUtil.setEntityResolver(entityResolver);
 	}
 
 	protected boolean isLiferayProject() {
