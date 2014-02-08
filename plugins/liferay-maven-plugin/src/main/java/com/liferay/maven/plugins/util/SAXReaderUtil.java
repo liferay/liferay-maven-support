@@ -19,6 +19,8 @@ import java.io.File;
 import org.dom4j.Document;
 import org.dom4j.io.SAXReader;
 
+import org.xml.sax.EntityResolver;
+
 /**
  * @author Brian Wing Shun Chan
  */
@@ -27,7 +29,15 @@ public class SAXReaderUtil {
 	public static Document read(File file, boolean validate) throws Exception {
 		SAXReader saxReader = new SAXReader(validate);
 
+		saxReader.setEntityResolver(_entityResolver);
+
 		return saxReader.read(file);
 	}
+
+	public static void setEntityResolver(EntityResolver entityResolver) {
+		_entityResolver = entityResolver;
+	}
+
+	private static EntityResolver _entityResolver;
 
 }
