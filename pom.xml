@@ -161,11 +161,7 @@
 		</profile>
 	</profiles>
 	<properties>
-<<<<<<< HEAD
 		<liferay.version>6.2-sp1</liferay.version>
-=======
-		<liferay.version>6.2-sp1</liferay.version>
->>>>>>> e7a971656fead6d724f2058ca6f6e1bc5f3bf1eb
 		<maven.version>2.0.10</maven.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<liferay.repository.release.id>liferay-releases-ee</liferay.repository.release.id>
