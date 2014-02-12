@@ -164,7 +164,7 @@
 		<liferay.version>6.2-sp1</liferay.version>
 		<maven.version>2.0.10</maven.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<liferay.repository.release.id>liferay-staging-ee</liferay.repository.release.id>
+		<liferay.repository.release.id>liferay-staging</liferay.repository.release.id>
 		<liferay.repository.release.name>Liferay Staging EE</liferay.repository.release.name>
 		<liferay.repository.release.url>https://repository.liferay.com/nexus/service/local/staging/deploy/maven2</liferay.repository.release.url>
 		<liferay.repository.snapshots.id>liferay-snapshots-ee</liferay.repository.snapshots.id>
