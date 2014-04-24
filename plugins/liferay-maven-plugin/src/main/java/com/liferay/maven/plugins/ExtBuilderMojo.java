@@ -200,7 +200,9 @@ public class ExtBuilderMojo extends AbstractLiferayMojo {
 			workDir, new File(webDir, "WEB-INF/classes"),
 			"portal-*.properties,system-*.properties", null, true, true);
 
-		FileUtil.copyDirectory(sqlSourceDir, sqlDir);
+		if (sqlSourceDir.exists() && sqlSourceDir.isDirectory()) {
+			FileUtil.copyDirectory(sqlSourceDir, sqlDir);
+		}
 
 		String dirName = webappDir.getAbsolutePath() + "/WEB-INF";
 
