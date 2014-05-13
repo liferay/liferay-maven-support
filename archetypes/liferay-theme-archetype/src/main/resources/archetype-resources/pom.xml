@@ -88,7 +88,7 @@
 		</dependency>
 	</dependencies>
 	<properties>
-		<liferay.theme.parent>_styled</liferay.theme.parent>
-		<liferay.theme.type>vm</liferay.theme.type>
+		<liferay.theme.parent>${themeParent}</liferay.theme.parent>
+		<liferay.theme.type>${themeType}</liferay.theme.type>
 	</properties>
 </project>

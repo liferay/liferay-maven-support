@@ -21,4 +21,12 @@
 			<directory>src/main/webapp</directory>
 		</fileSet>
 	</fileSets>
+	<requiredProperties>
+		<requiredProperty key="themeParent">
+			<defaultValue>_styled</defaultValue>	
+		</requiredProperty>
+		<requiredProperty key="themeType">
+			<defaultValue>vm</defaultValue>	
+		</requiredProperty>
+	</requiredProperties>
 </archetype-descriptor>
