@@ -232,6 +232,8 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 		finally {
 			currentThread.setContextClassLoader(contextClassLoader);
 
+			System.clearProperty("org.apache.commons.logging.Log");
+
 			System.setSecurityManager(currentSecurityManager);
 		}
 	}
