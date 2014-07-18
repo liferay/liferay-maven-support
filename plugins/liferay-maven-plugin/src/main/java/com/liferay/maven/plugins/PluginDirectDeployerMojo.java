@@ -227,12 +227,9 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 	}
 
 	protected void deployHook() throws Exception {
-		String[] args =
-			{appServerLibPortalDir.getAbsolutePath() + "/util-java.jar"};
-
 		executeTool(
 			"com.liferay.portal.tools.deploy.HookDeployer",
-			getProjectClassLoader(), args);
+			getProjectClassLoader(), getRequiredPortalJars());
 	}
 
 	protected void deployLayoutTemplate() throws Exception {
@@ -261,16 +258,9 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 		System.setProperty(
 			"deployer.util.taglib.dtd", tldPath + "/liferay-util.tld");
 
-		String libPath = appServerLibPortalDir.getAbsolutePath();
-
-		String[] args = {
-			libPath + "/util-bridges.jar", libPath + "/util-java.jar",
-			libPath + "/util-taglib.jar"
-		};
-
 		executeTool(
 			"com.liferay.portal.tools.deploy.PortletDeployer",
-			getProjectClassLoader(), args);
+			getProjectClassLoader(), getRequiredPortalJars());
 	}
 
 	protected void deployTheme() throws Exception {
@@ -281,24 +271,15 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 		System.setProperty(
 			"deployer.util.taglib.dtd", tldPath + "/liferay-util.tld");
 
-		String libPath = appServerLibPortalDir.getAbsolutePath();
-
-		String[] args =
-			{libPath + "/util-java.jar", libPath + "/util-taglib.jar"};
-
 		executeTool(
 			"com.liferay.portal.tools.deploy.ThemeDeployer",
-			getProjectClassLoader(), args);
+			getProjectClassLoader(), getRequiredPortalJars());
 	}
 
 	protected void deployWeb() throws Exception {
-		String libPath = appServerLibPortalDir.getAbsolutePath();
-
-		String[] args = {libPath + "/util-java.jar"};
-
 		executeTool(
 			"com.liferay.portal.tools.deploy.WebDeployer",
-			getProjectClassLoader(), args);
+			getProjectClassLoader(), getRequiredPortalJars());
 	}
 
 	protected void doExecute() throws Exception {
