@@ -238,7 +238,7 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 	protected void deployLayoutTemplate() throws Exception {
 		executeTool(
 			"com.liferay.portal.tools.deploy.LayoutTemplateDeployer",
-			getProjectClassLoader(), new String[0]);
+			getProjectClassLoader(), getRequiredPortalJars());
 	}
 
 	protected void deployPortlet() throws Exception {
@@ -351,6 +351,17 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 		else if (pluginType.equals("web")) {
 			deployWeb();
 		}
+	}
+
+	protected String[] getRequiredPortalJars() {
+		String libPath = appServerLibPortalDir.getAbsolutePath();
+
+		String[] dependencies = {
+			libPath + "/util-bridges.jar", libPath + "/util-java.jar",
+			libPath + "/util-taglib.jar"
+		};
+
+		return dependencies;
 	}
 
 	@Override
