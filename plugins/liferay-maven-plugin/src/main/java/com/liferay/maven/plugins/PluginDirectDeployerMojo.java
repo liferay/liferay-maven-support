@@ -335,14 +335,12 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 	}
 
 	protected String[] getRequiredPortalJars() {
-		String libPath = appServerLibPortalDir.getAbsolutePath();
+		String path = appServerLibPortalDir.getAbsolutePath();
 
-		String[] dependencies = {
-			libPath + "/util-bridges.jar", libPath + "/util-java.jar",
-			libPath + "/util-taglib.jar"
+		return new String[] {
+			path + "/util-bridges.jar", path + "/util-java.jar",
+			path + "/util-taglib.jar"
 		};
-
-		return dependencies;
 	}
 
 	@Override
