@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.liferay.maven</groupId>
 		<artifactId>liferay-archetypes</artifactId>
-		<version>7.0.0-m1-SNAPSHOT</version>
+		<version>7.0.0-m1</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
@@ -12,7 +12,7 @@
 	<artifactId>liferay-portlet-primefaces-archetype</artifactId>
 	<packaging>maven-archetype</packaging>
 	<name>Liferay Maven 2 Portlet PrimeFaces Archetype</name>
-	<version>7.0.0-m1-SNAPSHOT</version>
+	<version>7.0.0-m1</version>
 	<description>Provides an archetype to create Liferay PrimeFaces portlets.</description>
 	<build>
 		<extensions>
