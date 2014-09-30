@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>plugins</artifactId>
 		<groupId>com.liferay.maven</groupId>
-		<version>7.0.0-m1-SNAPSHOT</version>
+		<version>6.2.10.7</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
