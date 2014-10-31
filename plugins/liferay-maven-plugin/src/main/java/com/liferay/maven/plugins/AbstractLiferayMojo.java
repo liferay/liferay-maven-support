@@ -287,7 +287,7 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 			}
 
 			getLog().debug(
-				"Adding project to classpath " + dependencyMavenProject);
+				"Adding project to class path " + dependencyMavenProject);
 
 			classPathMavenProjects.add(dependencyMavenProject);
 		}
@@ -298,7 +298,7 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 
 				String path = (String)object;
 
-				getLog().debug("Classpath element " + path);
+				getLog().debug("Class path element " + path);
 
 				File file = new File(path);
 
