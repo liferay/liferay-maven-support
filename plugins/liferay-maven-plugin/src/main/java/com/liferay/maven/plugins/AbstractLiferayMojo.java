@@ -260,7 +260,8 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 
 		projectClassPath.addAll(getToolsClassPath());
 
-		List<MavenProject> classPathMavenProjects = new ArrayList<MavenProject>();
+		List<MavenProject> classPathMavenProjects =
+			new ArrayList<MavenProject>();
 
 		classPathMavenProjects.add(project);
 
