@@ -256,19 +256,41 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 
 	protected List<String> getProjectClassPath() throws Exception {
 		List<String> projectClassPath = new ArrayList<String>();
+		List<MavenProject> cpProjects = new ArrayList<MavenProject>();
 
 		projectClassPath.addAll(getToolsClassPath());
 
-		for (Object object : project.getCompileClasspathElements()) {
-			String path = (String)object;
+		cpProjects.add(project);
 
-			File file = new File(path);
+		for (Object object : project.getDependencyArtifacts()) {
+			Artifact artifact = (Artifact) object;
 
-			URI uri = file.toURI();
+			if (artifact.getArtifactHandler().isAddedToClasspath() &&
+				(Artifact.SCOPE_COMPILE.equals( artifact.getScope() ) ||
+					Artifact.SCOPE_PROVIDED.equals( artifact.getScope() ) ||
+					Artifact.SCOPE_SYSTEM.equals( artifact.getScope() ) ) ) {
+				MavenProject depProject = this.resolveProject( artifact );
 
-			URL url = uri.toURL();
+				if (depProject != null && depProject.getCompileSourceRoots().size() >= 1 ) {
+					getLog().debug( "adding project to classpath " + depProject );
+					cpProjects.add( depProject );
+				}
+			}
+		}
 
-			projectClassPath.add(url.toString());
+		for (MavenProject cpProject : cpProjects) {
+			for (Object object : cpProject.getCompileClasspathElements()) {
+				String path = (String)object;
+				getLog().debug("classpath element " + path);
+
+				File file = new File(path);
+
+				URI uri = file.toURI();
+
+				URL url = uri.toURL();
+
+				projectClassPath.add(url.toString());
+			}
 		}
 
 		getLog().debug("Project class path:");
