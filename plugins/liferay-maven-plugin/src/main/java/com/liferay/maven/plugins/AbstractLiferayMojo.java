@@ -256,29 +256,36 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 
 	protected List<String> getProjectClassPath() throws Exception {
 		List<String> projectClassPath = new ArrayList<String>();
-		List<MavenProject> cpProjects = new ArrayList<MavenProject>();
+		List<MavenProject> classPathProjects = new ArrayList<MavenProject>();
 
 		projectClassPath.addAll(getToolsClassPath());
 
-		cpProjects.add(project);
+		classPathProjects.add(project);
 
 		for (Object object : project.getDependencyArtifacts()) {
 			Artifact artifact = (Artifact) object;
 
 			if (artifact.getArtifactHandler().isAddedToClasspath()) {
-				MavenProject depProject = this.resolveProject( artifact );
+				MavenProject dependencyProject = resolveProject(artifact);
 
-				if (depProject != null && depProject.getCompileSourceRoots().size() > 0) {
-					getLog().debug("adding project to classpath " + depProject);
-					cpProjects.add(depProject);
+				if ((dependencyProject != null) &&
+					dependencyProject.getCompileSourceRoots().size() > 0) {
+
+					getLog().debug(
+						"Adding project to classpath " + dependencyProject);
+
+					classPathProjects.add(dependencyProject);
 				}
 			}
 		}
 
-		for (MavenProject cpProject : cpProjects) {
-			for (Object object : cpProject.getCompileClasspathElements()) {
+		for (MavenProject classPathProject : classPathProjects) {
+			for (Object object :
+					classPathProject.getCompileClasspathElements()) {
+
 				String path = (String)object;
-				getLog().debug("classpath element " + path);
+
+				getLog().debug("Classpath element " + path);
 
 				File file = new File(path);
 
