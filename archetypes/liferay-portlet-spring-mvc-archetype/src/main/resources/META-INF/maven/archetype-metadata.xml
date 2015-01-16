@@ -1,0 +1,65 @@
+<archetype-descriptor
+	xmlns="http://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.0.0 http://maven.apache.org/xsd/archetype-descriptor-1.0.0.xsd"
+	name="Intellinium spring mvc portlet archetype" partial="false">
+	<requiredProperties>
+		<requiredProperty key="portletName">
+			<defaultValue>MyPortlet</defaultValue>
+		</requiredProperty>
+		<requiredProperty key="groupId">
+			<defaultValue>groupId</defaultValue>
+		</requiredProperty>
+		<requiredProperty key="artifactId">
+			<defaultValue>myportlet</defaultValue>
+		</requiredProperty>
+		<requiredProperty key="version">
+			<defaultValue>1.0-SNAPSHOT</defaultValue>
+		</requiredProperty>
+		<requiredProperty key="package">
+			<defaultValue>com.mycompany.portlet</defaultValue>
+		</requiredProperty>
+		<requiredProperty key="organization">
+			<defaultValue>My Company</defaultValue>
+		</requiredProperty>
+		<requiredProperty key="fullTextDescription">
+			<defaultValue>this is my portlet</defaultValue>
+		</requiredProperty>
+
+
+
+
+
+	</requiredProperties>
+
+	<fileSets>
+		<fileSet filtered="true" packaged="true">
+			<directory>src/main/java</directory>
+		</fileSet>
+		<fileSet filtered="true" packaged="true">
+			<directory>src/test/java</directory>
+		</fileSet>
+		<fileSet filtered="true" packaged="false">
+			<directory>src/main/webapp</directory>
+			<excludes>
+				<exclude>**/*.jsp</exclude>
+			</excludes>
+
+		</fileSet>
+
+		<fileSet filtered="false" packaged="false">
+			<directory>src/main/webapp/</directory>
+			<includes>
+				<include>**/*.jsp</include>
+			</includes>
+
+		</fileSet>
+
+		<fileSet filtered="true" packaged="false">
+			<directory>src/main/resources</directory>
+		</fileSet>
+	</fileSets>
+
+
+
+</archetype-descriptor>
