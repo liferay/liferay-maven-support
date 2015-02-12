@@ -3,6 +3,6 @@
 
 <display>
 	<category name="category.sample">
-		<portlet id="${artifactId}" />
+		<portlet id="default" />
 	</category>
 </display>
