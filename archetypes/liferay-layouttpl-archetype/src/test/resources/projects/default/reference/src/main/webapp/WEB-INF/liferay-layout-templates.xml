@@ -3,10 +3,10 @@
 
 <layout-templates>
 	<custom>
-		<layout-template id="${artifactId}" name="${artifactId}">
-			<template-path>/${artifactId}.tpl</template-path>
-			<wap-template-path>/${artifactId}.wap.tpl</wap-template-path>
-			<thumbnail-path>/${artifactId}.png</thumbnail-path>
+		<layout-template id="default" name="default">
+			<template-path>/default.tpl</template-path>
+			<wap-template-path>/default.wap.tpl</wap-template-path>
+			<thumbnail-path>/default.png</thumbnail-path>
 		</layout-template>
 	</custom>
 </layout-templates>
