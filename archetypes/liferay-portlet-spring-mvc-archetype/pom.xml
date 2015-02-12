@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<parent>
+		<groupId>com.liferay.maven</groupId>
+		<artifactId>liferay-archetypes</artifactId>
+		<version>7.0.0-SNAPSHOT</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.liferay.maven.archetypes</groupId>
+	<artifactId>liferay-portlet-spring-mvc-archetype</artifactId>
+	<packaging>maven-archetype</packaging>
+	<name>Liferay Maven 2 Portlet Spring MVC Archetype</name>
+	<version>7.0.0-SNAPSHOT</version>
+	<description>Provides an archetype to create Liferay Spring MVC portlets.</description>
+	<build>
+		<extensions>
+			<extension>
+				<groupId>org.apache.maven.archetype</groupId>
+				<artifactId>archetype-packaging</artifactId>
+				<version>2.2</version>
+			</extension>
+		</extensions>
+		<plugins>
+			<plugin>
+				<artifactId>maven-archetype-plugin</artifactId>
+				<version>2.2</version>
+				<extensions>true</extensions>
+			</plugin>
+		</plugins>
+	</build>
+</project>
