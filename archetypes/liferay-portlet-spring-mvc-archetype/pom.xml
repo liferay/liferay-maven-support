@@ -12,7 +12,6 @@
 	<artifactId>liferay-portlet-spring-mvc-archetype</artifactId>
 	<packaging>maven-archetype</packaging>
 	<name>Liferay Maven 2 Portlet Spring MVC Archetype</name>
-	<version>7.0.0-SNAPSHOT</version>
 	<description>Provides an archetype to create Liferay Spring MVC portlets.</description>
 	<build>
 		<extensions>
