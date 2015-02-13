@@ -3,6 +3,12 @@
 <archetype-descriptor name="liferay-portlet-spring-mvc-archetype">
 	<fileSets>
 		<fileSet filtered="true">
+			<directory>src/main/java</directory>
+		</fileSet>
+		<fileSet filtered="true">
+			<directory>src/main/resources</directory>
+		</fileSet>
+		<fileSet filtered="true">
 			<directory>src/main/webapp</directory>
 			<excludes>
 				<exclude>icon.png</exclude>
