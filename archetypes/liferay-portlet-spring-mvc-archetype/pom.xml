@@ -36,8 +36,8 @@
 						<phase>generate-test-sources</phase>
 						<configuration>
 							<tasks>
-								<mkdir dir="${project.build.testOutputDirectory}/projects/default/reference/src/main/java" />
-								<mkdir dir="${project.build.testOutputDirectory}/projects/default/reference/src/main/resources" />
+								<mkdir dir="${project.build.testOutputDirectory}/projects/custom/reference/src/main/resources" />
+								<mkdir dir="${project.build.testOutputDirectory}/projects/defaults/reference/src/main/resources" />
 							</tasks>
 						</configuration>
 						<goals>
