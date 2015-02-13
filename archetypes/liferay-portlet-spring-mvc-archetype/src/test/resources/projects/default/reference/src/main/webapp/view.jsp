@@ -18,4 +18,4 @@
 
 <portlet:defineObjects />
 
-This is the <b>${artifactId}</b>.
+This is the <b>default</b>.
