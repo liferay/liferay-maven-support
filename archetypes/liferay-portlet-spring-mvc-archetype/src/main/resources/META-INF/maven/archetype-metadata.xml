@@ -2,8 +2,11 @@
 
 <archetype-descriptor name="liferay-portlet-spring-mvc-archetype">
 	<fileSets>
-		<fileSet filtered="true">
+		<fileSet filtered="true" packaged="true">
 			<directory>src/main/java</directory>
+            <includes>
+                <include>**/*.java</include>
+            </includes>
 		</fileSet>
 		<fileSet filtered="true">
 			<directory>src/main/resources</directory>
@@ -21,4 +24,9 @@
 			</includes>
 		</fileSet>
 	</fileSets>
+	<requiredProperties>
+		<requiredProperty key="controllerClassName">
+			<defaultValue>PortletViewController</defaultValue>
+		</requiredProperty>
+	</requiredProperties>
 </archetype-descriptor>
