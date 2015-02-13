@@ -1,3 +1,4 @@
+<%--
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
@@ -11,24 +12,12 @@
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
  */
+--%>
 
-package ${package};
+<%@ page contentType="text/html" pageEncoding="UTF-8" %>
 
-import com.liferay.portal.kernel.util.ReleaseInfo;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.portlet.bind.annotation.RenderMapping;
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-@Controller
-@RequestMapping("VIEW")
-public class ${controllerClassName} {
+This is the <b>custom</b> portlet.<br />
 
-	@RenderMapping
-	public String question(Model model) {
-		model.addAttribute("releaseInfo", ReleaseInfo.getReleaseInfo());
-
-		return "${artifactId}/view";
-	}
-
-}
+<c:out escapeXml="true" value="${releaseInfo}" />.

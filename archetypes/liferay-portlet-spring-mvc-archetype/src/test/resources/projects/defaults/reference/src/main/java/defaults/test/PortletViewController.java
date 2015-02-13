@@ -12,7 +12,7 @@
  * details.
  */
 
-package ${package};
+package defaults.test;
 
 import com.liferay.portal.kernel.util.ReleaseInfo;
 import org.springframework.stereotype.Controller;
@@ -22,13 +22,13 @@ import org.springframework.web.portlet.bind.annotation.RenderMapping;
 
 @Controller
 @RequestMapping("VIEW")
-public class ${controllerClassName} {
+public class PortletViewController {
 
 	@RenderMapping
 	public String question(Model model) {
 		model.addAttribute("releaseInfo", ReleaseInfo.getReleaseInfo());
 
-		return "${artifactId}/view";
+		return "defaults/view";
 	}
 
 }
