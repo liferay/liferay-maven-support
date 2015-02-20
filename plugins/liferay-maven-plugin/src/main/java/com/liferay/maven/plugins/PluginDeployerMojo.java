@@ -25,7 +25,7 @@ import org.apache.maven.plugin.MojoExecutionException;
  * @author Thiago Moreira
  * @goal   deploy
  */
-public class PluginDeployerMojo extends LiferayMojo {
+public class PluginDeployerMojo extends AbstractLiferayMojo {
 
 	public void execute() throws MojoExecutionException {
 		if (!isLiferayProject()) {

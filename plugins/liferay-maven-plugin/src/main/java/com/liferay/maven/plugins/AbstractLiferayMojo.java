@@ -21,7 +21,7 @@ import org.apache.maven.project.MavenProject;
 /**
  * @author Gregory Amerson
  */
-public abstract class LiferayMojo extends AbstractMojo
+public abstract class AbstractLiferayMojo extends AbstractMojo
 {
 	protected boolean isLiferayProject() {
 		String packaging = project.getPackaging();
