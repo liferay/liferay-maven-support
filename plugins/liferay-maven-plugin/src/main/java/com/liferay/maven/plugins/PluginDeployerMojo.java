@@ -18,14 +18,20 @@ import com.liferay.maven.plugins.util.CopyTask;
 
 import java.io.File;
 
+import org.apache.maven.plugin.MojoExecutionException;
+
 /**
  * @author Mika Koivisto
  * @author Thiago Moreira
  * @goal   deploy
  */
-public class PluginDeployerMojo extends AbstractLiferayMojo {
+public class PluginDeployerMojo extends LiferayMojo {
 
-	protected void doExecute() throws Exception {
+	public void execute() throws MojoExecutionException {
+		if (!isLiferayProject()) {
+			return;
+		}
+
 		if (warFile.exists()) {
 			getLog().info(
 				"Deploying " + warFileName + " to " +
