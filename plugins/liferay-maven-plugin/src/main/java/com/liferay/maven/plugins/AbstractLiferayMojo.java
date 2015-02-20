@@ -44,7 +44,6 @@ import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.model.Dependency;
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
@@ -57,7 +56,7 @@ import org.xml.sax.EntityResolver;
 /**
  * @author Mika Koivisto
  */
-public abstract class AbstractLiferayMojo extends AbstractMojo {
+public abstract class AbstractLiferayMojo extends LiferayMojo {
 
 	public static final float PORTAL_VERSION_6_1 = 6.1f;
 
@@ -532,18 +531,6 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 		SAXReaderUtil.setEntityResolver(entityResolver);
 	}
 
-	protected boolean isLiferayProject() {
-		String packaging = project.getPackaging();
-
-		if (packaging.equals("pom")) {
-			getLog().info("Skipping " + project.getArtifactId());
-
-			return false;
-		}
-
-		return true;
-	}
-
 	protected Artifact resolveArtifact(Dependency dependency) throws Exception {
 		Artifact artifact = null;
 
@@ -646,11 +633,6 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 	protected ArtifactResolver artifactResolver;
 
 	/**
-	 * @parameter expression="${liferayVersion}"
-	 */
-	protected String liferayVersion;
-
-	/**
 	 * @parameter expression="${localRepository}"
 	 * @readonly
 	 * @required
@@ -662,13 +644,6 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 	 * @required
 	 */
 	protected String pluginType;
-
-	/**
-	 * @parameter expression="${project}"
-	 * @required
-	 * @readonly
-	 */
-	protected MavenProject project;
 
 	/**
 	 * @component role="org.apache.maven.project.MavenProjectBuilder"
