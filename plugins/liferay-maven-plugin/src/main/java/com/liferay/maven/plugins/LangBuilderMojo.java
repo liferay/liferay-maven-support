@@ -20,7 +20,7 @@ import java.io.File;
  * @author Mika Koivisto
  * @goal   build-lang
  */
-public class LangBuilderMojo extends AbstractLiferayMojo {
+public class LangBuilderMojo extends AbstractToolsLiferayMojo {
 
 	protected void doExecute() throws Exception {
 		File file = new File(langDir, langFile + ".properties");

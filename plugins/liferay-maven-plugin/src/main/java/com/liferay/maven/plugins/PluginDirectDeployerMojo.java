@@ -27,7 +27,7 @@ import org.apache.maven.plugin.MojoExecutionException;
  * @author Thiago Moreira
  * @goal   direct-deploy
  */
-public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
+public class PluginDirectDeployerMojo extends AbstractToolsLiferayMojo {
 
 	protected void deployExt() throws Exception {
 		String artifactId = project.getArtifactId();

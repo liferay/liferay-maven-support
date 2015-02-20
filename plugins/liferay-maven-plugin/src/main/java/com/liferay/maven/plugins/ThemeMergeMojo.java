@@ -43,7 +43,7 @@ import org.dom4j.Element;
  * @goal   theme-merge
  * @phase  process-sources
  */
-public class ThemeMergeMojo extends AbstractLiferayMojo {
+public class ThemeMergeMojo extends AbstractToolsLiferayMojo {
 
 	protected void cleanUpTemplates(File templatesDir) {
 		File initFile = new File(templatesDir, "init." + themeType);
