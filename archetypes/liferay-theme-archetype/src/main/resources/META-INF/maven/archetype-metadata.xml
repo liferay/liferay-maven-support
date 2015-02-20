@@ -23,10 +23,10 @@
 	</fileSets>
 	<requiredProperties>
 		<requiredProperty key="themeParent">
-			<defaultValue>_styled</defaultValue>	
+			<defaultValue>_styled</defaultValue>
 		</requiredProperty>
 		<requiredProperty key="themeType">
-			<defaultValue>vm</defaultValue>	
+			<defaultValue>vm</defaultValue>
 		</requiredProperty>
 	</requiredProperties>
 </archetype-descriptor>
