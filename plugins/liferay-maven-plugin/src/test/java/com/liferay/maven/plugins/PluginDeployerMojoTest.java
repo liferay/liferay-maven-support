@@ -39,15 +39,23 @@ public class PluginDeployerMojoTest extends AbstractMojoTestCase {
 
 		File autoDeployDir = (File) getVariableValueFromObject(mojo, "autoDeployDir");
 
-		assertEquals(new File("${liferay.home}/deploy"), autoDeployDir);
+		assertEquals(new File("target/deploy"), autoDeployDir);
 
 		String warFileName = (String) getVariableValueFromObject(mojo, "warFileName");
 
-		assertEquals("mojo-tests.war", warFileName);
+		assertEquals("empty.war", warFileName);
 
 		File warFile = (File) getVariableValueFromObject(mojo, "warFile");
 
-		assertEquals(new File("/output/mojo-tests.war"), warFile);
+		assertEquals(new File("src/test/resources/unit/wars/empty.war"), warFile);
+	}
+
+	public void testMojoExecution() throws Exception {
+		PluginDeployerMojo mojo = _getMojo( "plugin-deployer-mojo-pom.xml" );
+
+		mojo.execute();
+
+		assertTrue(new File("target/deploy/empty.war").exists());
 	}
 
 	private PluginDeployerMojo _getMojo( String filename ) throws Exception {
