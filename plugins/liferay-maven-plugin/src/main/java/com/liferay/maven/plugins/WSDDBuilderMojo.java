@@ -20,7 +20,7 @@ import java.io.File;
  * @author Mika Koivisto
  * @goal   build-wsdd
  */
-public class WSDDBuilderMojo extends AbstractLiferayMojo {
+public class WSDDBuilderMojo extends AbstractToolsLiferayMojo {
 
 	protected void doExecute() throws Exception {
 		File serviceFile = new File(serviceFileName);

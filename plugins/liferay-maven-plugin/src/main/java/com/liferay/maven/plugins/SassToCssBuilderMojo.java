@@ -30,7 +30,7 @@ import org.apache.commons.io.filefilter.FileFilterUtils;
  * @goal   build-css
  * @phase  process-sources
  */
-public class SassToCssBuilderMojo extends AbstractLiferayMojo {
+public class SassToCssBuilderMojo extends AbstractToolsLiferayMojo {
 
 	protected void doExecute() throws Exception {
 		FileFilter fileFilter = FileFilterUtils.orFileFilter(

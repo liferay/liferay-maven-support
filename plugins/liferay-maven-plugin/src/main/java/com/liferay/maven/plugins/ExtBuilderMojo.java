@@ -30,7 +30,7 @@ import org.codehaus.plexus.components.io.fileselectors.IncludeExcludeFileSelecto
  * @author Mika Koivisto
  * @goal   build-ext
  */
-public class ExtBuilderMojo extends AbstractLiferayMojo {
+public class ExtBuilderMojo extends AbstractToolsLiferayMojo {
 
 	protected void copyJarAndClasses(
 			Artifact artifact, File jarDir, String jarName)

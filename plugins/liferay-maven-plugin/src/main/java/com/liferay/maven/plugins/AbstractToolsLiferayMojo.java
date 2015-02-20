@@ -50,7 +50,7 @@ import org.xml.sax.EntityResolver;
 /**
  * @author Mika Koivisto
  */
-public abstract class AbstractLiferayMojo extends LiferayMojo {
+public abstract class AbstractToolsLiferayMojo extends LiferayMojo {
 
 	public static final float PORTAL_VERSION_6_1 = 6.1f;
 

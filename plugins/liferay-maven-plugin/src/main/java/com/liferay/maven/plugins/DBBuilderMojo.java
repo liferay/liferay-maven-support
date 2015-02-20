@@ -20,7 +20,7 @@ import com.liferay.maven.plugins.util.Validator;
  * @author Mika Koivisto
  * @goal   build-db
  */
-public class DBBuilderMojo extends AbstractLiferayMojo {
+public class DBBuilderMojo extends AbstractToolsLiferayMojo {
 
 	protected void doExecute() throws Exception {
 		if (pluginType.equals("ext")) {

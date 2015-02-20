@@ -21,7 +21,7 @@ import java.io.File;
  * @goal   build-thumbnail
  * @phase  process-sources
  */
-public class ThumbnailBuilderMojo extends AbstractLiferayMojo {
+public class ThumbnailBuilderMojo extends AbstractToolsLiferayMojo {
 
 	protected void doExecute() throws Exception {
 		String[] args = new String[5];

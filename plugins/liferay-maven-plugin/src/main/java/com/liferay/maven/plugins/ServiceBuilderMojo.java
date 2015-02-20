@@ -42,7 +42,7 @@ import org.apache.maven.shared.invoker.MavenCommandLineBuilder;
  * @author Thiago Moreira
  * @goal   build-service
  */
-public class ServiceBuilderMojo extends AbstractLiferayMojo {
+public class ServiceBuilderMojo extends AbstractToolsLiferayMojo {
 
 	protected void copyServicePropertiesFile() throws Exception {
 		File servicePropertiesFile = new File(
