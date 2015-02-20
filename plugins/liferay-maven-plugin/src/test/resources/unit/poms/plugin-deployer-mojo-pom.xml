@@ -14,10 +14,13 @@
 				<artifactId>liferay-maven-plugin</artifactId>
 				<version>${project.version}</version>
 				<configuration>
-					<autoDeployDir>${liferay.home}/deploy</autoDeployDir>
-					<liferayVersion>7.0.0</liferayVersion>>
-					<warFile>/output/mojo-tests.war</warFile>
-					<warFileName>mojo-tests.war</warFileName>
+					<autoDeployDir>target/deploy</autoDeployDir>
+					<liferayVersion>7.0.0</liferayVersion>
+					<warFile>src/test/resources/unit/wars/empty.war</warFile>
+					<warFileName>empty.war</warFileName>
+					<project implementation="org.apache.maven.plugin.testing.stubs.MavenProjectStub">
+						<packaging>war</packaging>
+					</project>
 				</configuration>
 			</plugin>
 		</plugins>
