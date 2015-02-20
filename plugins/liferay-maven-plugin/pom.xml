@@ -86,5 +86,12 @@
 			<artifactId>plexus-io</artifactId>
 			<version>1.0-alpha-1</version>
 		</dependency>
+
+		<!-- Unit testing -->
+		<dependency>
+			<groupId>org.apache.maven.plugin-testing</groupId>
+			<artifactId>maven-plugin-testing-harness</artifactId>
+			<version>3.3.0</version>
+		</dependency>
 	</dependencies>
 </project>
