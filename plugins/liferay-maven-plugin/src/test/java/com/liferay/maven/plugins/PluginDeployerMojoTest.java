@@ -17,12 +17,20 @@ package com.liferay.maven.plugins;
 import java.io.File;
 
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
+import org.apache.maven.project.MavenProject;
 
 
 /**
  * @author Gregory Amerson
  */
 public class PluginDeployerMojoTest extends AbstractMojoTestCase {
+
+	@Override
+	protected void tearDown() throws Exception {
+		super.tearDown();
+
+		new File("target/deploy/empty.war").delete();
+	}
 
 	public void testDeployGoalExists() throws Exception {
 		PluginDeployerMojo mojo = _getMojo( "plugin-deployer-mojo-pom.xml" );
@@ -56,6 +64,17 @@ public class PluginDeployerMojoTest extends AbstractMojoTestCase {
 		mojo.execute();
 
 		assertTrue(new File("target/deploy/empty.war").exists());
+	}
+
+	public void testMojoSkipsExecution() throws Exception {
+		PluginDeployerMojo mojo = _getMojo( "plugin-deployer-mojo-pom.xml" );
+
+		MavenProject project = (MavenProject) getVariableValueFromObject(mojo, "project");
+		project.setPackaging("pom");
+
+		mojo.execute();
+
+		assertFalse(new File("target/deploy/empty.war").exists());
 	}
 
 	private PluginDeployerMojo _getMojo( String filename ) throws Exception {
