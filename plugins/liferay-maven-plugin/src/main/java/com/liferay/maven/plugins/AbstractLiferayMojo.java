@@ -1,4 +1,4 @@
-/*******************************************************************************
+/**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
@@ -10,19 +10,18 @@
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
- *
- *******************************************************************************/
+ */
+
 package com.liferay.maven.plugins;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.project.MavenProject;
 
-
 /**
  * @author Gregory Amerson
  */
-public abstract class AbstractLiferayMojo extends AbstractMojo
-{
+public abstract class AbstractLiferayMojo extends AbstractMojo {
+
 	protected boolean isLiferayProject() {
 		String packaging = project.getPackaging();
 
