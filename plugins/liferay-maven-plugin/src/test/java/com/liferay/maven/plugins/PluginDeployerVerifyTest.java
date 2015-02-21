@@ -23,7 +23,6 @@ import junit.framework.TestCase;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
-
 /**
  * @author Gregory Amerson
  */
@@ -35,11 +34,11 @@ public class PluginDeployerVerifyTest extends TestCase {
 		assertTrue(testDir.exists());
 
 		Verifier verifier = new Verifier(testDir.getAbsolutePath());
-		verifier.deleteArtifact("it", "missingWarFile", "1.0", "war" );
+		verifier.deleteArtifact("it", "missingWarFile", "1.0", "war");
 
 		List<String> cliOptions = new ArrayList<String>();
 		cliOptions.add("-N");
-		verifier.setCliOptions( cliOptions );
+		verifier.setCliOptions(cliOptions);
 		verifier.executeGoal("liferay:deploy");
 
 		verifier.verifyErrorFreeLog();
