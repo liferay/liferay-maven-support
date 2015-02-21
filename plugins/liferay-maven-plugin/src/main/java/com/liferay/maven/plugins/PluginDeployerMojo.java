@@ -41,7 +41,7 @@ public class PluginDeployerMojo extends AbstractLiferayMojo {
 				warFile, autoDeployDir, warFileName, null, true, true);
 		}
 		else {
-			getLog().warn(warFileName + " does not exist");
+			getLog().warn(warFile.getAbsolutePath() + " does not exist");
 		}
 	}
 
