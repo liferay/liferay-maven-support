@@ -25,50 +25,50 @@ import org.apache.maven.project.MavenProject;
 public class PluginDeployerMojoTest extends AbstractMojoTestCase {
 
 	public void testDeployGoalExists() throws Exception {
-		PluginDeployerMojo mojo = _getMojo("plugin-deployer-mojo-pom.xml");
+		PluginDeployerMojo pluginDeployerMojo = _getPluginDeployerMojo("plugin-deployer-mojo-pom.xml");
 
-		assertNotNull(mojo);
+		assertNotNull(pluginDeployerMojo);
 	}
 
 	public void testMojoExecution() throws Exception {
-		PluginDeployerMojo mojo = _getMojo("plugin-deployer-mojo-pom.xml");
+		PluginDeployerMojo pluginDeployerMojo = _getPluginDeployerMojo("plugin-deployer-mojo-pom.xml");
 
-		mojo.execute();
+		pluginDeployerMojo.execute();
 
 		assertTrue(new File("target/deploy/empty.war").exists());
 	}
 
 	public void testMojoSkipsExecution() throws Exception {
-		PluginDeployerMojo mojo = _getMojo("plugin-deployer-mojo-pom.xml");
+		PluginDeployerMojo pluginDeployerMojo = _getPluginDeployerMojo("plugin-deployer-mojo-pom.xml");
 
-		MavenProject project = (MavenProject)getVariableValueFromObject(mojo,
+		MavenProject project = (MavenProject)getVariableValueFromObject(pluginDeployerMojo,
 				"project");
 		project.setPackaging("pom");
 
-		mojo.execute();
+		pluginDeployerMojo.execute();
 
 		assertFalse(new File("target/deploy/empty.war").exists());
 	}
 
 	public void testMojoVariablesConfiguration() throws Exception {
-		PluginDeployerMojo mojo = _getMojo("plugin-deployer-mojo-pom.xml");
+		PluginDeployerMojo pluginDeployerMojo = _getPluginDeployerMojo("plugin-deployer-mojo-pom.xml");
 
-		String liferayVersion = (String)getVariableValueFromObject(mojo,
+		String liferayVersion = (String)getVariableValueFromObject(pluginDeployerMojo,
 				"liferayVersion");
 
 		assertEquals("7.0.0", liferayVersion);
 
-		File autoDeployDir = (File)getVariableValueFromObject(mojo,
+		File autoDeployDir = (File)getVariableValueFromObject(pluginDeployerMojo,
 				"autoDeployDir");
 
 		assertEquals(new File("target/deploy"), autoDeployDir);
 
-		String warFileName = (String)getVariableValueFromObject(mojo,
+		String warFileName = (String)getVariableValueFromObject(pluginDeployerMojo,
 				"warFileName");
 
 		assertEquals("empty.war", warFileName);
 
-		File warFile = (File) getVariableValueFromObject(mojo, "warFile");
+		File warFile = (File) getVariableValueFromObject(pluginDeployerMojo, "warFile");
 
 		assertEquals(new File("src/test/resources/unit/wars/empty.war"),
 				warFile);
@@ -81,7 +81,7 @@ public class PluginDeployerMojoTest extends AbstractMojoTestCase {
 		new File("target/deploy/empty.war").delete();
 	}
 
-	private PluginDeployerMojo _getMojo(String filename) throws Exception {
+	private PluginDeployerMojo _getPluginDeployerMojo(String filename) throws Exception {
 		File testPom = new File(getBasedir(), "src/test/resources/unit/poms/" +
 				filename);
 
