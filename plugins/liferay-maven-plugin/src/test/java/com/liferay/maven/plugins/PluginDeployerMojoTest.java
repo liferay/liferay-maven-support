@@ -19,47 +19,15 @@ import java.io.File;
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 import org.apache.maven.project.MavenProject;
 
-
 /**
  * @author Gregory Amerson
  */
 public class PluginDeployerMojoTest extends AbstractMojoTestCase {
 
-	@Override
-	protected void tearDown() throws Exception {
-		super.tearDown();
-
-		new File("target/deploy/empty.war").delete();
-	}
-
 	public void testDeployGoalExists() throws Exception {
 		PluginDeployerMojo mojo = _getMojo("plugin-deployer-mojo-pom.xml");
 
 		assertNotNull(mojo);
-	}
-
-	public void testMojoVariablesConfiguration() throws Exception {
-		PluginDeployerMojo mojo = _getMojo("plugin-deployer-mojo-pom.xml");
-
-		String liferayVersion = (String) getVariableValueFromObject(mojo,
-				"liferayVersion");
-
-		assertEquals("7.0.0", liferayVersion);
-
-		File autoDeployDir = (File) getVariableValueFromObject(mojo,
-				"autoDeployDir");
-
-		assertEquals(new File("target/deploy"), autoDeployDir);
-
-		String warFileName = (String) getVariableValueFromObject(mojo,
-				"warFileName");
-
-		assertEquals("empty.war", warFileName);
-
-		File warFile = (File) getVariableValueFromObject(mojo, "warFile");
-
-		assertEquals(new File("src/test/resources/unit/wars/empty.war"),
-				warFile);
 	}
 
 	public void testMojoExecution() throws Exception {
@@ -73,7 +41,7 @@ public class PluginDeployerMojoTest extends AbstractMojoTestCase {
 	public void testMojoSkipsExecution() throws Exception {
 		PluginDeployerMojo mojo = _getMojo("plugin-deployer-mojo-pom.xml");
 
-		MavenProject project = (MavenProject) getVariableValueFromObject(mojo,
+		MavenProject project = (MavenProject)getVariableValueFromObject(mojo,
 				"project");
 		project.setPackaging("pom");
 
@@ -82,9 +50,40 @@ public class PluginDeployerMojoTest extends AbstractMojoTestCase {
 		assertFalse(new File("target/deploy/empty.war").exists());
 	}
 
+	public void testMojoVariablesConfiguration() throws Exception {
+		PluginDeployerMojo mojo = _getMojo("plugin-deployer-mojo-pom.xml");
+
+		String liferayVersion = (String)getVariableValueFromObject(mojo,
+				"liferayVersion");
+
+		assertEquals("7.0.0", liferayVersion);
+
+		File autoDeployDir = (File)getVariableValueFromObject(mojo,
+				"autoDeployDir");
+
+		assertEquals(new File("target/deploy"), autoDeployDir);
+
+		String warFileName = (String)getVariableValueFromObject(mojo,
+				"warFileName");
+
+		assertEquals("empty.war", warFileName);
+
+		File warFile = (File) getVariableValueFromObject(mojo, "warFile");
+
+		assertEquals(new File("src/test/resources/unit/wars/empty.war"),
+				warFile);
+	}
+
+	@Override
+	protected void tearDown() throws Exception {
+		super.tearDown();
+
+		new File("target/deploy/empty.war").delete();
+	}
+
 	private PluginDeployerMojo _getMojo(String filename) throws Exception {
-		File testPom = new File(getBasedir(), "src/test/resources/unit/poms/"
-				+ filename);
+		File testPom = new File(getBasedir(), "src/test/resources/unit/poms/" +
+				filename);
 
 		return (PluginDeployerMojo) lookupMojo("deploy", testPom);
 	}
