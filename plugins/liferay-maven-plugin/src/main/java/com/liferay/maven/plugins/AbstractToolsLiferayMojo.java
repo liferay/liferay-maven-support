@@ -580,9 +580,9 @@ public abstract class AbstractToolsLiferayMojo extends AbstractLiferayMojo {
 		ProjectBuildingRequest projectBuildingRequest =
 			new DefaultProjectBuildingRequest();
 
+		projectBuildingRequest.setLocalRepository(localArtifactRepository);
 		projectBuildingRequest.setRemoteRepositories(
 			remoteArtifactRepositories);
-		projectBuildingRequest.setLocalRepository(localArtifactRepository);
 
 		ProjectBuildingResult projectBuildingResult = projectBuilder.build(
 			pomArtifact, projectBuildingRequest);
