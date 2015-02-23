@@ -37,21 +37,25 @@ public class PluginDeployerMojoTest extends AbstractMojoTestCase {
 
 		pluginDeployerMojo.execute();
 
-		assertTrue(new File("target/deploy/empty.war").exists());
+		File file = new File("target/deploy/empty.war");
+
+		assertTrue(file.exists());
 	}
 
 	public void testMojoSkipsExecution() throws Exception {
 		PluginDeployerMojo pluginDeployerMojo = _getPluginDeployerMojo(
 			"plugin-deployer-mojo-pom.xml");
 
-		MavenProject project = (MavenProject)getVariableValueFromObject(
+		MavenProject mavenProject = (MavenProject)getVariableValueFromObject(
 			pluginDeployerMojo, "project");
 
-		project.setPackaging("pom");
+		mavenProject.setPackaging("pom");
 
 		pluginDeployerMojo.execute();
 
-		assertFalse(new File("target/deploy/empty.war").exists());
+		File file = new File("target/deploy/empty.war");
+
+		assertFalse(file.exists());
 	}
 
 	public void testMojoVariablesConfiguration() throws Exception {
@@ -73,7 +77,7 @@ public class PluginDeployerMojoTest extends AbstractMojoTestCase {
 
 		assertEquals("empty.war", warFileName);
 
-		File warFile = (File) getVariableValueFromObject(
+		File warFile = (File)getVariableValueFromObject(
 			pluginDeployerMojo, "warFile");
 
 		assertEquals(
@@ -84,14 +88,18 @@ public class PluginDeployerMojoTest extends AbstractMojoTestCase {
 	protected void tearDown() throws Exception {
 		super.tearDown();
 
-		new File("target/deploy/empty.war").delete();
+		File file = File("target/deploy/empty.war");
+
+		file.delete();
 	}
 
-	private PluginDeployerMojo _getPluginDeployerMojo(String filename) throws Exception {
-		File testPom = new File(
-			getBasedir(), "src/test/resources/unit/poms/" + filename);
+	private PluginDeployerMojo _getPluginDeployerMojo(String fileName)
+		throws Exception {
 
-		return (PluginDeployerMojo)lookupMojo("deploy", testPom);
+		File file = new File(
+			getBasedir(), "src/test/resources/unit/poms/" + fileName);
+
+		return (PluginDeployerMojo)lookupMojo("deploy", file);
 	}
 
 }
