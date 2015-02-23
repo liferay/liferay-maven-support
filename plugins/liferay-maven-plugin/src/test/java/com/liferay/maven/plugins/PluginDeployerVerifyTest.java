@@ -30,22 +30,27 @@ import org.apache.maven.it.util.ResourceExtractor;
 public class PluginDeployerVerifyTest extends TestCase {
 
 	public void testWarFileWarningMessage() throws Exception {
-		File testDir = ResourceExtractor.simpleExtractResources(getClass(),
-				_basepath + "missingWarFile");
+		File testDir = ResourceExtractor.simpleExtractResources(
+			getClass(), "/projects/missingWarFile");
+
 		assertTrue(testDir.exists());
 
 		Verifier verifier = new Verifier(testDir.getAbsolutePath());
+
 		verifier.deleteArtifact("it", "missingWarFile", "1.0", "war");
 
 		List<String> cliOptions = new ArrayList<String>();
+
 		cliOptions.add("-N");
+		
 		verifier.setCliOptions(cliOptions);
+		
 		verifier.executeGoal("liferay:deploy");
 
 		verifier.verifyErrorFreeLog();
 		verifier.verifyTextInLog("missingWarFile-1.0.war does not exist");
+
 		verifier.resetStreams();
 	}
 
-	private String _basepath = "/projects/";
 }
