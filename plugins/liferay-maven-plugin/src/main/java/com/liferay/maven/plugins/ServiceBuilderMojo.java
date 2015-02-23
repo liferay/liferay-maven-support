@@ -19,8 +19,10 @@ import com.liferay.maven.plugins.util.StringUtil;
 import com.liferay.maven.plugins.util.Validator;
 
 import java.io.File;
+
 import java.net.URI;
 import java.net.URL;
+
 import java.util.List;
 
 import org.apache.maven.plugin.MojoExecutionException;
