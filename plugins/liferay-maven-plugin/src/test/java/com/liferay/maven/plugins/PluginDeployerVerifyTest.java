@@ -42,9 +42,9 @@ public class PluginDeployerVerifyTest extends TestCase {
 		List<String> cliOptions = new ArrayList<String>();
 
 		cliOptions.add("-N");
-		
+
 		verifier.setCliOptions(cliOptions);
-		
+
 		verifier.executeGoal("liferay:deploy");
 
 		verifier.verifyErrorFreeLog();
