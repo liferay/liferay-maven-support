@@ -88,7 +88,7 @@ public class PluginDeployerMojoTest extends AbstractMojoTestCase {
 	protected void tearDown() throws Exception {
 		super.tearDown();
 
-		File file = File("target/deploy/empty.war");
+		File file = new File("target/deploy/empty.war");
 
 		file.delete();
 	}
