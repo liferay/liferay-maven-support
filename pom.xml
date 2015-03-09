@@ -65,6 +65,20 @@
 		<module>archetypes</module>
 		<module>plugins</module>
 	</modules>
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+				<version>2.7</version>
+				<configuration>
+				<formats>
+					<format>xml</format>
+				</formats>
+				</configuration>
+			</plugin>
+		</plugins>
+	</reporting>
 	<repositories>
 		<repository>
 			<id>jboss-release</id>
