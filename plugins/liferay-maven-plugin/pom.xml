@@ -23,6 +23,13 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		<testResources>
+			<testResource>
+				<directory>src/test/resources/projects</directory>
+				<filtering>true</filtering>
+				<targetPath>projects</targetPath>
+			</testResource>
+		</testResources>
 	</build>
 	<dependencies>
 
