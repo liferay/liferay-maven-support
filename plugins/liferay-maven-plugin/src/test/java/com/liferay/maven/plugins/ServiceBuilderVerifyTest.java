@@ -15,6 +15,7 @@
 package com.liferay.maven.plugins;
 
 import java.io.File;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,8 +39,8 @@ public class ServiceBuilderVerifyTest extends TestCase {
 
 		verifier.deleteArtifact("it", "resolveProject", "1.0", "pom");
 		verifier.deleteArtifact("it", "resolveProject-portlet", "1.0", "war");
-		verifier.deleteArtifact("it", "resolveProject-portlet-service", "1.0",
-			"jar");
+		verifier.deleteArtifact(
+			"it", "resolveProject-portlet-service", "1.0", "jar");
 		verifier.setMavenDebug(true);
 
 		List<String> cliOptions = new ArrayList<String>();
@@ -52,7 +53,8 @@ public class ServiceBuilderVerifyTest extends TestCase {
 		verifier.executeGoal("liferay:build-service");
 
 		verifier.verifyTextInLog(
-			"Resolved dependency project MavenProject: it:resolveProject-portlet-service");
+			"Resolved dependency project MavenProject: " +
+				"it:resolveProject-portlet-service");
 
 		verifier.resetStreams();
 	}
