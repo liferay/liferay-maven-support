@@ -15,7 +15,6 @@
 package com.liferay.maven.plugins;
 
 import java.io.File;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +30,7 @@ public class PluginDeployerVerifyTest extends TestCase {
 
 	public void testWarFileWarningMessage() throws Exception {
 		File testDir = ResourceExtractor.simpleExtractResources(
-			getClass(), "/projects/missingWarFile");
+			getClass(), "/projects/plugindeployer/missingWarFile");
 
 		assertTrue(testDir.exists());
 
