@@ -281,6 +281,10 @@ public abstract class AbstractToolsLiferayMojo extends AbstractLiferayMojo {
 			if (dependencyMavenProject == null) {
 				continue;
 			}
+			else {
+				getLog().debug(
+					"Resolved dependency project " + dependencyMavenProject);
+			}
 
 			List<String> compileSourceRoots =
 				dependencyMavenProject.getCompileSourceRoots();
