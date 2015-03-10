@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>it</groupId>
+	<artifactId>resolveProject</artifactId>
+	<packaging>pom</packaging>
+	<version>1.0</version>
+	<properties>
+		<liferay.version>6.2.2</liferay.version>
+		<plugin.version>${project.version}</plugin.version>
+	</properties>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>com.liferay.maven.plugins</groupId>
+				<artifactId>liferay-maven-plugin</artifactId>
+				<version>${plugin.version}</version>
+				<configuration>
+					<liferayVersion>${liferay.version}</liferayVersion>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	<modules>
+		<module>resolveProject-portlet</module>
+		<module>resolveProject-portlet-service</module>
+	</modules>
+	<repositories>
+		<repository>
+			<id>Liferay CE Releases</id>
+			<url>https://repository.liferay.com/nexus/content/groups/liferay-ce/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+</project>
