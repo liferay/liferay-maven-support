@@ -593,12 +593,12 @@ public abstract class AbstractToolsLiferayMojo extends AbstractLiferayMojo {
 
 		List<String> activeProfileIds = new ArrayList<String>();
 
-		for (Profile activeProfile : this.project.getActiveProfiles()) {
-			activeProfileIds.add(activeProfile.getId());
+		for (String activeProfile : session.getRequest().getActiveProfiles()) {
+			activeProfileIds.add(activeProfile);
 		}
 
 		projectBuildingRequest.setActiveProfileIds(activeProfileIds);
-		projectBuildingRequest.setProfiles(this.project.getActiveProfiles());
+		projectBuildingRequest.setProfiles(session.getRequest().getProfiles());
 
 		ProjectBuildingResult projectBuildingResult = projectBuilder.build(
 			pomArtifact, true, projectBuildingRequest);
