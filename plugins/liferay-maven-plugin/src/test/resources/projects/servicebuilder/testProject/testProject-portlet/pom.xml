@@ -3,19 +3,22 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<parent>
 		<groupId>it</groupId>
-		<artifactId>resolveProject</artifactId>
+		<artifactId>testProject</artifactId>
 		<version>1.0</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>resolveProject-portlet</artifactId>
+	<groupId>it</groupId>
+	<artifactId>testProject-portlet</artifactId>
 	<packaging>war</packaging>
+	<name>testProject Portlet</name>
+	<version>1.0</version>
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>com.liferay.maven.plugins</groupId>
 				<artifactId>liferay-maven-plugin</artifactId>
-				<version>${plugin.version}</version>
+				<version>${liferay.maven.plugin.version}</version>
 				<executions>
 					<execution>
 						<phase>generate-sources</phase>
@@ -25,7 +28,7 @@
 					</execution>
 				</executions>
 				<configuration>
-					<apiBaseDir>${project.build.testOutputDirectory}/projects/servicebuilder/6.2/resolveProject/resolveProject-portlet-service</apiBaseDir>
+					<apiBaseDir>${project.build.testOutputDirectory}/projects/servicebuilder/testProject/testProject-portlet-service</apiBaseDir>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -33,7 +36,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>it</groupId>
-			<artifactId>resolveProject-portlet-service</artifactId>
+			<artifactId>testProject-portlet-service</artifactId>
 			<version>1.0</version>
 		</dependency>
 		<dependency>
