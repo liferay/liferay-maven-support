@@ -16,7 +16,6 @@ package com.liferay.maven.plugins;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -30,9 +29,9 @@ import org.apache.maven.it.util.ResourceExtractor;
  */
 public class ServiceBuilderVerifyTest extends TestCase {
 
-	public void testServiceBuilderResolveProject() throws Exception {
+	public void testBuildServiceResolveProject() throws Exception {
 		File testDir = ResourceExtractor.simpleExtractResources(getClass(),
-				"/projects/servicebuilder/testProject");
+			"/projects/servicebuilder/testProject");
 
 		assertTrue(testDir.exists());
 
@@ -40,39 +39,8 @@ public class ServiceBuilderVerifyTest extends TestCase {
 
 		verifier.deleteArtifact("it", "testProject", "1.0", "pom");
 		verifier.deleteArtifact("it", "testProject-portlet", "1.0", "war");
-		verifier.deleteArtifact("it", "testProject-portlet-service", "1.0", "jar");
-
-		verifier.setMavenDebug(true);
-
-		List<String> cliOptionsFor62 = new ArrayList<String>();
-
-		cliOptionsFor62.add("-P");
-		cliOptionsFor62.add("6.2.2");
-
-		cliOptionsFor62.add("-pl");
-		cliOptionsFor62.add("testProject-portlet");
-
-		verifier.setCliOptions(cliOptionsFor62);
-
-		verifier.executeGoal("liferay:build-service");
-
-		verifier.verifyTextInLog("Resolved dependency project MavenProject: "
-				+ "it:testProject-portlet-service");
-
-		verifier.resetStreams();
-	}
-
-	public void testServiceBuilderGenerateClass62() throws Exception {
-		File testDir = ResourceExtractor.simpleExtractResources(getClass(),
-				"/projects/servicebuilder/testProject");
-
-		assertTrue(testDir.exists());
-
-		Verifier verifier = new Verifier(testDir.getAbsolutePath());
-
-		verifier.deleteArtifact("it", "testProject", "1.0", "pom");
-		verifier.deleteArtifact("it", "testProject-portlet", "1.0", "war");
-		verifier.deleteArtifact("it", "testProject-portlet-service", "1.0", "jar");
+		verifier.deleteArtifact("it",
+			"testProject-portlet-service", "1.0", "jar");
 
 		verifier.setMavenDebug(true);
 
@@ -86,20 +54,19 @@ public class ServiceBuilderVerifyTest extends TestCase {
 
 		verifier.setCliOptions(cliOptions);
 
-		String[] goals = { "liferay:build-service" };
-		verifier.executeGoals(Arrays.asList(goals));
+		verifier.executeGoal("liferay:build-service");
 
-		File fooServiceUtilJavaFile = new File(
-				verifier.getBasedir()
-						+ "/testProject-portlet-service/src/main/java/it/service/FooServiceUtil.java");
-		assertTrue(fooServiceUtilJavaFile.exists());
+		verifier.verifyTextInLog("Resolved dependency project MavenProject: "
+			+ "it:testProject-portlet-service");
 
 		verifier.resetStreams();
 	}
 
-	public void testServiceBuilderGenerateClass61() throws Exception {
+	private void buildServiceGeneratedClass(String profileId)
+		throws Exception {
+
 		File testDir = ResourceExtractor.simpleExtractResources(getClass(),
-				"/projects/servicebuilder/testProject/");
+			"/projects/servicebuilder/testProject/");
 
 		assertTrue(testDir.exists());
 
@@ -107,7 +74,8 @@ public class ServiceBuilderVerifyTest extends TestCase {
 
 		verifier.deleteArtifact("it", "testProject", "1.0", "pom");
 		verifier.deleteArtifact("it", "testProject-portlet", "1.0", "war");
-		verifier.deleteArtifact("it", "testProject-portlet-service", "1.0", "jar");
+		verifier.deleteArtifact("it",
+			"testProject-portlet-service", "1.0", "jar");
 
 		verifier.setMavenDebug(true);
 
@@ -117,17 +85,26 @@ public class ServiceBuilderVerifyTest extends TestCase {
 		cliOptions.add("testProject-portlet");
 
 		cliOptions.add("-P");
-		cliOptions.add("6.1.2");
+		cliOptions.add(profileId);
 
 		verifier.setCliOptions(cliOptions);
 
 		verifier.executeGoal("liferay:build-service");
 
-		File fooServiceUtilJavaFile = new File(
-				verifier.getBasedir()
-						+ "/testProject-portlet-service/src/main/java/it/service/FooServiceUtil.java");
+		File fooServiceUtilJavaFile = new File( verifier.getBasedir()
+			+ "/testProject-portlet-service/src/main/java/it/service/"
+			+ "FooServiceUtil.java");
+
 		assertTrue(fooServiceUtilJavaFile.exists());
 
 		verifier.resetStreams();
+	}
+
+	public void testBuildServiceGeneratedClass61() throws Exception {
+		buildServiceGeneratedClass("6.1.2");
+	}
+
+	public void testBuildServiceGeneratedClass62() throws Exception {
+		buildServiceGeneratedClass("6.2.2");
 	}
 }
