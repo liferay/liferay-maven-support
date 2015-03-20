@@ -32,16 +32,16 @@ public class ServiceBuilderVerifyTest extends TestCase {
 	private void buildServiceGeneratedClass(String profileId)
 		throws Exception {
 
-		File testDir = ResourceExtractor.simpleExtractResources(getClass(),
-			"/projects/servicebuilder/testProject/");
+		File testDir = ResourceExtractor.simpleExtractResources(
+			getClass(), "/projects/servicebuilder/testProject");
 
 		assertTrue(testDir.exists());
 
 		Verifier verifier = new Verifier(testDir.getAbsolutePath());
 
-		File fooServiceUtilJavaFile = new File( verifier.getBasedir()
-			+ "/testProject-portlet-service/src/main/java/it/service/"
-			+ "FooServiceUtil.java");
+		File fooServiceUtilJavaFile = new File(
+			verifier.getBasedir() + "/testProject-portlet-service/src/main" +
+				"/java/it/service/FooServiceUtil.java");
 
 		if (fooServiceUtilJavaFile.exists()) {
 			fooServiceUtilJavaFile.delete();
@@ -51,8 +51,8 @@ public class ServiceBuilderVerifyTest extends TestCase {
 
 		verifier.deleteArtifact("it", "testProject", "1.0", "pom");
 		verifier.deleteArtifact("it", "testProject-portlet", "1.0", "war");
-		verifier.deleteArtifact("it",
-			"testProject-portlet-service", "1.0", "jar");
+		verifier.deleteArtifact(
+			"it", "testProject-portlet-service", "1.0", "jar");
 
 		verifier.setMavenDebug(true);
 
@@ -60,7 +60,6 @@ public class ServiceBuilderVerifyTest extends TestCase {
 
 		cliOptions.add("-pl");
 		cliOptions.add("testProject-portlet");
-
 		cliOptions.add("-P");
 		cliOptions.add(profileId);
 
@@ -82,8 +81,8 @@ public class ServiceBuilderVerifyTest extends TestCase {
 	}
 
 	public void testBuildServiceResolveProject() throws Exception {
-		File testDir = ResourceExtractor.simpleExtractResources(getClass(),
-			"/projects/servicebuilder/testProject");
+		File testDir = ResourceExtractor.simpleExtractResources(
+			getClass(), "/projects/servicebuilder/testProject");
 
 		assertTrue(testDir.exists());
 
@@ -91,8 +90,8 @@ public class ServiceBuilderVerifyTest extends TestCase {
 
 		verifier.deleteArtifact("it", "testProject", "1.0", "pom");
 		verifier.deleteArtifact("it", "testProject-portlet", "1.0", "war");
-		verifier.deleteArtifact("it",
-			"testProject-portlet-service", "1.0", "jar");
+		verifier.deleteArtifact(
+			"it", "testProject-portlet-service", "1.0", "jar");
 
 		verifier.setMavenDebug(true);
 
@@ -100,7 +99,6 @@ public class ServiceBuilderVerifyTest extends TestCase {
 
 		cliOptions.add("-P");
 		cliOptions.add("6.2.2");
-
 		cliOptions.add("-pl");
 		cliOptions.add("testProject-portlet");
 
@@ -108,9 +106,11 @@ public class ServiceBuilderVerifyTest extends TestCase {
 
 		verifier.executeGoal("liferay:build-service");
 
-		verifier.verifyTextInLog("Resolved dependency project MavenProject: "
-			+ "it:testProject-portlet-service");
+		verifier.verifyTextInLog(
+			"Resolved dependency project MavenProject:it" +
+				":testProject-portlet-service");
 
 		verifier.resetStreams();
 	}
+
 }
