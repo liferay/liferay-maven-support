@@ -15,6 +15,7 @@
 package com.liferay.maven.plugins;
 
 import java.io.File;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,49 +29,6 @@ import org.apache.maven.it.util.ResourceExtractor;
  * @author Simon Jiang
  */
 public class ServiceBuilderVerifyTest extends TestCase {
-
-	private void buildServiceGeneratedClass(String profileId)
-		throws Exception {
-
-		File testDir = ResourceExtractor.simpleExtractResources(
-			getClass(), "/projects/servicebuilder/testProject");
-
-		assertTrue(testDir.exists());
-
-		Verifier verifier = new Verifier(testDir.getAbsolutePath());
-
-		File fooServiceUtilJavaFile = new File(
-			verifier.getBasedir() + "/testProject-portlet-service/src/main" +
-				"/java/it/service/FooServiceUtil.java");
-
-		if (fooServiceUtilJavaFile.exists()) {
-			fooServiceUtilJavaFile.delete();
-		}
-
-		assertFalse(fooServiceUtilJavaFile.exists());
-
-		verifier.deleteArtifact("it", "testProject", "1.0", "pom");
-		verifier.deleteArtifact("it", "testProject-portlet", "1.0", "war");
-		verifier.deleteArtifact(
-			"it", "testProject-portlet-service", "1.0", "jar");
-
-		verifier.setMavenDebug(true);
-
-		List<String> cliOptions = new ArrayList<String>();
-
-		cliOptions.add("-pl");
-		cliOptions.add("testProject-portlet");
-		cliOptions.add("-P");
-		cliOptions.add(profileId);
-
-		verifier.setCliOptions(cliOptions);
-
-		verifier.executeGoal("liferay:build-service");
-
-		assertTrue(fooServiceUtilJavaFile.exists());
-
-		verifier.resetStreams();
-	}
 
 	public void testBuildServiceGeneratedClass61() throws Exception {
 		buildServiceGeneratedClass("6.1.2");
@@ -97,6 +55,49 @@ public class ServiceBuilderVerifyTest extends TestCase {
 
 		List<String> cliOptions = new ArrayList<String>();
 
+		cliOptions.add("-pl");
+		cliOptions.add("testProject-portlet");
+		cliOptions.add("-P");
+		cliOptions.add(profileId);
+
+		verifier.setCliOptions(cliOptions);
+
+		verifier.executeGoal("liferay:build-service");
+
+		verifier.verifyTextInLog(
+			"Resolved dependency project MavenProject:it" +
+				":testProject-portlet-service");
+
+		verifier.resetStreams();
+	}
+
+	private void buildServiceGeneratedClass(String profileId) throws Exception {
+		File testDir = ResourceExtractor.simpleExtractResources(
+			getClass(), "/projects/servicebuilder/testProject");
+
+		assertTrue(testDir.exists());
+
+		Verifier verifier = new Verifier(testDir.getAbsolutePath());
+
+		File fooServiceUtilJavaFile = new File(
+			verifier.getBasedir() + "/testProject-portlet-service/src/main" +
+				"/java/it/service/FooServiceUtil.java");
+
+		if (fooServiceUtilJavaFile.exists()) {
+			fooServiceUtilJavaFile.delete();
+		}
+
+		assertFalse(fooServiceUtilJavaFile.exists());
+
+		verifier.deleteArtifact("it", "testProject", "1.0", "pom");
+		verifier.deleteArtifact("it", "testProject-portlet", "1.0", "war");
+		verifier.deleteArtifact(
+			"it", "testProject-portlet-service", "1.0", "jar");
+
+		verifier.setMavenDebug(true);
+
+		List<String> cliOptions = new ArrayList<String>();
+
 		cliOptions.add("-P");
 		cliOptions.add("6.2.2");
 		cliOptions.add("-pl");
@@ -106,9 +107,7 @@ public class ServiceBuilderVerifyTest extends TestCase {
 
 		verifier.executeGoal("liferay:build-service");
 
-		verifier.verifyTextInLog(
-			"Resolved dependency project MavenProject:it" +
-				":testProject-portlet-service");
+		assertTrue(fooServiceUtilJavaFile.exists());
 
 		verifier.resetStreams();
 	}
