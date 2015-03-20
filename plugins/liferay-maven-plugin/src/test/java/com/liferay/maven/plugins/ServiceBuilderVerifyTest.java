@@ -39,6 +39,16 @@ public class ServiceBuilderVerifyTest extends TestCase {
 
 		Verifier verifier = new Verifier(testDir.getAbsolutePath());
 
+		File fooServiceUtilJavaFile = new File( verifier.getBasedir()
+			+ "/testProject-portlet-service/src/main/java/it/service/"
+			+ "FooServiceUtil.java");
+
+		if (fooServiceUtilJavaFile.exists()) {
+			fooServiceUtilJavaFile.delete();
+		}
+
+		assertFalse(fooServiceUtilJavaFile.exists());
+
 		verifier.deleteArtifact("it", "testProject", "1.0", "pom");
 		verifier.deleteArtifact("it", "testProject-portlet", "1.0", "war");
 		verifier.deleteArtifact("it",
@@ -57,10 +67,6 @@ public class ServiceBuilderVerifyTest extends TestCase {
 		verifier.setCliOptions(cliOptions);
 
 		verifier.executeGoal("liferay:build-service");
-
-		File fooServiceUtilJavaFile = new File( verifier.getBasedir()
-			+ "/testProject-portlet-service/src/main/java/it/service/"
-			+ "FooServiceUtil.java");
 
 		assertTrue(fooServiceUtilJavaFile.exists());
 
