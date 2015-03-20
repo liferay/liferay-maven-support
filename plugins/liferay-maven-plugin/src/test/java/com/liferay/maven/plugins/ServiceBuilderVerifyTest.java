@@ -54,28 +54,7 @@ public class ServiceBuilderVerifyTest extends TestCase {
 
 		verifier.setCliOptions(cliOptionsFor62);
 
-		String[] goalsFor622 = { "liferay:build-service" };
-		verifier.executeGoals(Arrays.asList(goalsFor622));
-
-		verifier.verifyTextInLog("Resolved dependency project MavenProject: "
-				+ "it:testProject-portlet-service");
-
-		verifier.deleteArtifact("it", "testProject", "1.0", "pom");
-		verifier.deleteArtifact("it", "testProject-portlet", "1.0", "war");
-		verifier.deleteArtifact("it", "testProject-portlet-service", "1.0", "jar");
-
-		List<String> cliOptionsFor61 = new ArrayList<String>();
-
-		cliOptionsFor61.add("-P");
-		cliOptionsFor61.add("6.1.2");
-
-		cliOptionsFor61.add("-pl");
-		cliOptionsFor61.add("testProject-portlet");
-
-		verifier.setCliOptions(cliOptionsFor61);
-
-		String[] goalsFor612 = { "liferay:build-service" };
-		verifier.executeGoals(Arrays.asList(goalsFor612));
+		verifier.executeGoal("liferay:build-service");
 
 		verifier.verifyTextInLog("Resolved dependency project MavenProject: "
 				+ "it:testProject-portlet-service");
