@@ -65,7 +65,7 @@ public class ServiceBuilderVerifyTest extends TestCase {
 		verifier.executeGoal("liferay:build-service");
 
 		verifier.verifyTextInLog(
-			"Resolved dependency project MavenProject: it: " +
+			"Resolved dependency project MavenProject: it:" +
 				"testProject-portlet-service");
 
 		verifier.resetStreams();
