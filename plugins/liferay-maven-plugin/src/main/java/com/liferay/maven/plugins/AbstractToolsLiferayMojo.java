@@ -601,7 +601,7 @@ public abstract class AbstractToolsLiferayMojo extends AbstractLiferayMojo {
 
 		projectBuildingRequest.setActiveProfileIds(activeProfileIds);
 		projectBuildingRequest.setProfiles(
-			mavenExecutionRequest).getProfiles());
+			mavenExecutionRequest.getProfiles());
 
 		ProjectBuildingResult projectBuildingResult = projectBuilder.build(
 			pomArtifact, true, projectBuildingRequest);
