@@ -58,7 +58,7 @@ public class ServiceBuilderVerifyTest extends TestCase {
 		cliOptions.add("-pl");
 		cliOptions.add("testProject-portlet");
 		cliOptions.add("-P");
-		cliOptions.add(profileId);
+		cliOptions.add("6.2.2");
 
 		verifier.setCliOptions(cliOptions);
 
@@ -99,7 +99,7 @@ public class ServiceBuilderVerifyTest extends TestCase {
 		List<String> cliOptions = new ArrayList<String>();
 
 		cliOptions.add("-P");
-		cliOptions.add("6.2.2");
+		cliOptions.add(profileId);
 		cliOptions.add("-pl");
 		cliOptions.add("testProject-portlet");
 
