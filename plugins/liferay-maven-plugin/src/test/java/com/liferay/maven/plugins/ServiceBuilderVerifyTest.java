@@ -55,10 +55,10 @@ public class ServiceBuilderVerifyTest extends TestCase {
 
 		List<String> cliOptions = new ArrayList<String>();
 
-		cliOptions.add("-pl");
-		cliOptions.add("testProject-portlet");
 		cliOptions.add("-P");
 		cliOptions.add("6.2.2");
+		cliOptions.add("-pl");
+		cliOptions.add("testProject-portlet");
 
 		verifier.setCliOptions(cliOptions);
 
