@@ -7,3 +7,6 @@ target
 */**/.project
 */**/.settings
 */**/target
+*/**/.idea
+plugins/liferay-maven-plugin/.idea/workspace.xml
+*.iml
