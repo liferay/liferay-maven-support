@@ -326,12 +326,8 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 	private static List<String> toolsClassPath = new ArrayList<String>();
 
 	protected List<String> getToolsClassPath() throws Exception {
-		if ( initialized ) {
-			getLog().info("Already initialized");
+		if ( !toolsClassPath.isEmpty() )
 			return toolsClassPath;
-		}
-		getLog().info("Not initialized yet");
-		initialized = true;
 
 		if ((appServerLibGlobalDir != null) && appServerLibGlobalDir.exists()) {
 			Collection<File> globalJarFiles = FileUtils.listFiles(
@@ -462,9 +458,9 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 
 			addDependencyToClassPath(toolsClassPath, jspApiDependency);
 		}
-		getLog().info("Extracting additional jars...");
+
 		ExtractorUtil.getInstance().extractWeb(liferayVersion, "WEB-INF/lib/**/*.*");
-		getLog().info("Extracting complete...");
+
 		Collection<File> portalJarFiles = FileUtils.listFiles(
 			appServerLibPortalDir, new String[] {"jar"}, false);
 
@@ -525,7 +521,6 @@ public abstract class AbstractLiferayMojo extends AbstractMojo {
 	}
 
 	protected void initUtils() throws Exception {
-		getLog().info("initUtils for AbstractLiferayMojo - " + this.getClass().getName());
 		ClassLoader classLoader = getToolsClassLoader();
 
 		Class<?> clazz = classLoader.loadClass(

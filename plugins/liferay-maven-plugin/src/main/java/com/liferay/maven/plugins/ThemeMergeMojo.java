@@ -40,11 +40,6 @@ import org.dom4j.Element;
  */
 public class ThemeMergeMojo extends AbstractLiferayMojo {
 
-	@Override
-	protected void initUtils() throws Exception {
-
-	}
-
 	protected void cleanUpTemplates(File templatesDir) {
 		File initFile = new File(templatesDir, "init." + themeType);
 

@@ -16,7 +16,10 @@ import java.util.List;
 
 public class ExtractorUtil {
 
+	private static final List<String> alreadyExtracted = new ArrayList<String>();
+
 	private static ExtractorUtil INSTANCE = null;
+	private static boolean uninitialized;
 
 	protected ArchiverManager archiverManager;
 	protected ArtifactFactory artifactFactory;
@@ -24,15 +27,19 @@ public class ExtractorUtil {
 	protected File appServerPortalDir;
 	protected ArtifactRepository localArtifactRepository;
 	protected List remoteArtifactRepositories;
-	private static final List<String> alreadyExtracted = new ArrayList<String>();
 
-	public ExtractorUtil(ArchiverManager archiverManager, ArtifactFactory artifactFactory, ArtifactResolver artifactResolver, File appServerPortalDir, ArtifactRepository localArtifactRepository, List remoteArtifactRepositories) {
+	private ExtractorUtil(ArchiverManager archiverManager, ArtifactFactory artifactFactory, ArtifactResolver artifactResolver, File appServerPortalDir, ArtifactRepository localArtifactRepository, List remoteArtifactRepositories) {
 		this.archiverManager = archiverManager;
 		this.artifactFactory = artifactFactory;
 		this.artifactResolver = artifactResolver;
 		this.appServerPortalDir = appServerPortalDir;
 		this.localArtifactRepository = localArtifactRepository;
 		this.remoteArtifactRepositories = remoteArtifactRepositories;
+		this.uninitialized = false;
+	}
+
+	private ExtractorUtil() {
+		uninitialized = true;
 	}
 
 	public static void createInstance(ArtifactFactory artifactFactory, ArtifactResolver artifactResolver, ArtifactRepository localArtifactRepository, List remoteArtifactRepositories, File appServerPortalDir, ArchiverManager archiverManager) {
@@ -40,10 +47,14 @@ public class ExtractorUtil {
 	}
 
 	public static ExtractorUtil getInstance() {
+		if ( INSTANCE == null )
+			INSTANCE = new ExtractorUtil();
 		return INSTANCE;
 	}
 
 	public void extractWeb(String liferayVersion, String... includes) throws Exception {
+		if ( uninitialized )
+			return;
 		List<String> newIncludes = new ArrayList<String>();
 		for ( String include : includes ) {
 			if ( !alreadyExtracted.contains(include) )
@@ -55,7 +66,7 @@ public class ExtractorUtil {
 				newIncludes.toArray(new String[]{}), null);
 	}
 
-	protected Dependency createDependency(
+	private Dependency createDependency(
 			String groupId, String artifactId, String version, String classifier,
 			String type) {
 
@@ -70,7 +81,7 @@ public class ExtractorUtil {
 		return dependency;
 	}
 
-	protected Artifact resolveArtifact(Dependency dependency) throws Exception {
+	private Artifact resolveArtifact(Dependency dependency) throws Exception {
 		Artifact artifact = null;
 
 		if (Validator.isNull(dependency.getClassifier())) {
@@ -94,7 +105,8 @@ public class ExtractorUtil {
 
 	public void extract(String groupId, String artifactId, String artifactVersion, String classifier,
 						String packageType, File workDir, String[] includes, String[] excludes) throws Exception {
-
+		if ( uninitialized )
+			return;
 
 		Dependency dependency = createDependency(groupId, artifactId, artifactVersion, classifier, packageType);
 
