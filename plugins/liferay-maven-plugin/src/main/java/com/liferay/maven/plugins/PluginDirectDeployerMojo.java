@@ -15,6 +15,7 @@
 package com.liferay.maven.plugins;
 
 import com.liferay.maven.plugins.util.CopyTask;
+import com.liferay.maven.plugins.util.ExtractorUtil;
 import com.liferay.maven.plugins.util.FileUtil;
 
 import java.io.File;
@@ -202,6 +203,13 @@ public class PluginDirectDeployerMojo extends AbstractLiferayMojo {
 
 		CopyTask.copyFile(
 			extUtilFile, deployDependenciesDir, fileName, null, true, true);
+	}
+
+	@Override
+	protected void initUtils() throws Exception {
+		ExtractorUtil.getInstance().extractWeb(liferayVersion, "WEB-INF/classes/**/*.*", "WEB-INF/lib/**/*.*",
+				"WEB-INF/tld/**/*.*");
+		super.initUtils();
 	}
 
 	protected void deployExtWeb(File extWebDocrootDir) throws Exception {
