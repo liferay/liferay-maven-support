@@ -15,12 +15,7 @@
 package com.liferay.maven.plugins;
 
 import com.liferay.maven.plugins.theme.Theme;
-import com.liferay.maven.plugins.util.ContextReplace;
-import com.liferay.maven.plugins.util.GetterUtil;
-import com.liferay.maven.plugins.util.PortalUtil;
-import com.liferay.maven.plugins.util.SAXReaderUtil;
-import com.liferay.maven.plugins.util.StringUtil;
-import com.liferay.maven.plugins.util.Validator;
+import com.liferay.maven.plugins.util.*;
 
 import java.io.File;
 
@@ -44,6 +39,11 @@ import org.dom4j.Element;
  * @phase  process-sources
  */
 public class ThemeMergeMojo extends AbstractLiferayMojo {
+
+	@Override
+	protected void initUtils() throws Exception {
+
+	}
 
 	protected void cleanUpTemplates(File templatesDir) {
 		File initFile = new File(templatesDir, "init." + themeType);
@@ -107,6 +107,8 @@ public class ThemeMergeMojo extends AbstractLiferayMojo {
 			parentThemeArtifactId.equals("portal-web")) {
 
 			portalTheme = true;
+			ExtractorUtil.getInstance().extractWeb(liferayVersion, "html/css/**/*.*", "html/themes/_unstyled/**/*.*",
+					"html/themes/_styled/**/*.*", "html/themes/classic/**/*.*", "html/themes/control_panel/**/*.*");
 		}
 
 		if (!portalTheme) {
@@ -275,7 +277,6 @@ public class ThemeMergeMojo extends AbstractLiferayMojo {
 
 			FileUtils.copyDirectory(sourceCssDir, targetCssDir);
 
-			getLog().info("Copying " + sourceCssDir + " to " + targetCssDir);
 		}
 
 		File sourceImagesDir = new File(sourceDir, sourceTheme.getImagesPath());
