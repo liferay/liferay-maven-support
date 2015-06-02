@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -18,8 +18,6 @@ import com.liferay.maven.plugins.util.CopyTask;
 
 import java.io.File;
 
-import org.apache.maven.plugin.MojoExecutionException;
-
 /**
  * @author Mika Koivisto
  * @author Thiago Moreira
@@ -27,11 +25,7 @@ import org.apache.maven.plugin.MojoExecutionException;
  */
 public class PluginDeployerMojo extends AbstractLiferayMojo {
 
-	public void execute() throws MojoExecutionException {
-		if (!isLiferayProject()) {
-			return;
-		}
-
+	protected void doExecute() throws Exception {
 		if (warFile.exists()) {
 			getLog().info(
 				"Deploying " + warFileName + " to " +
@@ -41,7 +35,7 @@ public class PluginDeployerMojo extends AbstractLiferayMojo {
 				warFile, autoDeployDir, warFileName, null, true, true);
 		}
 		else {
-			getLog().warn(warFile.getAbsolutePath() + " does not exist");
+			getLog().warn(warFileName + " does not exist");
 		}
 	}
 
