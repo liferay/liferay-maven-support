@@ -234,7 +234,7 @@
 		</profile>
 	</profiles>
 	<properties>
-		<maven.version>3.2.5</maven.version>
+		<maven.version>2.0.10</maven.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 </project>
