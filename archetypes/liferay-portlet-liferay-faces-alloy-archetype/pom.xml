@@ -11,7 +11,7 @@
 	<groupId>com.liferay.maven.archetypes</groupId>
 	<artifactId>liferay-portlet-liferay-faces-alloy-archetype</artifactId>
 	<packaging>maven-archetype</packaging>
-	<name>Liferay Maven 2 Portlet Liferay Faces Alloy Archetype</name>
+	<name>Liferay Maven Portlet Liferay Faces Alloy Archetype</name>
 	<description>Provides an archetype to create Liferay Faces Alloy portlets.</description>
 	<build>
 		<extensions>

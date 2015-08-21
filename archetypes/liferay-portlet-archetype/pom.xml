@@ -11,7 +11,7 @@
 	<groupId>com.liferay.maven.archetypes</groupId>
 	<artifactId>liferay-portlet-archetype</artifactId>
 	<packaging>maven-archetype</packaging>
-	<name>Liferay Maven 2 Portlet Archetype</name>
+	<name>Liferay Maven Portlet Archetype</name>
 	<description>Provides an archetype to create Liferay portlets.</description>
 	<build>
 		<extensions>

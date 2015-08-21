@@ -11,7 +11,7 @@
 	<groupId>com.liferay.maven.archetypes</groupId>
 	<artifactId>liferay-theme-archetype</artifactId>
 	<packaging>maven-archetype</packaging>
-	<name>Liferay Maven 2 Theme Archetype</name>
+	<name>Liferay Maven Theme Archetype</name>
 	<description>Provides an archetype to create Liferay themes.</description>
 	<build>
 		<extensions>
