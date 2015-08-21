@@ -5,9 +5,9 @@
 	<groupId>com.liferay.maven</groupId>
 	<artifactId>maven-support</artifactId>
 	<packaging>pom</packaging>
-	<name>Liferay Maven 2 Support</name>
+	<name>Liferay Maven Support</name>
 	<version>7.0.0-SNAPSHOT</version>
-	<description>Parent project to support Maven 2 subprojects.</description>
+	<description>Parent project to support Maven subprojects.</description>
 	<url>http://www.liferay.com</url>
 	<developers>
 		<developer>
@@ -21,6 +21,10 @@
 		<developer>
 			<id>thiago.moreira</id>
 			<name>Thiago Moreira</name>
+		</developer>
+		<developer>
+			<id>gregory.amerson</id>
+			<name>Gregory Amerson</name>
 		</developer>
 	</developers>
 	<licenses>

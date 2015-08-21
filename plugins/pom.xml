@@ -10,7 +10,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>plugins</artifactId>
 	<packaging>pom</packaging>
-	<name>Liferay Maven 2 Plugins</name>
+	<name>Liferay Maven Plugins</name>
 	<description>Parent project to support Liferay plugins.</description>
 	<modules>
 		<module>liferay-maven-plugin</module>

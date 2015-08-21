@@ -11,7 +11,7 @@
 	<groupId>com.liferay.maven.plugins</groupId>
 	<artifactId>liferay-maven-plugin</artifactId>
 	<packaging>maven-plugin</packaging>
-	<name>Liferay Maven 2 Plugin</name>
+	<name>Liferay Maven Plugin</name>
 	<description>Contains goals to manage Liferay plugins.</description>
 	<build>
 		<plugins>

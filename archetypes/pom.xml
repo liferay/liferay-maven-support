@@ -10,7 +10,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>liferay-archetypes</artifactId>
 	<packaging>pom</packaging>
-	<name>Liferay Maven 2 Archetypes</name>
+	<name>Liferay Maven Archetypes</name>
 	<description>Parent project to support Liferay archetypes.</description>
 	<modules>
 		<module>liferay-ext-archetype</module>
