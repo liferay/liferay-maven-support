@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -23,17 +23,9 @@ import java.io.File;
 import java.net.URI;
 import java.net.URL;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.shared.invoker.DefaultInvocationRequest;
-import org.apache.maven.shared.invoker.InvocationRequest;
-import org.apache.maven.shared.invoker.InvocationResult;
-import org.apache.maven.shared.invoker.Invoker;
-import org.apache.maven.shared.invoker.MavenCommandLineBuilder;
 
 /**
  * Builds Liferay Service Builder services.
@@ -42,7 +34,7 @@ import org.apache.maven.shared.invoker.MavenCommandLineBuilder;
  * @author Thiago Moreira
  * @goal   build-service
  */
-public class ServiceBuilderMojo extends AbstractLiferayMojo {
+public class ServiceBuilderMojo extends AbstractToolsLiferayMojo {
 
 	protected void copyServicePropertiesFile() throws Exception {
 		File servicePropertiesFile = new File(
@@ -173,8 +165,6 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 		}
 
 		moveServicePropertiesFile();
-
-		invokeDependencyBuild();
 	}
 
 	@Override
@@ -394,79 +384,6 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 		}
 	}
 
-	/**
-	 * @deprecated As of 6.1.0
-	 */
-	protected void invokeDependencyBuild() throws Exception {
-		if (!postBuildDependencyModules) {
-			return;
-		}
-
-		getLog().warn(
-			"Invoker is no longer supported by Maven 3 and will be removed " +
-				"in future builds.");
-
-		List<Dependency> dependencies = new ArrayList<Dependency>();
-
-		MavenProject parentProject = project.getParent();
-
-		if (parentProject == null) {
-			return;
-		}
-
-		String groupId = project.getGroupId();
-
-		List<String> modules = parentProject.getModules();
-
-		List<String> reactorIncludes = new ArrayList<String>();
-
-		for (Object dependencyObj : project.getDependencies()) {
-			Dependency dependency = (Dependency)dependencyObj;
-
-			if (groupId.equals(dependency.getGroupId()) &&
-				modules.contains(dependency.getArtifactId())) {
-
-				reactorIncludes.add(dependency.getArtifactId() + "/pom.xml");
-			}
-		}
-
-		if (reactorIncludes.isEmpty()) {
-			return;
-		}
-
-		InvocationRequest invocationRequest = new DefaultInvocationRequest();
-
-		invocationRequest.activateReactor(
-			reactorIncludes.toArray(new String[0]), null);
-
-		invocationRequest.setBaseDirectory(parentProject.getBasedir());
-
-		if (postBuildGoals == null) {
-			postBuildGoals = new ArrayList<String>();
-
-			postBuildGoals.add("install");
-		}
-
-		invocationRequest.setGoals(postBuildGoals);
-		invocationRequest.setRecursive(false);
-
-		MavenCommandLineBuilder mavenCommandLineBuilder =
-			new MavenCommandLineBuilder();
-
-		getLog().info(
-			"Executing " + mavenCommandLineBuilder.build(invocationRequest));
-
-		InvocationResult invocationResult = invoker.execute(invocationRequest);
-
-		if (invocationResult.getExecutionException() != null) {
-			throw invocationResult.getExecutionException();
-		}
-		else if (invocationResult.getExitCode() != 0) {
-			throw new MojoExecutionException(
-				"Exit code " + invocationResult.getExitCode());
-		}
-	}
-
 	protected void moveServicePropertiesFile() throws Exception {
 		FileUtil.move(
 			new File(implDir, "service.properties"),
@@ -521,11 +438,6 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 	private String implResourcesDir;
 
 	/**
-	 * @component
-	 */
-	private Invoker invoker;
-
-	/**
 	 * @deprecated As of 6.2.0
 	 * @parameter
 	 */
@@ -552,12 +464,6 @@ public class ServiceBuilderMojo extends AbstractLiferayMojo {
 	 * @required
 	 */
 	private String pluginType;
-
-	/**
-	 * @deprecated As of 6.1.0
-	 * @parameter default-value="false" expression="${postBuildDependencyModules}"
-	 */
-	private boolean postBuildDependencyModules;
 
 	/**
 	 * @deprecated As of 6.1.0
