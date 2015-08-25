@@ -332,6 +332,12 @@ public abstract class AbstractToolsLiferayMojo extends AbstractLiferayMojo {
 		return toClassLoader(getToolsClassPath());
 	}
 
+	protected ClassLoader getToolsClassLoader(Dependency[] dependencies)
+		throws Exception {
+
+		return toClassLoader(getToolsClassPath(dependencies));
+	}
+
 	protected List<String> getToolsClassPath() throws Exception {
 		List<String> toolsClassPath = new ArrayList<String>();
 
@@ -480,6 +486,18 @@ public abstract class AbstractToolsLiferayMojo extends AbstractLiferayMojo {
 
 		for (String path : toolsClassPath) {
 			getLog().debug("\t" + path);
+		}
+
+		return toolsClassPath;
+	}
+
+	protected List<String> getToolsClassPath(Dependency[] dependencies)
+		throws Exception {
+
+		List<String> toolsClassPath = getToolsClassPath();
+
+		for (Dependency dependency : dependencies) {
+			addDependencyToClassPath(toolsClassPath, dependency);
 		}
 
 		return toolsClassPath;

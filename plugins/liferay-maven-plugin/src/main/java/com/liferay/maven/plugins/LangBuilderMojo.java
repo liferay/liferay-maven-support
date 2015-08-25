@@ -16,6 +16,8 @@ package com.liferay.maven.plugins;
 
 import java.io.File;
 
+import org.apache.maven.model.Dependency;
+
 /**
  * @author Mika Koivisto
  * @goal   build-lang
@@ -36,9 +38,22 @@ public class LangBuilderMojo extends AbstractToolsLiferayMojo {
 		args[2] = "lang.plugin=" + langPlugin;
 		args[3] = "lang.translate=" + langTranslate;
 
+		Dependency langBuilderDependency =
+			createDependency(
+				"com.liferay", "com.liferay.lang.builder", "1.0.1", "", "jar");
+
+		Dependency translatorApiDependency =
+			createDependency(
+				"com.memetix", "microsoft-translator-java-api", "0.6.2", "",
+				"jar");
+
+		Dependency[] dependencies = {
+			langBuilderDependency, translatorApiDependency
+		};
+
 		executeTool(
-			"com.liferay.portal.tools.LangBuilder", getToolsClassLoader(),
-			args);
+			"com.liferay.lang.builder.LangBuilder",
+			getToolsClassLoader(dependencies), args);
 	}
 
 	/**
