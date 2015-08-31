@@ -10,7 +10,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.liferay.maven.plugins</groupId>
 	<artifactId>liferay-maven-plugin</artifactId>
-    <version>7.0.0-SNAPSHOT</version>
+	<version>7.0.0-SNAPSHOT</version>
 	<packaging>maven-plugin</packaging>
 	<name>Liferay Maven Plugin</name>
 	<description>Contains goals to manage Liferay plugins.</description>
