@@ -31,25 +31,20 @@ public class LangBuilderMojo extends AbstractToolsLiferayMojo {
 			return;
 		}
 
+		Dependency[] dependencies = {
+			createDependency(
+				"com.liferay", "com.liferay.lang.builder", "1.0.1", "", "jar"),
+			createDependency(
+				"com.memetix", "microsoft-translator-java-api", "0.6.2", "",
+				"jar")
+		};
+
 		String[] args = new String[4];
 
 		args[0] = "lang.dir=" + langDir;
 		args[1] = "lang.file=" + langFile;
 		args[2] = "lang.plugin=" + langPlugin;
 		args[3] = "lang.translate=" + langTranslate;
-
-		Dependency langBuilderDependency =
-			createDependency(
-				"com.liferay", "com.liferay.lang.builder", "1.0.1", "", "jar");
-
-		Dependency translatorApiDependency =
-			createDependency(
-				"com.memetix", "microsoft-translator-java-api", "0.6.2", "",
-				"jar");
-
-		Dependency[] dependencies = {
-			langBuilderDependency, translatorApiDependency
-		};
 
 		executeTool(
 			"com.liferay.lang.builder.LangBuilder",
