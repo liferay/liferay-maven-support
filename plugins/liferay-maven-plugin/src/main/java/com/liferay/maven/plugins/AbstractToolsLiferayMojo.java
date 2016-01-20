@@ -329,7 +329,11 @@ public abstract class AbstractToolsLiferayMojo extends AbstractLiferayMojo {
 	}
 
 	protected ClassLoader getToolsClassLoader() throws Exception {
-		return toClassLoader(getToolsClassPath());
+		if (_toolsClassLoader == null) {
+			_toolsClassLoader = toClassLoader(getToolsClassPath());
+		}
+
+		return _toolsClassLoader;
 	}
 
 	protected ClassLoader getToolsClassLoader(Dependency[] dependencies)
@@ -726,4 +730,5 @@ public abstract class AbstractToolsLiferayMojo extends AbstractLiferayMojo {
 	private static Pattern _majorVersionPattern = Pattern.compile(
 		"(\\d+[.]\\d+)");
 
+	private static ClassLoader _toolsClassLoader;
 }

@@ -220,7 +220,7 @@ public class PluginDirectDeployerMojo extends AbstractToolsLiferayMojo {
 		};
 
 		executeTool(
-			"com.liferay.portal.tools.WebXMLBuilder", getProjectClassLoader(),
+			"com.liferay.portal.tools.WebXMLBuilder", getToolsClassLoader(),
 			args);
 
 		FileUtil.move(mergedWebXml, originalWebXml);
@@ -229,13 +229,13 @@ public class PluginDirectDeployerMojo extends AbstractToolsLiferayMojo {
 	protected void deployHook() throws Exception {
 		executeTool(
 			"com.liferay.portal.tools.deploy.HookDeployer",
-			getProjectClassLoader(), getRequiredPortalJars());
+			getToolsClassLoader(), getRequiredPortalJars());
 	}
 
 	protected void deployLayoutTemplate() throws Exception {
 		executeTool(
 			"com.liferay.portal.tools.deploy.LayoutTemplateDeployer",
-			getProjectClassLoader(), getRequiredPortalJars());
+			getToolsClassLoader(), getRequiredPortalJars());
 	}
 
 	protected void deployPortlet() throws Exception {
@@ -260,7 +260,7 @@ public class PluginDirectDeployerMojo extends AbstractToolsLiferayMojo {
 
 		executeTool(
 			"com.liferay.portal.tools.deploy.PortletDeployer",
-			getProjectClassLoader(), getRequiredPortalJars());
+			getToolsClassLoader(), getRequiredPortalJars());
 	}
 
 	protected void deployTheme() throws Exception {
@@ -273,13 +273,13 @@ public class PluginDirectDeployerMojo extends AbstractToolsLiferayMojo {
 
 		executeTool(
 			"com.liferay.portal.tools.deploy.ThemeDeployer",
-			getProjectClassLoader(), getRequiredPortalJars());
+			getToolsClassLoader(), getRequiredPortalJars());
 	}
 
 	protected void deployWeb() throws Exception {
 		executeTool(
 			"com.liferay.portal.tools.deploy.WebDeployer",
-			getProjectClassLoader(), getRequiredPortalJars());
+			getToolsClassLoader(), getRequiredPortalJars());
 	}
 
 	protected void doExecute() throws Exception {
