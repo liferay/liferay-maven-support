@@ -604,12 +604,12 @@ public abstract class AbstractToolsLiferayMojo extends AbstractLiferayMojo {
 		ProjectBuildingRequest projectBuildingRequest =
 			new DefaultProjectBuildingRequest();
 
-		projectBuildingRequest.setSystemProperties(System.getProperties());
-
 		projectBuildingRequest.setLocalRepository(localArtifactRepository);
 		projectBuildingRequest.setRemoteRepositories(
 			remoteArtifactRepositories);
-		projectBuildingRequest.setRepositorySession(session.getRepositorySession());
+		projectBuildingRequest.setRepositorySession(
+			session.getRepositorySession());
+		projectBuildingRequest.setSystemProperties(System.getProperties());
 
 		List<String> activeProfileIds = new ArrayList<String>();
 
