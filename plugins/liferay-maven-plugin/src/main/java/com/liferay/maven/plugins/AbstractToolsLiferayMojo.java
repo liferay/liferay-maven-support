@@ -729,6 +729,5 @@ public abstract class AbstractToolsLiferayMojo extends AbstractLiferayMojo {
 
 	private static Pattern _majorVersionPattern = Pattern.compile(
 		"(\\d+[.]\\d+)");
-
 	private static ClassLoader _toolsClassLoader;
 }
