@@ -6,7 +6,7 @@
 	<artifactId>maven-support</artifactId>
 	<packaging>pom</packaging>
 	<name>Liferay Maven Support</name>
-	<version>6.2.10.16</version>
+	<version>6.2.10.16-SNAPSHOT</version>
 	<description>Parent project to support Maven subprojects.</description>
 	<url>http://www.liferay.com</url>
 	<developers>
