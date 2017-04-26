@@ -97,6 +97,8 @@ public class ThemeMergeMojo extends AbstractToolsLiferayMojo {
 		getLog().info("Parent theme artifact ID " + parentThemeArtifactId);
 		getLog().info("Parent theme version " + parentThemeArtifactVersion);
 		getLog().info("Parent theme ID " + parentThemeId);
+		getLog().info("Parent theme additional folders2 = " + parentThemeFolders);
+		
 
 		String[] excludes = null;
 		String[] includes = null;
@@ -324,6 +326,29 @@ public class ThemeMergeMojo extends AbstractToolsLiferayMojo {
 
 			cleanUpTemplates(targetTemplatesDir);
 		}
+		
+		// additional folders => iterate and copy from parent theme
+		if ( parentThemeFolders != null && !"".equals(parentThemeFolders)) {
+			String[] folders = parentThemeFolders.split(",");
+			for(String folder : folders) {
+				File sourceAddFolderDir = new File(
+						sourceDir, sourceTheme.getRootPath() + folder);
+				
+				if (sourceAddFolderDir.exists()) {
+					File targetAddFolderDir = new File(
+						webappDir, targetTheme.getRootPath() + folder);
+
+					targetAddFolderDir.mkdirs();
+
+					FileUtils.copyDirectory(sourceAddFolderDir, targetAddFolderDir);
+
+					getLog().info(
+						"Copying " + sourceAddFolderDir + " to " + targetAddFolderDir);
+
+					cleanUpTemplates(targetAddFolderDir);
+				}
+			}
+		}
 	}
 
 	protected void mergeTheme(Theme sourceTheme, Theme targetTheme)
@@ -463,6 +488,11 @@ public class ThemeMergeMojo extends AbstractToolsLiferayMojo {
 	 * @parameter default-value="_styled"
 	 */
 	private String parentThemeId;
+	
+	/**
+	 * @parameter parentThemeFolders additionnal folders to copy
+	 */
+	private String parentThemeFolders;
 
 	/**
 	 * @parameter
