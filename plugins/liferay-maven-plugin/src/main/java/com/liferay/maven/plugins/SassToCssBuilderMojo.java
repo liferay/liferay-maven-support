@@ -63,9 +63,7 @@ public class SassToCssBuilderMojo extends AbstractToolsLiferayMojo {
 			}
 
 			for (int i = 0; i < dirNames.length; i++) {
-				if (getPortalMajorVersion() < PORTAL_VERSION_6_2) {
-					args[i] = "sass.dir." + i + "=" + dirNames[i];
-				}
+				args[i] = "sass.dir." + i + "=" + dirNames[i];
 			}
 		}
 		else {
