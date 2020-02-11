@@ -136,7 +136,7 @@
 		<repository>
 			<id>jboss-release</id>
 			<name>JBoss Repository</name>
-			<url>http://repository.jboss.org/nexus/content/groups/public</url>
+			<url>https://repository.jboss.org/nexus/content/groups/public</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
@@ -147,7 +147,7 @@
 		<repository>
 			<id>sonatype-release</id>
 			<name>Sonatype Repository</name>
-			<url>http://oss.sonatype.org/content/groups/public</url>
+			<url>https://oss.sonatype.org/content/groups/public</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
@@ -160,7 +160,7 @@
 		<pluginRepository>
 			<id>sonatype-release</id>
 			<name>Sonatype Repository</name>
-			<url>http://oss.sonatype.org/content/groups/public</url>
+			<url>https://oss.sonatype.org/content/groups/public</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
